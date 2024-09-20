@@ -2,9 +2,9 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import GlobalProvider from "./src/context/GlobalProvider";
+import GlobalProvider from "./src/services/providers/GlobalProvider";
 import Home from "./src/screens/Home";
-// import { SignIn, SignUp, ForgotPassword } from "./src/screens/Auth";
+ import { Login, SignUp, ForgotPassword } from "./src/screens/Auth";
 // import Profile from "./src/screens/Profile";
 // import Problems from "./src/screens/Problems";
 import { useFonts } from "expo-font";
@@ -37,8 +37,8 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Home" component={Home} />
-          {/* <Stack.Screen name="SignIn" component={SignIn} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+          <Stack.Screen name="Login" component={Login} />
+          {/*<Stack.Screen name="ForgotPassword" component={ForgotPassword} />
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="Problems" component={Problems} />
           <Stack.Screen name="Profile" component={Profile} /> */}
