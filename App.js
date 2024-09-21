@@ -4,7 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import GlobalProvider from "./src/services/providers/GlobalProvider";
 import Home from "./src/screens/Home";
- import { Login, SignUp, ForgotPassword } from "./src/screens/Auth";
+ import { Login, Register, ForgotPassword } from "./src/screens/Auth";
 // import Profile from "./src/screens/Profile";
 // import Problems from "./src/screens/Problems";
 import { useFonts } from "expo-font";

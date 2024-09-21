@@ -1,12 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-
-const GlobalContext = createContext();
-export const useGlobalContext = () => useContext(GlobalContext);
+import React, { useEffect, useState } from "react";
+import { GlobalContext } from "./GlobalContext";
 
 const GlobalProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   // useEffect(() => {
 
   // }, []);
@@ -17,7 +15,9 @@ const GlobalProvider = ({ children }) => {
         user,
         setUser,
         loading,
-        setLoading
+        setLoading,
+        error,
+        setError
       }}
     >
       {children}
