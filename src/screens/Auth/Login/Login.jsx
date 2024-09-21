@@ -34,38 +34,26 @@ const Login = ({ navigation }) => {
     }
 
     try {
-      const response = await login({ email, password });
-
-      //   const response = await fetch("http://localhost:8000/api/login/sign-in", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       email: email,
-      //       password: password,
-      //     }),
-      //   });
-      console.log("Login successful:", response);
-      //   const data = await response.json();
-      //   const token = data.token;
-      //   const isActive = data.isActive;
-
-      //   if (isActive === false) {
-      //     navigation.navigate("ActiveAccount", { token });
-      //   } else {
-      //     await AsyncStorage.setItem("jwtToken", token);
-
-      //     console.log(response.ok);
-      //     if (response.ok) {
-      //       navigation.navigate("Home");
-      //     } else {
-      //       Alert.alert(
-      //         "Đăng nhâp thất bại",
-      //         data.message || "An error occurred"
-      //       );
-      //     }
-      //   }
+      const data = await login({ email, password });
+      console.log("Login successful:", data);
+   
+        const token = data.token;
+        const isActive = data.isActive;
+        console.log(token);
+          console.log(isActive);
+        if (isActive === false) {
+          navigation.navigate("ActiveAccount", { token });
+        } else {
+          await AsyncStorage.setItem("jwtToken", token);
+          if (data.message === "user.login.login_successfully") {
+            navigation.navigate("Problems");
+          } else {
+            Alert.alert(
+              "Đăng nhâp thất bại",
+              data.message || "An error occurred"
+            );
+          }
+        }
     } catch (e) {
       console.error("Login failed:", e);
       setError(e.message || "An error occurred");

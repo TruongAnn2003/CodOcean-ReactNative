@@ -1,35 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { requestOtp, verifyOtp } from "../../../services/api/auth";
 const ActiveAccount = ({ navigation, route }) => {
   const { token } = route.params;
   const [otp, setOtp] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [timer, setTimer] = useState(0);
 
-  const requestOtp = async () => {
+  const handlerequestOtp = async () => {
     try {
       setIsButtonDisabled(true);
       setTimer(60);
+      const otpData = await requestOtp(token);
 
-      const response = await fetch(
-        "http://localhost:8000/api/login/request-otp",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Thêm token vào header
-          },
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        Alert.alert("Thành công", "Mã OTP đã được gửi đến email của bạn.");
-      } else {
-        Alert.alert("Thất bại", data.message || "Không thể gửi mã OTP.");
-      }
+      console.log(otpData);
     } catch (error) {
       Alert.alert("Lỗi", "Đã xảy ra lỗi khi gửi mã OTP. Vui lòng thử lại sau.");
       console.error("Error requesting OTP:", error);
@@ -41,24 +26,11 @@ const ActiveAccount = ({ navigation, route }) => {
       Alert.alert("Lỗi", "Vui lòng nhập mã OTP");
       return;
     }
-
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/login/verify-otp",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, otp }),
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
+      const data = await verifyOtp(token, otp);
+      if (data.successfully) {
         await AsyncStorage.setItem("jwtToken", token);
-
-        navigation.navigate("Home");
+        navigation.navigate("Problems");
       } else {
         Alert.alert("Thất bại", data.message || "Mã OTP không chính xác");
       }
@@ -89,7 +61,7 @@ const ActiveAccount = ({ navigation, route }) => {
       />
       <Button
         title={isButtonDisabled ? `Nhận mã OTP (${timer}s)` : "Nhận mã OTP"}
-        onPress={requestOtp}
+        onPress={handlerequestOtp}
         disabled={isButtonDisabled}
       />
       <View style={styles.spacing} />

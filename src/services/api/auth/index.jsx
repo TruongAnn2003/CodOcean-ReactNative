@@ -1,7 +1,6 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const BASE_URL = `http://localhost:8000/api/login`;
+import { REACT_APP_BASE_API_URL } from "../../../utils/const";
+const BASE_URL = `${REACT_APP_BASE_API_URL}/api/login`;
 
 const register = async (request) => {
   const requestURL = `${BASE_URL}/register`;
@@ -10,24 +9,43 @@ const register = async (request) => {
 
 const login = async (request) => {
   const requestURL = `${BASE_URL}/sign-in`;
-  console.log(request);
-  console.log(requestURL);
   try {
     const response = await axios.post(requestURL, request, { timeout: 5000 });
-    //  await AsyncStorage.setItem("userToken", response.data.token);
-
     return response.data;
   } catch (error) {
-    if (error.response) {
-      // Lỗi từ server trả về, ví dụ: 401, 404
-      throw new Error(error.response.data.message || "Login failed");
-    } else if (error.request) {
-      // Yêu cầu đã được gửi nhưng không có phản hồi từ server
-      throw new Error("No response from server");
-    } else {
-      // Lỗi khác
-      throw new Error(error.message);
-    }
+    console.log(error);
   }
 };
-export { register, login };
+
+const requestOtp = async (token) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/request-otp`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Thêm token vào header
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const verifyOtp = async (token, otp) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/verify-otp`,
+      { otp },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export { register, login, requestOtp, verifyOtp };

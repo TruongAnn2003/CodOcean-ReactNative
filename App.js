@@ -4,9 +4,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import GlobalProvider from "./src/services/providers/GlobalProvider";
 import Home from "./src/screens/Home";
- import { Login, Register, ForgotPassword } from "./src/screens/Auth";
+import { Login, ActiveAccount, Register, ForgotPassword } from "./src/screens/Auth";
+import Problems from "./src/screens/Problems";
 // import Profile from "./src/screens/Profile";
-// import Problems from "./src/screens/Problems";
 import { useFonts } from "expo-font";
 
 const Stack = createNativeStackNavigator();
@@ -38,8 +38,11 @@ export default function App() {
         <Stack.Navigator>
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Problems" component={Problems} />
+          <Stack.Screen name="ActiveAccount" component={ActiveAccount} />
           {/*<Stack.Screen name="ForgotPassword" component={ForgotPassword} />
           <Stack.Screen name="SignUp" component={SignUp} />
+          <Stack.Screen name="Main" component={Login} />
           <Stack.Screen name="Problems" component={Problems} />
           <Stack.Screen name="Profile" component={Profile} /> */}
         </Stack.Navigator>
