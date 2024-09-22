@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  SafeAreaView,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { requestOtp, verifyOtp } from "../../../services/api/auth";
+import { images as Imgs } from "../../../constants";
+import tw from "twrnc";
+import { useGlobalContext } from "../../../services/providers";
 const ActiveAccount = ({ navigation, route }) => {
   const { token } = route.params;
   const [otp, setOtp] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [timer, setTimer] = useState(0);
-
+  const { loading, setLoading, error, setError } = useGlobalContext();
   const handlerequestOtp = async () => {
     try {
       setIsButtonDisabled(true);
       setTimer(60);
       const otpData = await requestOtp(token);
-
       console.log(otpData);
     } catch (error) {
       Alert.alert("Lỗi", "Đã xảy ra lỗi khi gửi mã OTP. Vui lòng thử lại sau.");
@@ -51,46 +60,68 @@ const ActiveAccount = ({ navigation, route }) => {
   }, [timer]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Xác minh OTP</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập mã OTP"
-        onChangeText={(text) => setOtp(text)}
-        value={otp}
-      />
-      <Button
-        title={isButtonDisabled ? `Nhận mã OTP (${timer}s)` : "Nhận mã OTP"}
-        onPress={handlerequestOtp}
-        disabled={isButtonDisabled}
-      />
-      <View style={styles.spacing} />
-      <Button title="Xác minh OTP" onPress={handleVerifyOtp} />
-    </View>
+    <SafeAreaView className={"flex-1 justify-center items-center bg-white"}>
+      <View className="flex items-center w-full">
+        <Imgs.LogoBgBlue className="mb-4" />
+        <View className="w-full p-4 justify-center items-center">
+          <Text
+            style={[
+              tw`text-2xl mb-6`,
+              { color: "#030BA6", fontFamily: "SSC-Bold" },
+            ]}
+          >
+            Verify OTP
+          </Text>
+          <TextInput
+            className={
+              "w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+            }
+            placeholder="Nhập mã OTP"
+            onChangeText={setOtp}
+            value={otp}
+            style={{ fontFamily: "SSC-Regular" }}
+          />
+          <TouchableOpacity
+            className={
+              "w-full h-12 bg-primary justify-center items-center rounded-lg mb-4 "
+            }
+            disabled={isButtonDisabled}
+            onPress={handlerequestOtp}
+          >
+            <Text
+              className={"text-white text-lg"}
+              style={{ fontFamily: "SSC-Bold" }}
+            >
+              {isButtonDisabled ? `Send OTP (${timer}s)` : "Send OTP"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className={
+              "w-full h-12 bg-secondary-100 justify-center items-center rounded-lg mb-4"
+            }
+            disabled={isButtonDisabled}
+            onPress={handleVerifyOtp}
+          >
+            <Text
+              className={"text-white text-lg"}
+              style={{ fontFamily: "SSC-Bold" }}
+            >
+              Verify OTP
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <Text
+              className="text-primary text-base"
+              style={{ fontFamily: "SSC-Regular" }}
+            >
+              Login
+            </Text>
+          </TouchableOpacity>
+          {loading && <ActivityIndicator size="large" />}
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 10,
-  },
-  spacing: {
-    marginVertical: 10,
-  },
-});
 
 export default ActiveAccount;

@@ -1,3 +1,3 @@
 import Loading from "../../assets/aminations/loading-white.json";
-
-export default { Loading };
+import continute from "../../assets/aminations/continue-white.json";
+export default { Loading, continute };

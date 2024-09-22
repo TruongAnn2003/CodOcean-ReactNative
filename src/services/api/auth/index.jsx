@@ -4,7 +4,16 @@ const BASE_URL = `${REACT_APP_BASE_API_URL}/api/login`;
 
 const register = async (request) => {
   const requestURL = `${BASE_URL}/register`;
-  return await axios.post(requestURL, request);
+  try {
+    console.log(requestURL);
+    console.log(request);
+    const response = await axios.post(requestURL, request, { timeout: 5000 });
+    console.log(response);
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const login = async (request) => {

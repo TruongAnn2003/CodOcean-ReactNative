@@ -40,7 +40,7 @@ module.exports = {
           extrabold: ["SairaSemiCondensed-ExtraBold", "sans-serif"],
           black: ["SairaSemiCondensed-Black", "sans-serif"],
         },
-      },
+      }
     },
   },
   plugins: [],

@@ -3,114 +3,173 @@ import {
   View,
   Text,
   TextInput,
-  Button,
+  SafeAreaView,
   Alert,
-  StyleSheet,
+  ScrollView,
   Pressable,
+  TouchableOpacity,
 } from "react-native";
+import { register } from "../../../services/api/auth";
+import {
+  validateEmail,
+  validatePassword,
+  validatePhoneNumber,
+} from "../../../utils/helpers";
+import { useGlobalContext } from "../../../services/providers";
+import { formatDate } from "../../../utils/formatting";
+import getAvatarLink from "../../../services/dicebear-avt";
+import DatePicker from "react-native-date-picker";
+import { images as Imgs } from "../../../constants";
+import tw from "twrnc";
 
 const Register = ({ navigation }) => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { loading, setLoading, error, setError } = useGlobalContext();
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+    password: "",
+    dateOfBirth: new Date(), // Ensure default is a Date object
+    urlImage: "",
+  });
+  const [open, setOpen] = useState(false);
 
-  const handleRegister = () => {
-    const handleSignup = async () => {
-      if (!username || !email || !password) {
-        Alert.alert("Error", "Please fill in all fields");
-        return;
+  const handleChange = (name, value) => {
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async () => {
+    const { fullName, email, phoneNumber, password, dateOfBirth, urlImage } =
+      formData;
+
+    if (!fullName || !email || !phoneNumber || !password || !dateOfBirth) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    if (validatePhoneNumber(phoneNumber) === false) {
+      Alert.alert("Error", "Invalid phone number format");
+      return;
+    }
+    if (validateEmail(email) === false) {
+      Alert.alert("Error", "Invalid email format");
+      return;
+    }
+    if (validatePassword(password) === false) {
+      Alert.alert("Error", "Invalid password format");
+      return;
+    }
+
+    try {
+      const data = await register({
+        fullName,
+        email,
+        phoneNumber,
+        password,
+        dateOfBirth: formatDate(dateOfBirth),
+        urlImage: getAvatarLink(fullName),
+      });
+
+      if (data.message === "user.login.register_successfully") {
+        Alert.alert("Success", "Account created successfully");
+        navigation.navigate("Login");
+      } else {
+        Alert.alert("Signup failed", data.message || "An error occurred");
       }
-
-      try {
-        const response = await fetch(
-          "http://localhost:8000/api/login/sign-up",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: username,
-              email: email,
-              password: password,
-            }),
-          }
-        );
-
-        const data = await response.json();
-        if (response.ok) {
-          Alert.alert("Success", "Account created successfully");
-          navigation.navigate("Login");
-        } else {
-          Alert.alert("Signup failed", data.message || "An error occurred");
-        }
-      } catch (error) {
-        Alert.alert("Error", "An error occurred. Please try again later.");
-        console.error("Signup error:", error);
-      }
-    };
+    } catch (error) {
+      Alert.alert("Error", "An error occurred. Please try again later.");
+      console.error("Signup error:", error);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Đăng ký</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Tên người dùng"
-        onChangeText={(text) => setName(text)}
-        value={name}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        onChangeText={(text) => setEmail(text)}
-        value={email}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Mật khẩu"
-        secureTextEntry={true}
-        onChangeText={(text) => setPassword(text)}
-        value={password}
-      />
-      <Button title="Đăng ký" onPress={handleRegister} />
-      <View style={styles.loginRedirect}>
-        <Text>Đã có tài khoản? </Text>
-        <Pressable onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.loginLink}>Đăng nhập</Text>
-        </Pressable>
-      </View>
-    </View>
+    <SafeAreaView className="flex-1 bg-white">
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 16,
+        }}
+      >
+        <View className="flex items-center w-full">
+          <Imgs.LogoBgBlue className="mb-4" />
+          <View className="w-full p-4 justify-center items-center">
+            <Text
+              style={[
+                tw`text-2xl mb-6`,
+                { color: "#030BA6", fontFamily: "SSC-Bold" },
+              ]}
+            >
+              Register
+            </Text>
+
+            <TextInput
+              className="w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              placeholder="Full Name"
+              value={formData.fullName}
+              style={{ fontFamily: "SSC-Regular" }}
+              onChangeText={(value) => handleChange("fullName", value)}
+            />
+            <TextInput
+              className="w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              placeholder="Email"
+              style={{ fontFamily: "SSC-Regular" }}
+              value={formData.email}
+              onChangeText={(value) => handleChange("email", value)}
+            />
+            <TextInput
+              className="w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              placeholder="Phone Number"
+              value={formData.phoneNumber}
+              style={{ fontFamily: "SSC-Regular" }}
+              onChangeText={(value) => handleChange("phoneNumber", value)}
+            />
+            <TextInput
+              className="w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              placeholder="Password"
+              style={{ fontFamily: "SSC-Regular" }}
+              secureTextEntry={true}
+              value={formData.password}
+              onChangeText={(value) => handleChange("password", value)}
+            />
+            <TextInput
+              className="w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              style={{ fontFamily: "SSC-Regular" }}
+              placeholder="Date of Birth"
+              secureTextEntry={true}
+              value={formData.dateOfBirth}
+              onChangeText={(value) => handleChange("dateOfBirth", date)}
+            />
+
+            <TouchableOpacity
+              className="w-full h-12 bg-primary justify-center items-center rounded-lg mb-4"
+              disabled={loading}
+              onPress={handleSubmit}
+            >
+              <Text
+                className="text-white text-lg"
+                style={{ fontFamily: "SSC-Bold" }}
+              >
+                {loading ? "Registering..." : "Submit"}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text
+                className="text-blue-600 text-base"
+                style={{ fontFamily: "SSC-Regular" }}
+              >
+                Login
+              </Text>
+            </TouchableOpacity>
+
+            {loading && <ActivityIndicator size="large" />}
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 10,
-  },
-  loginRedirect: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 20,
-  },
-  loginLink: {
-    color: "blue",
-    textDecorationLine: "underline",
-  },
-});
 
 export default Register;
