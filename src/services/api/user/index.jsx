@@ -1,28 +1,19 @@
 import axios from "axios";
+import { REACT_APP_BASE_API_URL } from "../../../utils/const";
+const BASE_URL = `${REACT_APP_BASE_API_URL}/api/profile`;
 
-const BASE_URL = `${process.env.REACT_APP_BASE_API_URL}/api`;
-
-const getUser = async (paramsString) => {
-  const requestURL = `${BASE_URL}/users?${paramsString}`;
-  return await axios.get(requestURL);
+const getUserProfile = async (token) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/get-profile`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-const getUsersExcludingCurrentUser = async (paramsString) => {
-  const requestURL = `${BASE_URL}/users?${paramsString}`;
-  return await axios.get(requestURL);
-  //get-users-excluding-cur-user?curUserId=${curUserId}&page=${size}&size=${size}
-};
-
-const getUsersByNameExcludingCurrentUser = async (paramsString) => {
-  const requestURL = `${BASE_URL}/users?${paramsString}`;
-  return await axios.get(requestURL);
-  //get-users-by-name-excluding-cur-user?fullName=${fullName}&curUserId=${curUserId}&page=${size}&size=${size}
-};
-
-export {
-  signUp,
-  loginUser,
-  getUser,
-  getUsersExcludingCurrentUser,
-  getUsersByNameExcludingCurrentUser,
-};
+export { getUserProfile };

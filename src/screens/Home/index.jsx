@@ -1,18 +1,27 @@
-import React from "react";
-import { View, TouchableOpacity, Alert, Text } from "react-native";
-import { images as Imgs } from "../../constants";
-import CustomButton from "../../components/CustomButtons";
-export default function Home() {
+import React, { useEffect } from "react";
+import { View, SafeAreaView, StatusBar, Text } from "react-native";
+import { images as Imgs, aminations } from "../../constants";
+import LottieView from "lottie-react-native";
+export default function Home({ navigation }) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.navigate("Login");
+    }, 3000); // 3 seconds
+
+    // Clear timeout if the component is unmounted before the timer ends
+    return () => clearTimeout(timer);
+  }, [navigation]);
   return (
-    <View className="flex-1 items-center justify-center bg-primary">
-      <Imgs.LogoBg></Imgs.LogoBg>
+    <SafeAreaView className="flex-1 items-center justify-center bg-secondary-100">
+      <StatusBar hidden={true} />
+      <Imgs.LogoBgWhite></Imgs.LogoBgWhite>
       <Imgs.WelcomeFrame></Imgs.WelcomeFrame>
-      <CustomButton
-        title="Continue"
-        style="bg-greenblue"
-        textStyle="text-white"
-        onPress={() => Alert.alert("Continue Pressed!")}
+      <LottieView
+        source={aminations.Loading}
+        style={{ width: "25%", height: "25%" }}
+        autoPlay
+        loop
       />
-    </View>
+    </SafeAreaView>
   );
 }

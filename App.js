@@ -2,12 +2,9 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import GlobalProvider from "./src/context/GlobalProvider";
-import Home from "./src/screens/Home";
-// import { SignIn, SignUp, ForgotPassword } from "./src/screens/Auth";
-// import Profile from "./src/screens/Profile";
-// import Problems from "./src/screens/Problems";
+import GlobalProvider from "./src/services/providers/GlobalProvider";
 import { useFonts } from "expo-font";
+import DrawerNavigator from "./src/navigation/DrawerNavigator";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,14 +32,7 @@ export default function App() {
   return (
     <GlobalProvider>
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={Home} />
-          {/* <Stack.Screen name="SignIn" component={SignIn} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-          <Stack.Screen name="SignUp" component={SignUp} />
-          <Stack.Screen name="Problems" component={Problems} />
-          <Stack.Screen name="Profile" component={Profile} /> */}
-        </Stack.Navigator>
+        <DrawerNavigator /> 
       </NavigationContainer>
     </GlobalProvider>
   );
