@@ -3,16 +3,8 @@ import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import GlobalProvider from "./src/services/providers/GlobalProvider";
-import Home from "./src/screens/Home";
-import {
-  Login,
-  ActiveAccount,
-  Register,
-  ForgotPassword,
-} from "./src/screens/Auth";
-import Problems from "./src/screens/Problems";
-import Profile from "./src/screens/Profile";
 import { useFonts } from "expo-font";
+import DrawerNavigator from "./src/navigation/DrawerNavigator";
 
 const Stack = createNativeStackNavigator();
 
@@ -40,35 +32,7 @@ export default function App() {
   return (
     <GlobalProvider>
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Login"
-            component={Login}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="ActiveAccount"
-            component={ActiveAccount}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="ForgotPassword"
-            component={ForgotPassword}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Register"
-            component={Register}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen name="Problems" component={Problems} />
-          <Stack.Screen name="Profile" component={Profile} />
-        </Stack.Navigator>
+        <DrawerNavigator /> 
       </NavigationContainer>
     </GlobalProvider>
   );

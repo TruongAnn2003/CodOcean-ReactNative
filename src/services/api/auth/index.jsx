@@ -1,5 +1,7 @@
 import axios from "axios";
 import { REACT_APP_BASE_API_URL } from "../../../utils/const";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const BASE_URL = `${REACT_APP_BASE_API_URL}/api/login`;
 
 const register = async (request) => {
@@ -57,4 +59,26 @@ const verifyOtp = async (token, otp) => {
     console.log(error);
   }
 };
-export { register, login, requestOtp, verifyOtp };
+
+const saveToken = async (token) => {
+  try {
+    await AsyncStorage.setItem("jwtToken", token);
+    console.log("Token saved successfully!");
+  } catch (error) {
+    console.error("Error saving token:", error);
+  }
+};
+
+const getToken = async () => {
+  try {
+    const token = await AsyncStorage.getItem("jwtToken");
+    if (token !== null) {
+      console.log("Token:", token);
+      return token;
+    }
+  } catch (error) {
+    console.error("Error retrieving token:", error);
+  }
+};
+
+export { register, login, requestOtp, verifyOtp, getToken, saveToken };

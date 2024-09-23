@@ -6,9 +6,10 @@ import {
   SafeAreaView,
   Alert,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { requestOtp, verifyOtp } from "../../../services/api/auth";
+import { requestOtp, verifyOtp, saveToken } from "../../../services/api/auth";
 import { images as Imgs } from "../../../constants";
 import tw from "twrnc";
 import { useGlobalContext } from "../../../services/providers";
@@ -38,8 +39,8 @@ const ActiveAccount = ({ navigation, route }) => {
     try {
       const data = await verifyOtp(token, otp);
       if (data.successfully) {
-        await AsyncStorage.setItem("jwtToken", token);
-        navigation.navigate("Problems");
+        saveToken(token);
+        navigation.navigate("Login");
       } else {
         Alert.alert("Thất bại", data.message || "Mã OTP không chính xác");
       }

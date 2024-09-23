@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { GlobalContext } from "./GlobalContext";
-
+import getAvatarLink from "../dicebear-avt";
 const GlobalProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({
+    fullName: "CodOceaner",
+    phoneNumber: "",
+    dateOfBirth: "",
+    email: "",
+    urlImage: getAvatarLink("CodOceaner"),
+    addedAt: null,
+    updatedAt: null,
+    role: null,
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  // useEffect(() => {
-
-  // }, []);
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   return (
     <GlobalContext.Provider
@@ -17,7 +26,7 @@ const GlobalProvider = ({ children }) => {
         loading,
         setLoading,
         error,
-        setError
+        setError,
       }}
     >
       {children}

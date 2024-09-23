@@ -5,7 +5,7 @@ import LottieView from "lottie-react-native";
 export default function Home({ navigation }) {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.navigate("ActiveAccount",'s');
+      navigation.navigate("Login");
     }, 3000); // 3 seconds
 
     // Clear timeout if the component is unmounted before the timer ends

@@ -9,7 +9,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { login } from "../../../services/api/auth";
+import { login, saveToken, getToken } from "../../../services/api/auth";
+import { getUserProfile } from "../../../services/api/user";
 import { useGlobalContext } from "../../../services/providers";
 import { validateEmail, validatePassword } from "../../../utils/helpers";
 import { images as Imgs } from "../../../constants";
@@ -44,17 +45,19 @@ const Login = ({ navigation }) => {
 
     try {
       const data = await login({ email, password });
-      console.log("Login successful:", data);
-
-      const token = data.token;
-      const isActive = data.isActive;
-      console.log(token);
-      console.log(isActive);
+      const token = data?.token;
+      const isActive = data?.isActive;
       if (isActive === false) {
         navigation.navigate("ActiveAccount", { token });
       } else {
-        await AsyncStorage.setItem("jwtToken", token);
+        saveToken(token);
         if (data.message === "user.login.login_successfully") {
+          const profileData = await getUserProfile(token);
+          if (profileData && profileData?.profile) {
+            setUser(profileData?.profile);
+          } else {
+            console.log("Profile data not found.");
+          }
           navigation.navigate("Problems");
         } else {
           Alert.alert(
