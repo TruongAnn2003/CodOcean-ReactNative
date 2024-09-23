@@ -8,7 +8,7 @@ import { useGlobalContext } from "../../services/providers";
 const Profile = () => {
   const { user } = useGlobalContext();
   return (
-    <View className={`flex-1 bg-gray-100 p-4`}>
+    <View className={`flex-1 bg-gray-300 p-4`}>
       <UserInfoCard user={user}></UserInfoCard>
     </View>
   );

@@ -1,10 +1,6 @@
-/** @type {import('tailwindcss').Config} */
+// /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./App.{js,jsx,ts,tsx}",
-    "./src/components/**/*.{js,jsx,ts,tsx}",
-    "./src/screens/**/*.{js,jsx,ts,tsx}",
-  ],
+  content: ["./App.{js,jsx,ts,tsx}", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: {
@@ -27,20 +23,19 @@ module.exports = {
         yellow: "#FBD601",
         green: "#00B485",
         greenblue: "#4ED7D9",
+        white:"#FFFFFF"
       },
       fontFamily: {
-        ssc: {
-          thin: ["SairaSemiCondensed-Thin", "sans-serif"],
-          extralight: ["SairaSemiCondensed-ExtraLight", "sans-serif"],
-          light: ["SairaSemiCondensed-Light", "sans-serif"],
-          regular: ["SairaSemiCondensed-Regular", "sans-serif"],
-          medium: ["SairaSemiCondensed-Medium", "sans-serif"],
-          semibold: ["SairaSemiCondensed-SemiBold", "sans-serif"],
-          bold: ["SairaSemiCondensed-Bold", "sans-serif"],
-          extrabold: ["SairaSemiCondensed-ExtraBold", "sans-serif"],
-          black: ["SairaSemiCondensed-Black", "sans-serif"],
-        },
-      }
+        sscthin: ["SairaSemiCondensed-Thin", "sans-serif"],
+        sscextralight: ["SairaSemiCondensed-ExtraLight", "sans-serif"],
+        ssclight: ["SairaSemiCondensed-Light", "sans-serif"],
+        sscregular: ["SairaSemiCondensed-Regular", "sans-serif"],
+        sscmedium: ["SairaSemiCondensed-Medium", "sans-serif"],
+        sscsemibold: ["SairaSemiCondensed-SemiBold", "sans-serif"],
+        sscbold: ["SairaSemiCondensed-Bold", "sans-serif"],
+        sscextrabold: ["SairaSemiCondensed-ExtraBold", "sans-serif"],
+        sscblack: ["SairaSemiCondensed-Black", "sans-serif"],
+      },
     },
   },
   plugins: [],

@@ -15,7 +15,6 @@ import { useGlobalContext } from "../../../services/providers";
 import { validateEmail, validatePassword } from "../../../utils/helpers";
 import { images as Imgs } from "../../../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
-import tw from "twrnc";
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -78,65 +77,47 @@ const Login = ({ navigation }) => {
     <SafeAreaView className={"flex-1 justify-center items-center bg-white"}>
       <View className="flex items-center w-full">
         <Imgs.LogoBgBlue className="mb-4" />
-        <View className="w-full p-4 justify-center items-center">
-          <Text
-            style={[
-              tw`text-2xl mb-6`,
-              { color: "#030BA6", fontFamily: "SSC-Bold" },
-            ]}
-          >
-            Login
-          </Text>
+        <View className="w-full p-4 justify-center items-center ">
+          <Text className="text-2xl mb-6 font-sscsemibold text-primary">Login</Text>
           <TextInput
             className={
-              "w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              "w-full h-12 font-sscregular border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
             }
             placeholder="Email"
             onChangeText={setEmail}
             value={email}
             keyboardType="email-address"
             autoCapitalize="none"
-            style={{ fontFamily: "SSC-Regular" }}
           />
           <TextInput
             className={
-              "w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              "w-full h-12 border font-sscregular  border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
             }
             placeholder="Password"
             secureTextEntry={true}
             onChangeText={setPassword}
             value={password}
-            style={{ fontFamily: "SSC-Regular" }}
           />
           <TouchableOpacity
             className={
-              "w-full h-12 bg-primary justify-center items-center rounded-lg mb-4"
+              "w-full h-12 bg-primary  justify-center items-center rounded-lg mb-4"
             }
             disabled={loading}
             onPress={handleLogin}
           >
-            <Text
-              className={"text-white text-lg"}
-              style={{ fontFamily: "SSC-Bold" }}
-            >
+            <Text className={"text-white text-lg font-sscsemibold"}>
               {loading ? "Logging in..." : "Login"}
             </Text>
           </TouchableOpacity>
 
           <View className="flex-row justify-center mb-4">
             <TouchableOpacity onPress={navigateRegister} className="mr-4">
-              <Text
-                className={"text-blue-600 text-base"}
-                style={{ fontFamily: "SSC-Regular" }}
-              >
+              <Text className={"text-secondary-100 text-base font-sscregular"}>
                 Create Account
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={navigateForgotPassword}>
-              <Text
-                className={"text-blue-600 text-base"}
-                style={{ fontFamily: "SSC-Regular" }}
-              >
+              <Text className={"text-secondary-100 text-base font-sscregular"}>
                 Forgot Password
               </Text>
             </TouchableOpacity>

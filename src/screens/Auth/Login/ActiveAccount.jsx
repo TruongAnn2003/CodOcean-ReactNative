@@ -11,7 +11,6 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { requestOtp, verifyOtp, saveToken } from "../../../services/api/auth";
 import { images as Imgs } from "../../../constants";
-import tw from "twrnc";
 import { useGlobalContext } from "../../../services/providers";
 const ActiveAccount = ({ navigation, route }) => {
   const { token } = route.params;
@@ -64,23 +63,17 @@ const ActiveAccount = ({ navigation, route }) => {
     <SafeAreaView className={"flex-1 justify-center items-center bg-white"}>
       <View className="flex items-center w-full">
         <Imgs.LogoBgBlue className="mb-4" />
-        <View className="w-full p-4 justify-center items-center">
-          <Text
-            style={[
-              tw`text-2xl mb-6`,
-              { color: "#030BA6", fontFamily: "SSC-Bold" },
-            ]}
-          >
+        <View className="w-full p-4 justify-center  items-center">
+          <Text classname="text-2xl mb-6 font-sscsemibold text-primary">
             Verify OTP
           </Text>
           <TextInput
             className={
-              "w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              "w-full h-12 border border-gray-300 font-sscregular rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
             }
             placeholder="Nhập mã OTP"
             onChangeText={setOtp}
             value={otp}
-            style={{ fontFamily: "SSC-Regular" }}
           />
           <TouchableOpacity
             className={
@@ -89,10 +82,7 @@ const ActiveAccount = ({ navigation, route }) => {
             disabled={isButtonDisabled}
             onPress={handlerequestOtp}
           >
-            <Text
-              className={"text-white text-lg"}
-              style={{ fontFamily: "SSC-Bold" }}
-            >
+            <Text className={"text-white text-lg font-sscsemibold"}>
               {isButtonDisabled ? `Send OTP (${timer}s)` : "Send OTP"}
             </Text>
           </TouchableOpacity>
@@ -103,18 +93,12 @@ const ActiveAccount = ({ navigation, route }) => {
             disabled={isButtonDisabled}
             onPress={handleVerifyOtp}
           >
-            <Text
-              className={"text-white text-lg"}
-              style={{ fontFamily: "SSC-Bold" }}
-            >
+            <Text className={"text-white text-lg font-sscsemibold"}>
               Verify OTP
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <Text
-              className="text-primary text-base"
-              style={{ fontFamily: "SSC-Regular" }}
-            >
+            <Text className="text-secondary-100 text-base font-sscregular">
               Login
             </Text>
           </TouchableOpacity>

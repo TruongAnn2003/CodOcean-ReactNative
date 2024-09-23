@@ -20,7 +20,6 @@ import { formatDate } from "../../../utils/formatting";
 import getAvatarLink from "../../../services/dicebear-avt";
 import DatePicker from "react-native-date-picker";
 import { images as Imgs } from "../../../constants";
-import tw from "twrnc";
 
 const Register = ({ navigation }) => {
   const { loading, setLoading, error, setError } = useGlobalContext();
@@ -95,47 +94,37 @@ const Register = ({ navigation }) => {
         <View className="flex items-center w-full">
           <Imgs.LogoBgBlue className="mb-4" />
           <View className="w-full p-4 justify-center items-center">
-            <Text
-              style={[
-                tw`text-2xl mb-6`,
-                { color: "#030BA6", fontFamily: "SSC-Bold" },
-              ]}
-            >
+            <Text className="font-sscsemibold text-2xl mb-6 text-primary">
               Register
             </Text>
 
             <TextInput
-              className="w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              className="w-full h-12 border font-sscregular border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
               placeholder="Full Name"
               value={formData.fullName}
-              style={{ fontFamily: "SSC-Regular" }}
               onChangeText={(value) => handleChange("fullName", value)}
             />
             <TextInput
-              className="w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              className="w-full h-12 border font-sscregular border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
               placeholder="Email"
-              style={{ fontFamily: "SSC-Regular" }}
               value={formData.email}
               onChangeText={(value) => handleChange("email", value)}
             />
             <TextInput
-              className="w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              className="w-full h-12 border font-sscregular border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
               placeholder="Phone Number"
               value={formData.phoneNumber}
-              style={{ fontFamily: "SSC-Regular" }}
               onChangeText={(value) => handleChange("phoneNumber", value)}
             />
             <TextInput
-              className="w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+              className="w-full h-12 border font-sscregular border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
               placeholder="Password"
-              style={{ fontFamily: "SSC-Regular" }}
               secureTextEntry={true}
               value={formData.password}
               onChangeText={(value) => handleChange("password", value)}
             />
             <TextInput
-              className="w-full h-12 border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
-              style={{ fontFamily: "SSC-Regular" }}
+              className="w-full h-12 border font-sscregular border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
               placeholder="Date of Birth"
               secureTextEntry={true}
               value={formData.dateOfBirth}
@@ -147,18 +136,14 @@ const Register = ({ navigation }) => {
               disabled={loading}
               onPress={handleSubmit}
             >
-              <Text
-                className="text-white text-lg"
-                style={{ fontFamily: "SSC-Bold" }}
-              >
+              <Text className="text-white font-sscsemibold text-lg">
                 {loading ? "Registering..." : "Submit"}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate("Login")}>
               <Text
-                className="text-blue-600 text-base"
-                style={{ fontFamily: "SSC-Regular" }}
+                className="text-secondary-100 font-sscregular text-base "
               >
                 Login
               </Text>

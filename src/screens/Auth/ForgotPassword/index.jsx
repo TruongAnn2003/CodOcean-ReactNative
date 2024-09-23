@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Text, View, TextInput, TouchableOpacity } from "react-native";
-
+import { images as Imgs } from "../../../constants";
 export default function ForgotPassword({ navigation }) {
   const [email, setEmail] = useState("");
 
@@ -11,12 +11,15 @@ export default function ForgotPassword({ navigation }) {
 
   return (
     <View className={"flex-1 justify-center items-center p-4 bg-white"}>
-      <Text className={"text-2xl font-bold mb-6 text-gray-800"}>
+      <Imgs.LogoBgBlue className="mb-4" />
+      <Text className={"text-2xl font-sscsemibold mb-6 text-primary"}>
         Forgot Password
       </Text>
 
       <TextInput
-        className={"w-full h-12 border border-gray-300 rounded-lg px-4 mb-4"}
+        className={
+          "w-full h-12 font-sscregular border border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
+        }
         placeholder="Enter your email"
         value={email}
         onChangeText={(text) => setEmail(text)}
@@ -26,15 +29,19 @@ export default function ForgotPassword({ navigation }) {
 
       <TouchableOpacity
         className={
-          "w-full h-12 bg-blue-600 justify-center items-center rounded-lg mb-4"
+          "w-full h-12 bg-primary justify-center items-center rounded-lg mb-4"
         }
         onPress={handleResetPassword}
       >
-        <Text className={"text-white text-lg"}>Reset Password</Text>
+        <Text className={"text-white text-lg font-sscsemibold"}>
+          Reset Password
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-        <Text className={"text-blue-600 text-base mt-2"}>Back to Login</Text>
+        <Text className={"text-secondary-100 text-base mt-2 font-sscregular"}>
+          Back to Login
+        </Text>
       </TouchableOpacity>
     </View>
   );

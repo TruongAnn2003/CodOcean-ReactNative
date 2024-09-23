@@ -53,30 +53,14 @@ const MainStack = ({ navigation }) => (
             <Ionicons
               name="menu"
               size={24}
-              color="black"
+              color="#030BA6"
               style={{ marginRight: 15 }}
             />
           </TouchableOpacity>
         ),
       }}
     />
-    <Stack.Screen
-      name="Profile"
-      component={Profile}
-      options={{
-        headerShown: true,
-        headerRight: () => (
-          <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
-            <Ionicons
-              name="menu"
-              size={24}
-              color="black"
-              style={{ marginRight: 15 }}
-            />
-          </TouchableOpacity>
-        ),
-      }}
-    />
+    <Stack.Screen name="Profile" component={Profile} />
   </Stack.Navigator>
 );
 
