@@ -14,9 +14,9 @@ import {
   validateEmail,
   validatePassword,
   validatePhoneNumber,
-} from "../../../utils/helpers";
+} from "../../../utils/_helpers";
 import { useGlobalContext } from "../../../services/providers";
-import { formatDate } from "../../../utils/formatting";
+import { formatDate } from "../../../utils/_formatting";
 import getAvatarLink from "../../../services/dicebear-avt";
 import DatePicker from "react-native-date-picker";
 import { images as Imgs } from "../../../constants";
@@ -142,9 +142,7 @@ const Register = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text
-                className="text-secondary-100 font-sscregular text-base "
-              >
+              <Text className="text-secondary-100 font-sscregular text-base ">
                 Login
               </Text>
             </TouchableOpacity>

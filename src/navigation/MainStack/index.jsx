@@ -2,16 +2,22 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Home from "../screens/Home";
+import Home from "../../screens/Home";
 import {
   Login,
   ActiveAccount,
   Register,
   ForgotPassword,
-} from "../screens/Auth";
-import Problems from "../screens/Problems";
-import Profile from "../screens/Profile";
-
+} from "../../screens/Auth";
+import Problems from "../../screens/Problems";
+import {
+  Profile,
+  ChangeInfo,
+  MyProblems,
+  Statistics,
+} from "../../screens/User";
+import Discuss from "../../screens/Discuss";
+import Setting from "../../screens/Setting";
 const Stack = createNativeStackNavigator();
 
 const MainStack = ({ navigation }) => (
@@ -61,6 +67,11 @@ const MainStack = ({ navigation }) => (
       }}
     />
     <Stack.Screen name="Profile" component={Profile} />
+    <Stack.Screen name="ChangeInfo" component={ChangeInfo} />
+    <Stack.Screen name="Statistics" component={Statistics} />
+    <Stack.Screen name="MyProblems" component={MyProblems} />
+    <Stack.Screen name="Discuss" component={Discuss} />
+    <Stack.Screen name="Setting" component={Setting} />
   </Stack.Navigator>
 );
 

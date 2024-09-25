@@ -1,14 +1,11 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import {
-  DrawerContentScrollView,
-  DrawerItemList,
-  DrawerItem,
-} from "@react-navigation/drawer";
+import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { useGlobalContext } from "../../services/providers";
 import UserAvatar from "react-native-user-avatar";
 import getAvatarLink from "../../services/dicebear-avt";
 import { MaterialIcons } from "@expo/vector-icons";
+import { images as Imgs } from "../../constants";
 
 const CustomDrawerContent = (props) => {
   const { user } = useGlobalContext();
@@ -17,7 +14,7 @@ const CustomDrawerContent = (props) => {
     <DrawerContentScrollView {...props} style={styles.drawer}>
       <View className="flex items-center mb-6 p-4 border-b border-gray-600">
         <UserAvatar
-          size={100}
+          size={60}
           name={user?.fullName}
           src={getAvatarLink(user?.fullName)}
           className="mb-2"
@@ -27,7 +24,7 @@ const CustomDrawerContent = (props) => {
         </Text>
       </View>
 
-      <View className="mt-4 px-4">
+      <View className=" px-4">
         <DrawerItem
           label="Profile"
           onPress={() => props.navigation.navigate("Profile")}
@@ -37,7 +34,7 @@ const CustomDrawerContent = (props) => {
             color: "white",
             fontSize: 16,
             fontWeight: "600",
-            fontFamily: "SairaSemiCondensed-SemiBold",
+            fontFamily: "SairaSemiCondensed-Regular",
           }}
         />
         <DrawerItem
@@ -51,7 +48,49 @@ const CustomDrawerContent = (props) => {
             color: "white",
             fontSize: 16,
             fontWeight: "600",
-            fontFamily: "SairaSemiCondensed-SemiBold",
+            fontFamily: "SairaSemiCondensed-Regular",
+          }}
+        />
+        <DrawerItem
+          label="Discuss"
+          onPress={() => props.navigation.navigate("Discuss")}
+          icon={() => (
+            <MaterialIcons name="assignment" size={24} color="white" />
+          )}
+          className="p-3 rounded-lg mb-3"
+          labelStyle={{
+            color: "white",
+            fontSize: 16,
+            fontWeight: "600",
+            fontFamily: "SairaSemiCondensed-Regular",
+          }}
+        />
+        <DrawerItem
+          label="Statistics"
+          onPress={() => props.navigation.navigate("Statistics")}
+          icon={() => (
+            <MaterialIcons name="assignment" size={24} color="white" />
+          )}
+          className="p-3 rounded-lg mb-3"
+          labelStyle={{
+            color: "white",
+            fontSize: 16,
+            fontWeight: "600",
+            fontFamily: "SairaSemiCondensed-Regular",
+          }}
+        />
+        <DrawerItem
+          label="Setting"
+          onPress={() => props.navigation.navigate("Setting")}
+          icon={() => (
+            <MaterialIcons name="assignment" size={24} color="white" />
+          )}
+          className="p-3 rounded-lg mb-3"
+          labelStyle={{
+            color: "white",
+            fontSize: 16,
+            fontWeight: "600",
+            fontFamily: "SairaSemiCondensed-Regular",
           }}
         />
         <DrawerItem
@@ -65,23 +104,20 @@ const CustomDrawerContent = (props) => {
             color: "white",
             fontSize: 16,
             fontWeight: "600",
-            fontFamily: "SairaSemiCondensed-SemiBold",
+            fontFamily: "SairaSemiCondensed-Regular",
           }}
         />
       </View>
 
-      <View className="mt-auto items-center mb-6">
-        {/* <Image
-          source={{ uri: "https://your-image-url.com/your-image.jpg" }} // Đường dẫn đến ảnh của bạn
-          className="w-32 h-32 rounded-full"
-        /> */}
+      <View className="w-full items-center">
+        <Imgs.WhaleBg />
       </View>
     </DrawerContentScrollView>
   );
 };
 const styles = StyleSheet.create({
   drawer: {
-    backgroundColor: "#030BA6", // Màu primary (ví dụ: màu xanh đậm)
+    backgroundColor: "#030BA6",
     flex: 1,
   },
 });

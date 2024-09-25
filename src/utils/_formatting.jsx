@@ -5,4 +5,4 @@ const formatDate = (date) => {
   return "";
 };
 
-export {formatDate}
+export default { formatDate };

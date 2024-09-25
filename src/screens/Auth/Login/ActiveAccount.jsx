@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { requestOtp, verifyOtp, saveToken } from "../../../services/api/auth";
+import { requestOtp, verifyOtp } from "../../../services/api/auth";
 import { images as Imgs } from "../../../constants";
 import { useGlobalContext } from "../../../services/providers";
+import * as _helpers from "../../../utils/_helpers";
 const ActiveAccount = ({ navigation, route }) => {
   const { token } = route.params;
   const [otp, setOtp] = useState("");
@@ -22,29 +22,39 @@ const ActiveAccount = ({ navigation, route }) => {
     try {
       setIsButtonDisabled(true);
       setTimer(60);
-      const otpData = await requestOtp(token);
-      console.log(otpData);
+      const response = await requestOtp(token);
     } catch (error) {
-      Alert.alert("Lỗi", "Đã xảy ra lỗi khi gửi mã OTP. Vui lòng thử lại sau.");
+      Alert.alert("Error", "An error occurred. Please try again later.");
       console.error("Error requesting OTP:", error);
     }
   };
 
   const handleVerifyOtp = async () => {
     if (!otp) {
-      Alert.alert("Lỗi", "Vui lòng nhập mã OTP");
+      Alert.alert("Warm", "Please enter the OTP code.");
       return;
     }
     try {
-      const data = await verifyOtp(token, otp);
-      if (data.successfully) {
-        saveToken(token);
-        navigation.navigate("Login");
+      const response = await verifyOtp(token, otp);
+      if (response.status === 200) {
+        await _helpers.saveToken(token);
+        const profileResponse = await getUserProfile();
+
+        if (profileResponse.status === 200) {
+          setUser(profileResponse.data.profile);
+          navigation.navigate("Problems");
+        } else {
+          console.log("Profile data not found.");
+          Alert.alert("Error", "Profile data not found.");
+        }
       } else {
-        Alert.alert("Thất bại", data.message || "Mã OTP không chính xác");
+        Alert.alert(
+          "Fail",
+          response.data.message || "The OTP code is incorrect."
+        );
       }
     } catch (error) {
-      Alert.alert("Lỗi", "Đã xảy ra lỗi. Vui lòng thử lại sau.");
+      Alert.alert("Error", "An error occurred. Please try again later.");
       console.error("Error verifying OTP:", error);
     }
   };
@@ -90,7 +100,6 @@ const ActiveAccount = ({ navigation, route }) => {
             className={
               "w-full h-12 bg-secondary-100 justify-center items-center rounded-lg mb-4"
             }
-            disabled={isButtonDisabled}
             onPress={handleVerifyOtp}
           >
             <Text className={"text-white text-lg font-sscsemibold"}>

@@ -1,84 +1,40 @@
 import axios from "axios";
-import { REACT_APP_BASE_API_URL } from "../../../utils/const";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const BASE_URL = `${REACT_APP_BASE_API_URL}/api/login`;
+import * as _const from "../../../utils/_const";
+import * as _helpers from "../../../utils/_helpers";
+const BASE_URL = `${_const.REACT_APP_BASE_API_URL}/api/login`;
 
 const register = async (request) => {
   const requestURL = `${BASE_URL}/register`;
-  try {
-    console.log(requestURL);
-    console.log(request);
-    const response = await axios.post(requestURL, request, { timeout: 5000 });
-    console.log(response);
-
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  return await axios.post(requestURL, request);
 };
 
 const login = async (request) => {
   const requestURL = `${BASE_URL}/sign-in`;
-  try {
-    const response = await axios.post(requestURL, request, { timeout: 5000 });
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  return await axios.post(requestURL, request);
 };
 
 const requestOtp = async (token) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/request-otp`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Thêm token vào header
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  const requestURL = `${BASE_URL}/request-otp`;
+  return await axios.get(requestURL, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
 const verifyOtp = async (token, otp) => {
-  try {
-    const response = await axios.post(
-      `${BASE_URL}/verify-otp`,
-      { otp },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const saveToken = async (token) => {
-  try {
-    await AsyncStorage.setItem("jwtToken", token);
-    console.log("Token saved successfully!");
-  } catch (error) {
-    console.error("Error saving token:", error);
-  }
-};
-
-const getToken = async () => {
-  try {
-    const token = await AsyncStorage.getItem("jwtToken");
-    if (token !== null) {
-      console.log("Token:", token);
-      return token;
+  const requestURL = `${BASE_URL}/verify-otp`;
+  return await axios.post(
+    requestURL,
+    { otp },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     }
-  } catch (error) {
-    console.error("Error retrieving token:", error);
-  }
+  );
 };
 
-export { register, login, requestOtp, verifyOtp, getToken, saveToken };
+export { register, login, requestOtp, verifyOtp };
