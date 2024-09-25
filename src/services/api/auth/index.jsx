@@ -24,6 +24,7 @@ const requestOtp = async (token) => {
 };
 
 const verifyOtp = async (token, otp) => {
+  
   const requestURL = `${BASE_URL}/verify-otp`;
   return await axios.post(
     requestURL,

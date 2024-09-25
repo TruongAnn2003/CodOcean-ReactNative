@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, ActivityIndicator, Alert, Text } from "react-native";
+import {
+  View,
+  ActivityIndicator,
+  Alert,
+  Text,
+  TextInput,
+  FlatList,
+  Button
+} from "react-native";
 import { useGlobalContext } from "../../services/providers";
 import { getAllTopics, getProblems } from "../../services/api/problem";
 import * as _helpers from "../../utils/_helpers";
@@ -11,9 +19,9 @@ const Problems = () => {
   // State for filter criteria
   const [pageNumber, setPageNumber] = useState(0);
   const [limit, setLimit] = useState(10);
-  const [status, setStatus] = useState("");
-  const [difficulty, setDifficulty] = useState("");
-  const [topic, setTopic] = useState("");
+  const [status, setStatus] = useState(null);
+  const [difficulty, setDifficulty] = useState(null);
+  const [topic, setTopic] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const fetchProblems = async () => {
@@ -22,12 +30,12 @@ const Problems = () => {
 
     try {
       const response = await getProblems({
-        pageNumber: 0,
-        limit: 10,
-        status: null,
-        difficulty: null,
-        topic: null,
-        searchTerm: "",
+        pageNumber,
+        limit,
+        status,
+        difficulty,
+        topic,
+        searchTerm,
       });
       _helpers.log("fetchProblems-response", response);
       if (response.status === 200) {

@@ -12,12 +12,13 @@ import { requestOtp, verifyOtp } from "../../../services/api/auth";
 import { images as Imgs } from "../../../constants";
 import { useGlobalContext } from "../../../services/providers";
 import * as _helpers from "../../../utils/_helpers";
+import {getUserProfile} from "../../../services/api/user"
 const ActiveAccount = ({ navigation, route }) => {
   const { token } = route.params;
   const [otp, setOtp] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [timer, setTimer] = useState(0);
-  const { loading, setLoading, error, setError } = useGlobalContext();
+  const { loading, setLoading, error, setError, setUser } = useGlobalContext();
   const handlerequestOtp = async () => {
     try {
       setIsButtonDisabled(true);
@@ -36,10 +37,10 @@ const ActiveAccount = ({ navigation, route }) => {
     }
     try {
       const response = await verifyOtp(token, otp);
-      if (response.status === 200) {
+      if (response.status === 201) {
         await _helpers.saveToken(token);
         const profileResponse = await getUserProfile();
-
+        _helpers.log("verifyOtp-response", response);
         if (profileResponse.status === 200) {
           setUser(profileResponse.data.profile);
           navigation.navigate("Problems");

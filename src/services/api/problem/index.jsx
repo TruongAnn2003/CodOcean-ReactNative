@@ -18,9 +18,6 @@ const getAllTopics = async () => {
 
 const getProblems = async (request) => {
   const token = await _helpers.getToken();
-  // const cleanRequest = Object.fromEntries(
-  //   Object.entries(request).filter(([_, v]) => v != null)
-  // );
   const paramsString = queryString.stringify(request);
   const requestURL = `${BASE_URL}/search/problems?${paramsString}`;
   _helpers.log("getProblems-requestURL", requestURL);

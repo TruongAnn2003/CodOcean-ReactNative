@@ -8,17 +8,14 @@ import {
   ScrollView,
   Pressable,
   TouchableOpacity,
+  ActivityIndicator, // Đừng quên import ActivityIndicator nếu bạn dùng nó
 } from "react-native";
 import { register } from "../../../services/api/auth";
-import {
-  validateEmail,
-  validatePassword,
-  validatePhoneNumber,
-} from "../../../utils/_helpers";
+import * as _helpers from "../../../utils/_helpers";
 import { useGlobalContext } from "../../../services/providers";
-import { formatDate } from "../../../utils/_formatting";
+import * as _formatting from "../../../utils/_formatting";
 import getAvatarLink from "../../../services/dicebear-avt";
-import DatePicker from "react-native-date-picker";
+import DateTimePicker from "@react-native-community/datetimepicker"; // Import DateTimePicker
 import { images as Imgs } from "../../../constants";
 
 const Register = ({ navigation }) => {
@@ -28,10 +25,10 @@ const Register = ({ navigation }) => {
     email: "",
     phoneNumber: "",
     password: "",
-    dateOfBirth: new Date(), // Ensure default is a Date object
+    dateOfBirth: new Date(), // Ngày mặc định là ngày hiện tại
     urlImage: "",
   });
-  const [open, setOpen] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false); // State để quản lý hiển thị DatePicker
 
   const handleChange = (name, value) => {
     setFormData({ ...formData, [name]: value });
@@ -46,34 +43,37 @@ const Register = ({ navigation }) => {
       return;
     }
 
-    if (validatePhoneNumber(phoneNumber) === false) {
+    if (_helpers.validatePhoneNumber(phoneNumber) === false) {
       Alert.alert("Error", "Invalid phone number format");
       return;
     }
-    if (validateEmail(email) === false) {
+    if (_helpers.validateEmail(email) === false) {
       Alert.alert("Error", "Invalid email format");
       return;
     }
-    if (validatePassword(password) === false) {
+    if (_helpers.validatePassword(password) === false) {
       Alert.alert("Error", "Invalid password format");
       return;
     }
 
     try {
-      const data = await register({
+      const response = await register({
         fullName,
         email,
         phoneNumber,
         password,
-        dateOfBirth: formatDate(dateOfBirth),
+        dateOfBirth: dateOfBirth,
         urlImage: getAvatarLink(fullName),
       });
 
-      if (data.message === "user.login.register_successfully") {
+      if (response.status === 200) {
         Alert.alert("Success", "Account created successfully");
         navigation.navigate("Login");
       } else {
-        Alert.alert("Signup failed", data.message || "An error occurred");
+        Alert.alert(
+          "Signup failed",
+          response.data.message || "An error occurred"
+        );
       }
     } catch (error) {
       Alert.alert("Error", "An error occurred. Please try again later.");
@@ -82,7 +82,7 @@ const Register = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 justify-center items-center bg-white">
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -93,29 +93,33 @@ const Register = ({ navigation }) => {
       >
         <View className="flex items-center w-full">
           <Imgs.LogoBgBlue className="mb-4" />
-          <View className="w-full p-4 justify-center items-center">
-            <Text className="font-sscsemibold text-2xl mb-6 text-primary">
+          <View className="w-full p-4 justify-center items-center ">
+            <Text className="text-2xl mb-6 font-sscsemibold text-primary">
               Register
             </Text>
 
+            {/* Các trường input khác */}
             <TextInput
               className="w-full h-12 border font-sscregular border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
               placeholder="Full Name"
               value={formData.fullName}
               onChangeText={(value) => handleChange("fullName", value)}
             />
+
             <TextInput
               className="w-full h-12 border font-sscregular border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
               placeholder="Email"
               value={formData.email}
               onChangeText={(value) => handleChange("email", value)}
             />
+
             <TextInput
               className="w-full h-12 border font-sscregular border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
               placeholder="Phone Number"
               value={formData.phoneNumber}
               onChangeText={(value) => handleChange("phoneNumber", value)}
             />
+
             <TextInput
               className="w-full h-12 border font-sscregular border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
               placeholder="Password"
@@ -123,26 +127,62 @@ const Register = ({ navigation }) => {
               value={formData.password}
               onChangeText={(value) => handleChange("password", value)}
             />
-            <TextInput
-              className="w-full h-12 border font-sscregular border-gray-300 rounded-lg px-4 mb-4 focus:border-secondary focus:outline-none"
-              placeholder="Date of Birth"
-              secureTextEntry={true}
-              value={formData.dateOfBirth}
-              onChangeText={(value) => handleChange("dateOfBirth", date)}
-            />
 
+            <Pressable
+              style={{
+                width: "100%",
+                height: 48,
+                borderWidth: 1,
+                borderColor: "#D1D5DB",
+                borderRadius: 8,
+                justifyContent: "center",
+                paddingLeft: 16,
+                marginBottom: 16,
+              }}
+              onPress={() => setShowDatePicker(true)} // Mở DatePicker khi người dùng bấm vào
+            >
+              <Text className="text-base font-sscregular text-[#D1D5DB]">
+                {formData.dateOfBirth
+                  ? formData.dateOfBirth.toLocaleDateString()
+                  : "Select Date of Birth"}
+              </Text>
+            </Pressable>
+
+            {/* DateTimePicker Component */}
+            {showDatePicker && (
+              <DateTimePicker
+                value={formData.dateOfBirth} // Giá trị hiện tại của ngày sinh
+                mode="date" // Đặt chế độ là chọn ngày
+                display="default" // Giao diện mặc định
+                onChange={(event, selectedDate) => {
+                  const currentDate = selectedDate || formData.dateOfBirth;
+                  setShowDatePicker(false); // Đóng DatePicker sau khi chọn
+                  handleChange("dateOfBirth", currentDate); // Cập nhật ngày sinh
+                }}
+              />
+            )}
+
+            {/* Submit Button */}
             <TouchableOpacity
-              className="w-full h-12 bg-primary justify-center items-center rounded-lg mb-4"
+              style={{
+                width: "100%",
+                height: 48,
+                backgroundColor: "#1E3A8A",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 8,
+                marginBottom: 16,
+              }}
               disabled={loading}
               onPress={handleSubmit}
             >
-              <Text className="text-white font-sscsemibold text-lg">
+              <Text className="text-white text-base font-sscregular">
                 {loading ? "Registering..." : "Submit"}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text className="text-secondary-100 font-sscregular text-base ">
+              <Text className="text-secondary-100 text-base font-sscregular">
                 Login
               </Text>
             </TouchableOpacity>
