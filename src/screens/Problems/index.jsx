@@ -5,7 +5,7 @@ import {
   Alert,
   Text,
   TextInput,
-  Button,
+  TouchableOpacity,
 } from "react-native";
 import {
   getProblems,
@@ -33,6 +33,7 @@ const Problems = () => {
     topic: "",
     searchTerm: "",
   });
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchTopics = async () => {
     setLoading(true);
@@ -42,6 +43,7 @@ const Problems = () => {
       const response = await getAllTopics();
       if (response.status === _const.RESPONSE_STATUS.Ok) {
         setTopics(response.data);
+        // _helpers.log("fetchTopics-data", response.data);
       } else {
         Alert.alert("Error", "Failed to fetch topics.");
       }
@@ -61,6 +63,7 @@ const Problems = () => {
       const response = await getTrendingProblems();
       if (response.status === _const.RESPONSE_STATUS.Ok) {
         setTrendingProblems(response.data);
+        // _helpers.log("fetchTrendingProblems-data", response.data);
       } else {
         Alert.alert("Error", "Failed to fetch trending problems.");
       }
@@ -99,6 +102,7 @@ const Problems = () => {
   }, []);
 
   useEffect(() => {
+    _helpers.log("fetchProblems-filter", filter);
     fetchProblems();
   }, [filter]);
 
@@ -125,39 +129,51 @@ const Problems = () => {
   return (
     <View className="flex-1 p-4">
       <View className="mb-4">
-        <TextInput
-          placeholder="Search problems"
-          value={filter.searchTerm}
-          onChangeText={(value) => handleFilterChange("searchTerm", value)}
-          className="border border-gray-300 rounded-md p-2 mb-4 text-base"
-        />
         <TopicBar
           topics={topics}
           onSelect={(value) => handleFilterChange("topic", value)}
         />
-        <View className="mb-4">
-          <Text className="text-gray-700 font-semibold mb-2">
-            Status: {_formatting.formatString(filter.status)}
-          </Text>
-          <SelectInput
-            options={_const.PROBLEM_STATUS.map((status) => ({
-              name: _formatting.formatString(status),
-              value: status,
-            }))}
-            onSelect={(value) => handleFilterChange("status", value)}
+        <View className="flex-row items-center bg-white rounded-full border border-gray-300 p-2 mb-4">
+          <TextInput
+            placeholder="Search problems"
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+            className="flex-1 text-base font-sscregular px-4 text-gray-700"
+            placeholderTextColor="gray"
           />
+          <TouchableOpacity
+            onPress={() => handleFilterChange("searchTerm", searchTerm)}
+            className="bg-white rounded-full p-2 justify-center items-center"
+          >
+            <Text className="text-white text-lg font-sscsemibold">🔍</Text>
+          </TouchableOpacity>
         </View>
-        <View className="mb-4">
-          <Text className="text-gray-700 font-semibold mb-2">
-            Difficulty: {_formatting.formatString(filter.difficulty)}
-          </Text>
-          <SelectInput
-            options={_const.PROBLEM_DIFFICULTY.map((difficulty) => ({
-              name: _formatting.formatString(difficulty),
-              value: difficulty,
-            }))}
-            onSelect={(value) => handleFilterChange("difficulty", value)}
-          />
+        <View className="flex-row justify-between mb-4">
+          <View className="flex-1 mr-2">
+            <Text className="text-gray-700 font-semibold mb-2">
+              Status: {_formatting.formatString(filter.status)}
+            </Text>
+            <SelectInput
+              options={_const.PROBLEM_STATUS.map((status) => ({
+                name: _formatting.formatString(status),
+                value: status,
+              }))}
+              onSelect={(value) => handleFilterChange("status", value)}
+            />
+          </View>
+
+          <View className="flex-1 ml-2">
+            <Text className="text-gray-700 font-semibold mb-2">
+              Difficulty: {_formatting.formatString(filter.difficulty)}
+            </Text>
+            <SelectInput
+              options={_const.PROBLEM_DIFFICULTY.map((difficulty) => ({
+                name: _formatting.formatString(difficulty),
+                value: difficulty,
+              }))}
+              onSelect={(value) => handleFilterChange("difficulty", value)}
+            />
+          </View>
         </View>
       </View>
       <ProblemList problems={problems} />

@@ -31,9 +31,8 @@ const login = async (request) => {
   return await axios.post(requestURL, request);
 };
 
-const activeAccountRequestOTP = async (token, request) => {
-  const paramsString = queryString.stringify(request);
-  const requestURL = `${BASE_URL}/request-otp${paramsString}`;
+const activeAccountRequestOTP = async (token) => {
+  const requestURL = `${BASE_URL}/request-otp`;
   return await axios.get(requestURL, {
     headers: {
       "Content-Type": "application/json",

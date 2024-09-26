@@ -61,7 +61,7 @@ const Login = ({ navigation }) => {
       const isActive = data.isActive;
 
       if (!isActive) {
-        navigation.navigate("ActiveAccount", { token, email });
+        navigation.navigate("ActiveAccount", { token });
       } else {
         _helpers.saveToken(token);
         const profileResponse = await getUserProfile();

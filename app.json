@@ -4,10 +4,10 @@
     "slug": "CodOcean-ReactNative",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo-white.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo-text.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

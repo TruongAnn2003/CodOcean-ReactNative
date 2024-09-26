@@ -2,7 +2,8 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { useGlobalContext } from "../../services/providers";
-import UserAvatar from "react-native-user-avatar";
+// import UserAvatar from "react-native-user-avatar";
+import UserAvatar from "../UserAvatar";
 import getAvatarLink from "../../services/dicebear-avt";
 import { MaterialIcons } from "@expo/vector-icons";
 import { images as Imgs } from "../../constants";
@@ -15,7 +16,6 @@ const CustomDrawerContent = (props) => {
       <View className="flex items-center mb-6 p-4 border-b border-gray-600">
         <UserAvatar
           size={60}
-          name={user?.fullName}
           src={user?.urlImage}
           className="mb-2"
         />

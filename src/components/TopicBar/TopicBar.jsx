@@ -10,7 +10,9 @@ function TopicBar({ topics, onSelect }) {
         horizontal
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={(item) => <TopicBarItem topic={item} onSelect={onSelect} />}
+        renderItem={({ item }) => (
+          <TopicBarItem topic={item} onSelect={onSelect} />
+        )}
       />
     </View>
   );

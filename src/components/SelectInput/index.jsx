@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
 import { Picker } from "@react-native-picker/picker"; // Import Picker
 
 function SelectInput({ options, onSelect }) {
@@ -13,38 +13,25 @@ function SelectInput({ options, onSelect }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Select an option:</Text>
-      <Picker
-        selectedValue={selectedValue}
-        onValueChange={handleValueChange}
-        style={styles.picker}
-      >
-        {options.map((option) => (
-          <Picker.Item
-            key={option.value}
-            label={option.name}
-            value={option.value}
-          />
-        ))}
-      </Picker>
+    <View className="my-2 px-4">
+      <Text className="text-base mb-2">Select an option:</Text>
+      <View className="bg-gray-200 rounded-md">
+        <Picker
+          selectedValue={selectedValue}
+          onValueChange={handleValueChange}
+          className="h-12 bg-gray-200 rounded-md"
+        >
+          {options.map((option) => (
+            <Picker.Item
+              key={option.value}
+              label={option.name}
+              value={option.value}
+            />
+          ))}
+        </Picker>
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: 10,
-    paddingHorizontal: 10,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  picker: {
-    height: 50,
-    backgroundColor: "#f0f0f0",
-  },
-});
 
 export default SelectInput;

@@ -16,7 +16,7 @@ import * as _const from "../../../utils/_const";
 import { getUserProfile } from "../../../services/api/user";
 
 const ActiveAccount = ({ navigation, route }) => {
-  const { token, email } = route.params;
+  const { token } = route.params;
   const [otp, setOtp] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [timer, setTimer] = useState(0);
@@ -27,21 +27,10 @@ const ActiveAccount = ({ navigation, route }) => {
       setIsButtonDisabled(true);
       setTimer(60);
       _helpers.log("activeAccountRequestOTP-token", token);
-      const response = await activeAccountRequestOTP(token, { email });
+      const response = await activeAccountRequestOTP(token);
 
-      if (response.status === 201) {
+      if (response.status === _const.RESPONSE_STATUS.Created) {
         Alert.alert("OTP Sent", "The OTP has been sent to your email.");
-
-        const interval = setInterval(() => {
-          setTimer((prev) => {
-            if (prev === 1) {
-              clearInterval(interval);
-              setIsButtonDisabled(false);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
       } else {
         Alert.alert("Error", "Failed to send OTP. Please try again.");
       }
@@ -69,7 +58,7 @@ const ActiveAccount = ({ navigation, route }) => {
           console.log("Profile data not found.");
           Alert.alert("Error", "Profile data not found.");
         }
-      } else {
+      } else if (response.status === _const.RESPONSE_STATUS.Bad_Request) {
         Alert.alert(
           "Fail",
           response.data.message || "The OTP code is incorrect."
@@ -81,15 +70,15 @@ const ActiveAccount = ({ navigation, route }) => {
     }
   };
 
-  // useEffect(() => {
-  //   let countdown;
-  //   if (timer > 0) {
-  //     countdown = setTimeout(() => setTimer(timer - 1), 1000);
-  //   } else if (timer === 0) {
-  //     setIsButtonDisabled(false);
-  //   }
-  //   return () => clearTimeout(countdown);
-  // }, [timer]);
+  useEffect(() => {
+    let countdown;
+    if (timer > 0) {
+      countdown = setTimeout(() => setTimer(timer - 1), 1000);
+    } else if (timer === 0) {
+      setIsButtonDisabled(false);
+    }
+    return () => clearTimeout(countdown);
+  }, [timer]);
 
   return (
     <SafeAreaView className={"flex-1 justify-center items-center bg-white"}>

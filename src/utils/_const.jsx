@@ -1,10 +1,11 @@
 const REACT_APP_BASE_API_URL =
-  "https://6dc3-2001-ee0-520a-4030-85cc-f3f2-382e-fab0.ngrok-free.app";
+  "https://76d2-2001-ee0-167-409d-45e-d6e0-6953-7c74.ngrok-free.app";
 const PROBLEM_STATUS = ["ALL", "SOLVED", "TODO", "ATTEMPTED"];
 const PROBLEM_DIFFICULTY = ["ALL", "EASY", "NORMAL", "HARD"];
 const RESPONSE_STATUS = {
   Ok: 200,
   Created: 201,
+  Bad_Request: 400,
 };
 export {
   REACT_APP_BASE_API_URL,

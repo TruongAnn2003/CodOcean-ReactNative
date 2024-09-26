@@ -1,6 +1,6 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Home from "../../screens/Home";
 import {
@@ -9,7 +9,7 @@ import {
   Register,
   ForgotPassword,
 } from "../../screens/Auth";
-import Problems from "../../screens/Problems";
+// import Problems from "../../screens/Problems";
 import {
   Profile,
   ChangeInfo,
@@ -19,7 +19,7 @@ import {
 import Discuss from "../../screens/Discuss";
 import Setting from "../../screens/Setting";
 const Stack = createNativeStackNavigator();
-
+const Problems = React.lazy(() => import("../../screens/Problems"));
 const MainStack = ({ navigation }) => (
   <Stack.Navigator>
     <Stack.Screen
@@ -51,7 +51,6 @@ const MainStack = ({ navigation }) => (
     />
     <Stack.Screen
       name="Problems"
-      component={Problems}
       options={{
         headerShown: true,
         headerRight: () => (
@@ -65,7 +64,13 @@ const MainStack = ({ navigation }) => (
           </TouchableOpacity>
         ),
       }}
-    />
+    >
+      {() => (
+        <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+          <Problems />
+        </Suspense>
+      )}
+    </Stack.Screen>
     <Stack.Screen name="Profile" component={Profile} />
     <Stack.Screen name="ChangeInfo" component={ChangeInfo} />
     <Stack.Screen name="Statistics" component={Statistics} />
