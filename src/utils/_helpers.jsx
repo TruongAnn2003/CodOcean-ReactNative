@@ -70,6 +70,16 @@ const log = (description, obj, level = "info") => {
   console[level](`${description}:`, message);
 };
 
+const cleanRequestParams = (request) => {
+  return Object.keys(request).reduce((acc, key) => {
+    const value = request[key];
+    if (value !== null && value !== "" && value !== "ALL") {
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
+};
+
 export {
   validateEmail,
   validatePassword,
@@ -78,4 +88,5 @@ export {
   getToken,
   removeToken,
   log,
+  cleanRequestParams,
 };

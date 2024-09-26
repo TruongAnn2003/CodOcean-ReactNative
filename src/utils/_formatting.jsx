@@ -4,5 +4,14 @@ const formatDate = (date) => {
   }
   return "";
 };
+const formatString = (str) => {
+  if (str !== null)
+    return str
+      .toLowerCase()
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  return "";
+};
 
-export default { formatDate };
+export { formatDate, formatString };

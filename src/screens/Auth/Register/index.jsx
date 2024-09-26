@@ -11,9 +11,10 @@ import {
   ActivityIndicator, // Đừng quên import ActivityIndicator nếu bạn dùng nó
 } from "react-native";
 import { register } from "../../../services/api/auth";
-import * as _helpers from "../../../utils/_helpers";
 import { useGlobalContext } from "../../../services/providers";
 import * as _formatting from "../../../utils/_formatting";
+import * as _helpers from "../../../utils/_helpers";
+import * as _const from "../../../utils/_const"
 import getAvatarLink from "../../../services/dicebear-avt";
 import DateTimePicker from "@react-native-community/datetimepicker"; // Import DateTimePicker
 import { images as Imgs } from "../../../constants";
@@ -66,7 +67,7 @@ const Register = ({ navigation }) => {
         urlImage: getAvatarLink(fullName),
       });
 
-      if (response.status === 200) {
+      if (response.status === _const.RESPONSE_STATUS.Ok) {
         Alert.alert("Success", "Account created successfully");
         navigation.navigate("Login");
       } else {

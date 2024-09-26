@@ -16,7 +16,7 @@ const CustomDrawerContent = (props) => {
         <UserAvatar
           size={60}
           name={user?.fullName}
-          src={getAvatarLink(user?.fullName)}
+          src={user?.urlImage}
           className="mb-2"
         />
         <Text className="text-lg text-white font-sscbold">

@@ -8,7 +8,7 @@ const UserInfoCard = ({ user }) => {
       <UserAvatar
         size={100}
         name={user?.fullName}
-        src={getAvatarLink(user?.fullName)}
+        src={user?.urlImage}
       />
       <Text className="text-2xl mb-4 font-sscbold">{user?.fullName}</Text>
       <View className="w-full mb-2 flex-row justify-between">

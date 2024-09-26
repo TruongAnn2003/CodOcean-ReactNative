@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { login } from "../../../services/api/auth";
 import * as _helpers from "../../../utils/_helpers";
+import * as _const from "../../../utils/_const";
 import { getUserProfile } from "../../../services/api/user";
 import { useGlobalContext } from "../../../services/providers";
 import { images as Imgs } from "../../../constants";
@@ -60,12 +61,12 @@ const Login = ({ navigation }) => {
       const isActive = data.isActive;
 
       if (!isActive) {
-        navigation.navigate("ActiveAccount", { token });
+        navigation.navigate("ActiveAccount", { token, email });
       } else {
         _helpers.saveToken(token);
         const profileResponse = await getUserProfile();
 
-        if (profileResponse.status === 200) {
+        if (profileResponse.status === _const.RESPONSE_STATUS.Ok) {
           setUser(profileResponse.data.profile);
           navigation.navigate("Problems");
         } else {
