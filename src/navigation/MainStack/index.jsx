@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { TouchableOpacity, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Home from "../../screens/Home";
+import ProblemDetail from "../../components/ProblemDetail";
 import {
   Login,
   ActiveAccount,
@@ -15,6 +16,7 @@ import {
   ChangeInfo,
   MyProblems,
   Statistics,
+  MyDiscuss,
 } from "../../screens/User";
 import Discuss from "../../screens/Discuss";
 import Setting from "../../screens/Setting";
@@ -71,10 +73,24 @@ const MainStack = ({ navigation }) => (
         </Suspense>
       )}
     </Stack.Screen>
+    <Stack.Screen
+      name="ProblemDetail"
+      component={ProblemDetail}
+      options={{ title: "Problem Details" }}
+    />
     <Stack.Screen name="Profile" component={Profile} />
     <Stack.Screen name="ChangeInfo" component={ChangeInfo} />
     <Stack.Screen name="Statistics" component={Statistics} />
-    <Stack.Screen name="MyProblems" component={MyProblems} />
+    <Stack.Screen
+      name="MyProblems"
+      component={MyProblems}
+      options={{ title: "My Problems" }}
+    />
+    <Stack.Screen
+      name="MyDiscuss"
+      component={MyDiscuss}
+      options={{ title: "My Discuss" }}
+    />
     <Stack.Screen name="Discuss" component={Discuss} />
     <Stack.Screen name="Setting" component={Setting} />
   </Stack.Navigator>

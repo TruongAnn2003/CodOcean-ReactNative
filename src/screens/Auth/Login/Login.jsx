@@ -90,7 +90,7 @@ const Login = ({ navigation }) => {
       <View className="flex items-center w-full">
         <Imgs.LogoBgBlue className="mb-4" />
         <View className="w-full p-4 justify-center items-center ">
-          <Text className="text-2xl mb-6 font-sscsemibold text-primary">
+          <Text className="text-2xl mb-6 font-sscsemibold text-secondary">
             Login
           </Text>
           <TextInput
@@ -120,12 +120,12 @@ const Login = ({ navigation }) => {
 
           <View className="flex-row justify-center mb-4">
             <TouchableOpacity onPress={navigateRegister} className="mr-4">
-              <Text className="text-secondary-100 text-base font-sscregular">
+              <Text className="text-secondary text-base font-sscregular">
                 Create Account
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={navigateForgotPassword}>
-              <Text className="text-secondary-100 text-base font-sscregular">
+              <Text className="text-secondary text-base font-sscregular">
                 Forgot Password
               </Text>
             </TouchableOpacity>

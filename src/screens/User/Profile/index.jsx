@@ -1,15 +1,41 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Image, ScrollView, ActivityIndicator } from "react-native";
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
 import UserInfoCard from "../../../components/UserInfoCard";
-import { login, saveToken, getToken } from "../../../services/api/auth";
-import { getUserProfile } from "../../../services/api/user";
 import { useGlobalContext } from "../../../services/providers";
 
-const Profile = () => {
+const Profile = ({ navigation }) => {
   const { user } = useGlobalContext();
+
+  const handleNavigate = (screen) => {
+    navigation.navigate(screen);
+  };
+
   return (
-    <View className={`flex-1 bg-gray-300 p-4`}>
-      <UserInfoCard user={user}></UserInfoCard>
+    <View className="flex-1 bg-white p-4">
+      <UserInfoCard user={user} />
+
+      <View className="flex-row justify-around my-4 border-t border-gray-300 pt-4">
+        <TouchableOpacity
+          onPress={() => handleNavigate("MyProblems")}
+          className="flex-1 items-center bg-white rounded-lg shadow-md p-2 mx-2"
+        >
+          <Text className="font-sscsemibold text-secondary">My Problems</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => handleNavigate("MyDiscuss")}
+          className="flex-1 items-center bg-white rounded-lg shadow-md p-2 mx-2"
+        >
+          <Text className="font-sscsemibold text-secondary">My Discuss</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => handleNavigate("Statistics")}
+          className="flex-1 items-center bg-white rounded-lg shadow-md p-2 mx-2"
+        >
+          <Text className="font-sscsemibold text-secondary">Statistics</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

@@ -65,9 +65,45 @@ const getTrendingProblems = async (limit = 10) => {
   });
 };
 
+const getProblemById = async (id) => {
+  const token = await _helpers.getToken();
+  const requestURL = `${BASE_URL}/problems/findById?problemId=${id}`;
+  return await axios.get(requestURL, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+const getAllSolvedProblems = async () => {
+  const token = await _helpers.getToken();
+  const requestURL = `${BASE_URL}/profile/get-all-solved-problems`;
+  return await axios.get(requestURL, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+const getAllUploadedProblems = async () => {
+  const token = await _helpers.getToken();
+  const requestURL = `${BASE_URL}/profile/get-all-uploaded-problems`;
+  return await axios.get(requestURL, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export {
   getProblems,
   getAllTopics,
   getTrendingProblems,
   getTrendingProblemsByTopic,
+  getProblemById,
+  getAllSolvedProblems,
+  getAllUploadedProblems,
 };

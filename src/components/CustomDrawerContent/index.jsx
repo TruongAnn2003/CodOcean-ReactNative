@@ -7,28 +7,25 @@ import UserAvatar from "../UserAvatar";
 import getAvatarLink from "../../services/dicebear-avt";
 import { MaterialIcons } from "@expo/vector-icons";
 import { images as Imgs } from "../../constants";
+import Icon from "react-native-vector-icons/Feather";
 
 const CustomDrawerContent = (props) => {
   const { user } = useGlobalContext();
 
   return (
     <DrawerContentScrollView {...props} style={styles.drawer}>
-      <View className="flex items-center mb-6 p-4 border-b border-gray-600">
-        <UserAvatar
-          size={60}
-          src={user?.urlImage}
-          className="mb-2"
-        />
+      <View className="flex items-center mb-6 p-4 border-b">
+        <UserAvatar size={60} src={user?.urlImage} className="mb-2" />
         <Text className="text-lg text-white font-sscbold">
           {user?.fullName}
         </Text>
       </View>
 
-      <View className=" px-4">
+      <View className="px-4">
         <DrawerItem
           label="Profile"
           onPress={() => props.navigation.navigate("Profile")}
-          icon={() => <MaterialIcons name="person" size={24} color="white" />}
+          icon={() => <Icon name="user" size={24} color="#ffff" />}
           className="p-3 rounded-lg mb-3 "
           labelStyle={{
             color: "white",
@@ -40,9 +37,7 @@ const CustomDrawerContent = (props) => {
         <DrawerItem
           label="Problems"
           onPress={() => props.navigation.navigate("Problems")}
-          icon={() => (
-            <MaterialIcons name="assignment" size={24} color="white" />
-          )}
+          icon={() => <Icon name="code" size={24} color="#ffff" />}
           className="p-3 rounded-lg mb-3"
           labelStyle={{
             color: "white",
@@ -54,9 +49,7 @@ const CustomDrawerContent = (props) => {
         <DrawerItem
           label="Discuss"
           onPress={() => props.navigation.navigate("Discuss")}
-          icon={() => (
-            <MaterialIcons name="assignment" size={24} color="white" />
-          )}
+          icon={() => <Icon name="message-square" size={24} color="#ffff" />}
           className="p-3 rounded-lg mb-3"
           labelStyle={{
             color: "white",
@@ -68,9 +61,7 @@ const CustomDrawerContent = (props) => {
         <DrawerItem
           label="Statistics"
           onPress={() => props.navigation.navigate("Statistics")}
-          icon={() => (
-            <MaterialIcons name="assignment" size={24} color="white" />
-          )}
+          icon={() => <Icon name="activity" size={24} color="#ffff" />}
           className="p-3 rounded-lg mb-3"
           labelStyle={{
             color: "white",
@@ -82,9 +73,7 @@ const CustomDrawerContent = (props) => {
         <DrawerItem
           label="Setting"
           onPress={() => props.navigation.navigate("Setting")}
-          icon={() => (
-            <MaterialIcons name="assignment" size={24} color="white" />
-          )}
+          icon={() => <Icon name="settings" size={24} color="#ffff" />}
           className="p-3 rounded-lg mb-3"
           labelStyle={{
             color: "white",
@@ -96,9 +85,7 @@ const CustomDrawerContent = (props) => {
         <DrawerItem
           label="Logout"
           onPress={() => props.navigation.navigate("Login")}
-          icon={() => (
-            <MaterialIcons name="assignment" size={24} color="white" />
-          )}
+          icon={() => <Icon name="log-out" size={24} color="#ffff" />}
           className="p-3 rounded-lg mb-3"
           labelStyle={{
             color: "white",
@@ -117,7 +104,7 @@ const CustomDrawerContent = (props) => {
 };
 const styles = StyleSheet.create({
   drawer: {
-    backgroundColor: "#030BA6",
+    backgroundColor: "#024873",
     flex: 1,
   },
 });

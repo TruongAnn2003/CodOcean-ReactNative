@@ -85,7 +85,7 @@ const ActiveAccount = ({ navigation, route }) => {
       <View className="flex items-center w-full">
         <Imgs.LogoBgBlue className="mb-4" />
         <View className="w-full p-4 justify-center  items-center">
-          <Text classname="text-2xl mb-6 font-sscsemibold text-primary">
+          <Text classname="text-2xl mb-6 font-sscsemibold text-secondary">
             Verify OTP
           </Text>
           <TextInput
@@ -109,7 +109,7 @@ const ActiveAccount = ({ navigation, route }) => {
           </TouchableOpacity>
           <TouchableOpacity
             className={
-              "w-full h-12 bg-secondary-100 justify-center items-center rounded-lg mb-4"
+              "w-full h-12 bg-secondary justify-center items-center rounded-lg mb-4"
             }
             onPress={handleVerifyOTP}
           >
@@ -118,7 +118,7 @@ const ActiveAccount = ({ navigation, route }) => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <Text className="text-secondary-100 text-base font-sscregular">
+            <Text className="text-secondary text-base font-sscregular">
               Login
             </Text>
           </TouchableOpacity>

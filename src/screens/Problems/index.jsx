@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   ActivityIndicator,
@@ -6,11 +6,11 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import {
   getProblems,
   getAllTopics,
-  getTrendingProblemsByTopic,
   getTrendingProblems,
 } from "../../services/api/problem";
 import * as _const from "../../utils/_const";
@@ -20,14 +20,18 @@ import ProblemList from "../../components/ProblemList";
 import TopicBar from "../../components/TopicBar";
 import SelectInput from "../../components/SelectInput";
 import { useGlobalContext } from "../../services/providers";
+import TrendingProblems from "../../components/TrendingProblems";
+import Icon from "react-native-vector-icons/Feather";
+
 const Problems = () => {
   const [problems, setProblems] = useState([]);
   const [topics, setTopics] = useState([]);
   const [trendingProblems, setTrendingProblems] = useState([]);
   const { loading, setLoading, error, setError } = useGlobalContext();
+  const [totalPage, setTotalPage] = useState(0);
   const [filter, setFilter] = useState({
     pageNumber: 0,
-    limit: 10,
+    limit: 1,
     status: "",
     difficulty: "",
     topic: "",
@@ -43,13 +47,32 @@ const Problems = () => {
       const response = await getAllTopics();
       if (response.status === _const.RESPONSE_STATUS.Ok) {
         setTopics(response.data);
-        // _helpers.log("fetchTopics-data", response.data);
       } else {
         Alert.alert("Error", "Failed to fetch topics.");
       }
     } catch (err) {
       console.error("Error fetching topics:", err);
       setError(err.message || "An error occurred while fetching topics.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProblems = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await getProblems(filter);
+      if (response.status === _const.RESPONSE_STATUS.Ok) {
+        setProblems((prev) => [...prev, ...response.data.problemDTOs]);
+        setTotalPage(response.data.totalPage);
+      } else {
+        Alert.alert("Error", "Failed to fetch problems.");
+      }
+    } catch (err) {
+      console.error("Error fetching problems:", err);
+      setError(err.message || "An error occurred while fetching problems.");
     } finally {
       setLoading(false);
     }
@@ -62,7 +85,7 @@ const Problems = () => {
     try {
       const response = await getTrendingProblems();
       if (response.status === _const.RESPONSE_STATUS.Ok) {
-        setTrendingProblems(response.data);
+        setTrendingProblems((prev) => [...prev, ...response.data]);
         // _helpers.log("fetchTrendingProblems-data", response.data);
       } else {
         Alert.alert("Error", "Failed to fetch trending problems.");
@@ -77,43 +100,44 @@ const Problems = () => {
     }
   };
 
-  const fetchProblems = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await getProblems(filter);
-      if (response.status === _const.RESPONSE_STATUS.Ok) {
-        setProblems(response.data.problemDTOs);
-      } else {
-        Alert.alert("Error", "Failed to fetch problems.");
-      }
-    } catch (err) {
-      console.error("Error fetching problems:", err);
-      setError(err.message || "An error occurred while fetching problems.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchTopics();
     fetchTrendingProblems();
   }, []);
 
   useEffect(() => {
-    _helpers.log("fetchProblems-filter", filter);
     fetchProblems();
   }, [filter]);
 
-  const handleFilterChange = (name, value) => {
-    setFilter({ ...filter, [name]: value });
+  const loadMoreProblems = () => {
+    setFilter((prev) => ({
+      ...prev,
+      pageNumber:
+        prev.pageNumber === totalPage ? totalPage : prev.pageNumber + 1,
+    }));
   };
 
-  if (loading) {
+  const scrollViewRef = useRef(null);
+
+  const handleScroll = (event) => {
+    const scrollY = event.nativeEvent.contentOffset.y;
+    const contentHeight = event.nativeEvent.contentSize.height;
+    const layoutHeight = event.nativeEvent.layoutMeasurement.height;
+
+    if (scrollY + layoutHeight >= contentHeight - 50 && !loading) {
+      loadMoreProblems();
+    }
+  };
+
+  const handleFilterChange = (name, value) => {
+    setFilter({ ...filter, [name]: value, pageNumber: 0 });
+    setProblems([]);
+  };
+
+  if (loading && problems.length === 0) {
     return (
       <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#048cbf" />
       </View>
     );
   }
@@ -121,14 +145,20 @@ const Problems = () => {
   if (error) {
     return (
       <View className="flex-1 justify-center items-center">
-        <Text className="text-red-500">{error}</Text>
+        <Text className="text-pink">{error}</Text>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 p-4">
-      <View className="mb-4">
+    <ScrollView
+      className="flex-1 p-4"
+      contentContainerStyle={{ paddingBottom: 20 }}
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
+      ref={scrollViewRef}
+    >
+      <View className="mb-4 bg-gray-50 rounded-lg p-4 shadow-md">
         <TopicBar
           topics={topics}
           onSelect={(value) => handleFilterChange("topic", value)}
@@ -145,12 +175,14 @@ const Problems = () => {
             onPress={() => handleFilterChange("searchTerm", searchTerm)}
             className="bg-white rounded-full p-2 justify-center items-center"
           >
-            <Text className="text-white text-lg font-sscsemibold">🔍</Text>
+            <Text className="text-white text-lg font-sscsemibold">
+              <Icon name="search" size={18} color="#024873"></Icon>
+            </Text>
           </TouchableOpacity>
         </View>
         <View className="flex-row justify-between mb-4">
           <View className="flex-1 mr-2">
-            <Text className="text-gray-700 font-semibold mb-2">
+            <Text className="text-secondary font-sscsemibold mb-2">
               Status: {_formatting.formatString(filter.status)}
             </Text>
             <SelectInput
@@ -163,7 +195,7 @@ const Problems = () => {
           </View>
 
           <View className="flex-1 ml-2">
-            <Text className="text-gray-700 font-semibold mb-2">
+            <Text className="text-secondary font-sscsemibold mb-2">
               Difficulty: {_formatting.formatString(filter.difficulty)}
             </Text>
             <SelectInput
@@ -176,8 +208,12 @@ const Problems = () => {
           </View>
         </View>
       </View>
-      <ProblemList problems={problems} />
-    </View>
+      <TrendingProblems trendingProblems={trendingProblems}></TrendingProblems>
+      <ProblemList
+        problems={problems}
+        loading={loading}
+      />
+    </ScrollView>
   );
 };
 

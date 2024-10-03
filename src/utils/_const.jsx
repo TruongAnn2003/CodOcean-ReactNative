@@ -1,5 +1,5 @@
 const REACT_APP_BASE_API_URL =
-  "https://76d2-2001-ee0-167-409d-45e-d6e0-6953-7c74.ngrok-free.app";
+  "https://25fb-2001-ee0-520a-4030-6c34-ae88-f707-fb9c.ngrok-free.app";
 const PROBLEM_STATUS = ["ALL", "SOLVED", "TODO", "ATTEMPTED"];
 const PROBLEM_DIFFICULTY = ["ALL", "EASY", "NORMAL", "HARD"];
 const RESPONSE_STATUS = {

@@ -15,7 +15,7 @@ const FormGetEmail = ({ onContinue }) => {
 
   return (
     <View className="w-full">
-      <Text className="mb-2 text-lg font-semibold text-gray-700">
+      <Text className="mb-2 text-lg font-sscregular text-secondary">
         Enter Your Email:
       </Text>
       <TextInput

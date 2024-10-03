@@ -4,11 +4,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#030BA6",
+        primary: "#048cbf",
         secondary: {
-          DEFAULT: "#030ABC",
-          100: "#0455BF",
-          200: "#1B72BF",
+          DEFAULT: "#024873",
+          100: "#0a0c0d",
+          200: "#022840",
+          300: "#024873",
+          400: "#048cbf",
+          500: "#88dff2",
+          600: "#ebf9ff",
         },
         black: {
           DEFAULT: "#000000",
@@ -23,7 +27,7 @@ module.exports = {
         yellow: "#FBD601",
         green: "#00B485",
         greenblue: "#4ED7D9",
-        white:"#FFFFFF"
+        white: "#FFFFFF",
       },
       fontFamily: {
         sscthin: ["SairaSemiCondensed-Thin", "sans-serif"],

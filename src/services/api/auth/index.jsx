@@ -3,7 +3,7 @@ import * as _const from "../../../utils/_const";
 import * as _helpers from "../../../utils/_helpers";
 import queryString from "query-string";
 
-const BASE_URL = `${_const.REACT_APP_BASE_API_URL}/api/login`;
+const BASE_URL = `${_const.REACT_APP_BASE_API_URL}/api/auth/v1`;
 
 /*
 {

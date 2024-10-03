@@ -13,23 +13,28 @@ function SelectInput({ options, onSelect }) {
   };
 
   return (
-    <View className="my-2 px-4">
-      <Text className="text-base mb-2">Select an option:</Text>
-      <View className="bg-gray-200 rounded-md">
-        <Picker
-          selectedValue={selectedValue}
-          onValueChange={handleValueChange}
-          className="h-12 bg-gray-200 rounded-md"
-        >
-          {options.map((option) => (
-            <Picker.Item
-              key={option.value}
-              label={option.name}
-              value={option.value}
-            />
-          ))}
-        </Picker>
-      </View>
+    <View className="bg-white rounded-lg">
+      <Picker
+        selectedValue={selectedValue}
+        onValueChange={handleValueChange}
+        className="bg-white rounded-lg"
+        style={{
+          height: 50,
+          backgroundColor: "white",
+          color: "#024873",
+          fontSize: 16,
+          borderRadius: 30,
+          fontFamily: "SairaSemiCondensed-Regular",
+        }}
+      >
+        {options.map((option) => (
+          <Picker.Item
+            key={option.value}
+            label={option.name}
+            value={option.value}
+          />
+        ))}
+      </Picker>
     </View>
   );
 }

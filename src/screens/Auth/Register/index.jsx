@@ -95,7 +95,7 @@ const Register = ({ navigation }) => {
         <View className="flex items-center w-full">
           <Imgs.LogoBgBlue className="mb-4" />
           <View className="w-full p-4 justify-center items-center ">
-            <Text className="text-2xl mb-6 font-sscsemibold text-primary">
+            <Text className="text-2xl mb-6 font-sscsemibold text-secondary">
               Register
             </Text>
 
@@ -168,7 +168,7 @@ const Register = ({ navigation }) => {
               style={{
                 width: "100%",
                 height: 48,
-                backgroundColor: "#1E3A8A",
+                backgroundColor: "#048cbf",
                 justifyContent: "center",
                 alignItems: "center",
                 borderRadius: 8,
@@ -183,7 +183,7 @@ const Register = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text className="text-secondary-100 text-base font-sscregular">
+              <Text className="text-secondary text-base font-sscregular">
                 Login
               </Text>
             </TouchableOpacity>

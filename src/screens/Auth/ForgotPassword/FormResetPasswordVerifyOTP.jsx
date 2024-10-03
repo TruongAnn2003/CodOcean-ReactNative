@@ -16,7 +16,7 @@ const FormResetPasswordVerifyOTP = ({ email, onVerify }) => {
 
   return (
     <View className="w-full p-4">
-      <Text className="mb-2 text-lg font-semibold text-gray-700">
+      <Text className="mb-2 text-lg font-sscregular text-secondary">
         Your Email:
       </Text>
       <TextInput
@@ -26,7 +26,7 @@ const FormResetPasswordVerifyOTP = ({ email, onVerify }) => {
         editable={false} // Không thể chỉnh sửa email
       />
 
-      <Text className="mb-2 text-lg font-semibold text-gray-700">
+      <Text className="mb-2 text-lg font-sscregular text-secondary">
         New Password:
       </Text>
       <TextInput
@@ -37,7 +37,7 @@ const FormResetPasswordVerifyOTP = ({ email, onVerify }) => {
         secureTextEntry={true} // Ẩn mật khẩu khi nhập
       />
 
-      <Text className="mb-2 text-lg font-semibold text-gray-700">OTP:</Text>
+      <Text className="mb-2 text-lg font-sscregular text-secondary">OTP:</Text>
       <TextInput
         placeholder="Enter OTP"
         value={otp}

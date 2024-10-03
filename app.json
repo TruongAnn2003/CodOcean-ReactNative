@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "CodOcean-ReactNative",
-    "slug": "CodOcean-ReactNative",
+    "name": "CodOcean App",
+    "slug": "CodOcean App",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo-white.png",
