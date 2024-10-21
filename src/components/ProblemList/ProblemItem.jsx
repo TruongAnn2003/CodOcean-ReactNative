@@ -1,12 +1,11 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import * as _const from "../../utils/_const";
-import { useNavigation } from "@react-navigation/native"; // Import useNavigation
+import { useNavigation } from "@react-navigation/native";
 import { getProblemById } from "../../services/api/problem";
 
 const ProblemItem = ({ problem, index }) => {
-  const navigation = useNavigation(); // Get navigation object
-
+  const navigation = useNavigation();
   const difficultyStyleColor = () => {
     switch (problem.difficulty) {
       case _const.PROBLEM_DIFFICULTY[1]:

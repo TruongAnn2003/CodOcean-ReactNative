@@ -80,16 +80,59 @@ const MainStack = ({ navigation }) => (
     />
     <Stack.Screen name="Profile" component={Profile} />
     <Stack.Screen name="ChangeInfo" component={ChangeInfo} />
-    <Stack.Screen name="Statistics" component={Statistics} />
+    <Stack.Screen
+      name="Statistics"
+      component={Statistics}
+      options={{
+        title: "My Statistics",
+        headerShown: true,
+        headerRight: () => (
+          <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+            <Ionicons
+              name="menu"
+              size={24}
+              color="#030BA6"
+              style={{ marginRight: 15 }}
+            />
+          </TouchableOpacity>
+        ),
+      }}
+    />
     <Stack.Screen
       name="MyProblems"
       component={MyProblems}
-      options={{ title: "My Problems" }}
+      options={{
+        title: "My Problems",
+        headerShown: true,
+        headerRight: () => (
+          <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+            <Ionicons
+              name="menu"
+              size={24}
+              color="#030BA6"
+              style={{ marginRight: 15 }}
+            />
+          </TouchableOpacity>
+        ),
+      }}
     />
     <Stack.Screen
       name="MyDiscuss"
       component={MyDiscuss}
-      options={{ title: "My Discuss" }}
+      options={{
+        title: "My Discuss",
+        headerShown: true,
+        headerRight: () => (
+          <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+            <Ionicons
+              name="menu"
+              size={24}
+              color="#030BA6"
+              style={{ marginRight: 15 }}
+            />
+          </TouchableOpacity>
+        ),
+      }}
     />
     <Stack.Screen name="Discuss" component={Discuss} />
     <Stack.Screen name="Setting" component={Setting} />

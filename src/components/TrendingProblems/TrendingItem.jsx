@@ -2,7 +2,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
-import * as _const from '../../utils/_const'
+import * as _const from "../../utils/_const";
+
 const TrendingItem = ({ problem, onSelect }) => {
   const difficultyStyleColor = () => {
     switch (problem.difficultyLevel) {
@@ -16,6 +17,8 @@ const TrendingItem = ({ problem, onSelect }) => {
         return "font-sscregular text-gray bg-white";
     }
   };
+
+
   return (
     <TouchableOpacity
       className="w-100 p-4 bg-white rounded-lg mx-2 shadow-lg hover:shadow-xl transition-shadow duration-300"

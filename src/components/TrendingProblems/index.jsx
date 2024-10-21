@@ -1,11 +1,25 @@
 import React from "react";
 import { View, Text, FlatList } from "react-native";
-import ProblemItem from "../ProblemList/ProblemItem"; // Ensure you have this component to render individual problems
 import TrendingItem from "./TrendingItem";
-
+import { getProblemById } from "../../services/api/problem";
+import { useNavigation } from "@react-navigation/native";
 const TrendingProblems = ({ trendingProblems }) => {
+  const navigation = useNavigation();
+  const handleSelectItem = async (problem) => {
+    try {
+      const response = await getProblemById(problem.id);
+      console.log(response.data);
+      navigation.navigate("ProblemDetail", { problem: response.data });
+    } catch (error) {
+      console.error("Failed to navigate:", error);
+    }
+  };
+
   const renderItem = ({ item }) => (
-    <TrendingItem problem={item} onSelect={() => {}} />
+    <TrendingItem
+      problem={item}
+      onSelect={(problem) => handleSelectItem(problem)}
+    />
   );
 
   return (
