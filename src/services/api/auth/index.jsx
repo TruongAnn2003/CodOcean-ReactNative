@@ -1,84 +1,89 @@
 import axios from "axios";
-import { REACT_APP_BASE_API_URL } from "../../../utils/const";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as _const from "../../../utils/_const";
+import * as _helpers from "../../../utils/_helpers";
+import queryString from "query-string";
 
-const BASE_URL = `${REACT_APP_BASE_API_URL}/api/login`;
+const BASE_URL = `${_const.REACT_APP_BASE_API_URL}/api/auth/v1`;
 
+/*
+{
+  "fullName": "John Doe",
+  "email": "teomzxc@gmail.com",
+  "phoneNumber": "2234567890",
+  "password": "abcdef",
+  "dateOfBirth": "1990-01-01T00:00:00",
+  "urlImage": "https://example.com/path/to/new-avatar.jpg"
+}
+*/
 const register = async (request) => {
   const requestURL = `${BASE_URL}/register`;
-  try {
-    console.log(requestURL);
-    console.log(request);
-    const response = await axios.post(requestURL, request, { timeout: 5000 });
-    console.log(response);
-
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  return await axios.post(requestURL, request);
 };
 
+/*
+{
+  "email": "abc@gmail.com",
+  "password": "123456Abc@"
+}
+*/
 const login = async (request) => {
   const requestURL = `${BASE_URL}/sign-in`;
-  try {
-    const response = await axios.post(requestURL, request, { timeout: 5000 });
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  return await axios.post(requestURL, request);
 };
 
-const requestOtp = async (token) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/request-otp`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Thêm token vào header
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+const activeAccountRequestOTP = async (token) => {
+  const requestURL = `${BASE_URL}/request-otp`;
+  return await axios.get(requestURL, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
-const verifyOtp = async (token, otp) => {
-  try {
-    const response = await axios.post(
-      `${BASE_URL}/verify-otp`,
-      { otp },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+/*
+{
+  "email": "abc@gmail.com"
+}
+*/
+const requestOTP = async (request) => {
+  const paramsString = queryString.stringify(request);
+  const requestURL = `${BASE_URL}/request-otp?${paramsString}`;
+  return await axios.get(requestURL);
 };
 
-const saveToken = async (token) => {
-  try {
-    await AsyncStorage.setItem("jwtToken", token);
-    console.log("Token saved successfully!");
-  } catch (error) {
-    console.error("Error saving token:", error);
-  }
+/*
+{
+  "otp": "646172"
+}
+*/
+const verifyOTP = async (token, request) => {
+  const requestURL = `${BASE_URL}/verify-otp`;
+  return await axios.post(requestURL, request, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
 
-const getToken = async () => {
-  try {
-    const token = await AsyncStorage.getItem("jwtToken");
-    if (token !== null) {
-      console.log("Token:", token);
-      return token;
-    }
-  } catch (error) {
-    console.error("Error retrieving token:", error);
-  }
+/*
+{
+  "email": "abc@gmail.com",
+  "newPassword": "123456Abc@",
+  "otp": "646172",
+}
+*/
+const forgotPassword = async (request) => {
+  const requestURL = `${BASE_URL}/forgot-password`;
+  return await axios.post(requestURL, request);
 };
 
-export { register, login, requestOtp, verifyOtp, getToken, saveToken };
+export {
+  register,
+  login,
+  activeAccountRequestOTP,
+  requestOTP,
+  verifyOTP,
+  forgotPassword,
+};

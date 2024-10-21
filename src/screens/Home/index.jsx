@@ -12,7 +12,7 @@ export default function Home({ navigation }) {
     return () => clearTimeout(timer);
   }, [navigation]);
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-secondary-100">
+    <SafeAreaView className="flex-1 items-center justify-center bg-secondary">
       <StatusBar hidden={true} />
       <Imgs.LogoBgWhite></Imgs.LogoBgWhite>
       <Imgs.WelcomeFrame></Imgs.WelcomeFrame>
