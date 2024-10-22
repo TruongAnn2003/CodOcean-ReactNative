@@ -9,94 +9,92 @@ import {
   ScrollView,
 } from "react-native";
 import {
+  FILTER_DEFAULT,
+  PROBLEM_STATUS,
+  PROBLEM_DIFFICULTY,
+} from "../../constants";
+import {
+  setFilters,
   getProblems,
-  getAllTopics,
-  getTrendingProblems,
-} from "../../services/api/problem";
-import * as _const from "../../utils/_const";
-import * as _helpers from "../../utils/_helpers";
-import * as _formatting from "../../utils/_formatting";
+  getTopics,
+  getTrending,
+  getDataStatistics,
+} from "../../services/redux-toolkit/reducers/problemSlice";
+import { setError } from "../../services/redux-toolkit/reducers/errorSlice";
+import { useTranslation } from "react-i18next";
+import { useSelector, useDispatch } from "react-redux";
+
 import ProblemList from "../../components/ProblemList";
 import TopicBar from "../../components/TopicBar";
 import SelectInput from "../../components/SelectInput";
-import { useGlobalContext } from "../../services/providers";
 import TrendingProblems from "../../components/TrendingProblems";
 import Icon from "react-native-vector-icons/Feather";
+import { formatString } from "../../utils/formatting";
 
 const Problems = () => {
-  const [problems, setProblems] = useState([]);
-  const [topics, setTopics] = useState([]);
-  const [trendingProblems, setTrendingProblems] = useState([]);
-  const { loading, setLoading, error, setError } = useGlobalContext();
-  const [totalPage, setTotalPage] = useState(0);
-  const [filter, setFilter] = useState({
-    pageNumber: 0,
-    limit: 1,
-    status: "",
-    difficulty: "",
-    topic: "",
-    searchTerm: "",
-  });
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
+  const {
+    problems,
+    filters,
+    isLoading,
+    totalPage,
+    topics,
+    trendingProblems,
+    error,
+  } = useSelector((state) => state.problem);
 
   const fetchTopics = async () => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await getAllTopics();
-      if (response.status === _const.RESPONSE_STATUS.Ok) {
-        setTopics(response.data);
-      } else {
-        Alert.alert("Error", "Failed to fetch topics.");
-      }
-    } catch (err) {
-      console.error("Error fetching topics:", err);
-      setError(err.message || "An error occurred while fetching topics.");
-    } finally {
-      setLoading(false);
+      const resultAction = await dispatch(getTopics());
+      if (getTopics.rejected.match(resultAction))
+        await dispatch(
+          setError(`${t("features.collapsibles.getTopics.failure")}: ${error}`)
+        );
+    } catch (e) {
+      dispatch(
+        setError(
+          `${t("features.collapsibles.getTopics.failure")}: ${e.message}`
+        )
+      );
     }
   };
 
   const fetchProblems = async () => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await getProblems(filter);
-      if (response.status === _const.RESPONSE_STATUS.Ok) {
-        setProblems((prev) => [...prev, ...response.data.problemDTOs]);
-        setTotalPage(response.data.totalPage);
-      } else {
-        Alert.alert("Error", "Failed to fetch problems.");
-      }
-    } catch (err) {
-      console.error("Error fetching problems:", err);
-      setError(err.message || "An error occurred while fetching problems.");
-    } finally {
-      setLoading(false);
+      const resultAction = await dispatch(getProblems(filters));
+      if (getProblems.rejected.match(resultAction))
+        await dispatch(
+          setError(
+            `${t("features.collapsibles.getProblems.failure")}: ${error}`
+          )
+        );
+    } catch (e) {
+      dispatch(
+        setError(
+          `${t("features.collapsibles.getProblems.failure")}: ${e.message}`
+        )
+      );
     }
   };
 
   const fetchTrendingProblems = async () => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await getTrendingProblems();
-      if (response.status === _const.RESPONSE_STATUS.Ok) {
-        setTrendingProblems((prev) => [...prev, ...response.data]);
-        // _helpers.log("fetchTrendingProblems-data", response.data);
-      } else {
-        Alert.alert("Error", "Failed to fetch trending problems.");
-      }
-    } catch (err) {
-      console.error("Error fetching trending problems:", err);
-      setError(
-        err.message || "An error occurred while fetching trending problems."
+      const resultAction = await dispatch(getTrending());
+      if (getTrending.rejected.match(resultAction))
+        await dispatch(
+          setError(
+            `${t("features.collapsibles.getTrending.failure")}: ${error}`
+          )
+        );
+    } catch (e) {
+      dispatch(
+        setError(
+          `${t("features.collapsibles.getTrending.failure")}: ${e.message}`
+        )
       );
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -106,15 +104,15 @@ const Problems = () => {
   }, []);
 
   useEffect(() => {
-    fetchProblems();
-  }, [filter]);
+    fetchProblems(); // Fetch problems with updated filters
+  }, [filters]);
 
   const loadMoreProblems = () => {
-    setFilter((prev) => ({
-      ...prev,
+    updateFilters({
+      ...filters,
       pageNumber:
-        prev.pageNumber === totalPage ? totalPage : prev.pageNumber + 1,
-    }));
+        filters.pageNumber === totalPage ? totalPage : filters.pageNumber + 1,
+    });
   };
 
   const scrollViewRef = useRef(null);
@@ -124,17 +122,20 @@ const Problems = () => {
     const contentHeight = event.nativeEvent.contentSize.height;
     const layoutHeight = event.nativeEvent.layoutMeasurement.height;
 
-    if (scrollY + layoutHeight >= contentHeight - 50 && !loading) {
+    if (scrollY + layoutHeight >= contentHeight - 50 && !isLoading) {
       loadMoreProblems();
     }
   };
 
-  const handleFilterChange = (name, value) => {
-    setFilter({ ...filter, [name]: value, pageNumber: 0 });
-    setProblems([]);
+  const updateFilters = (newFilters) => {
+    dispatch(setFilters({ newFilters })); // Update filters
   };
 
-  if (loading && problems.length === 0) {
+  const handleFilterChange = (name, value) => {
+    updateFilters({ ...filters, [name]: value, pageNumber: 0 });
+  };
+
+  if (isLoading && problems.length === 0) {
     return (
       <View className="flex-1 justify-center items-center">
         <ActivityIndicator size="large" color="#048cbf" />
@@ -145,7 +146,9 @@ const Problems = () => {
   if (error) {
     return (
       <View className="flex-1 justify-center items-center">
-        <Text className="text-pink">{error}</Text>
+        <Text className="text-pink">
+          {error?.message || "An error occurred"}
+        </Text>
       </View>
     );
   }
@@ -175,19 +178,17 @@ const Problems = () => {
             onPress={() => handleFilterChange("searchTerm", searchTerm)}
             className="bg-white rounded-full p-2 justify-center items-center"
           >
-            <Text className="text-white text-lg font-sscsemibold">
-              <Icon name="search" size={18} color="#024873"></Icon>
-            </Text>
+            <Icon name="search" size={18} color="#024873" />
           </TouchableOpacity>
         </View>
         <View className="flex-row justify-between mb-4">
           <View className="flex-1 mr-2">
             <Text className="text-secondary font-sscsemibold mb-2">
-              Status: {_formatting.formatString(filter.status)}
+              Status: {formatString(filters.status)}
             </Text>
             <SelectInput
-              options={_const.PROBLEM_STATUS.map((status) => ({
-                name: _formatting.formatString(status),
+              options={PROBLEM_STATUS.map((status) => ({
+                name: formatString(status),
                 value: status,
               }))}
               onSelect={(value) => handleFilterChange("status", value)}
@@ -196,11 +197,11 @@ const Problems = () => {
 
           <View className="flex-1 ml-2">
             <Text className="text-secondary font-sscsemibold mb-2">
-              Difficulty: {_formatting.formatString(filter.difficulty)}
+              Difficulty: {formatString(filters.difficulty)}
             </Text>
             <SelectInput
-              options={_const.PROBLEM_DIFFICULTY.map((difficulty) => ({
-                name: _formatting.formatString(difficulty),
+              options={PROBLEM_DIFFICULTY.map((difficulty) => ({
+                name: formatString(difficulty),
                 value: difficulty,
               }))}
               onSelect={(value) => handleFilterChange("difficulty", value)}
@@ -208,11 +209,8 @@ const Problems = () => {
           </View>
         </View>
       </View>
-      <TrendingProblems trendingProblems={trendingProblems}></TrendingProblems>
-      <ProblemList
-        problems={problems}
-        loading={loading}
-      />
+      <TrendingProblems></TrendingProblems>
+      <ProblemList problems={problems} isloading={isLoading} />
     </ScrollView>
   );
 };

@@ -1,4 +1,4 @@
-import {Login ,ActiveAccount}from "./Login";
-import Register from "./Register";
+import {SignIn ,ActiveAccount}from "./SignIn";
+import SignUp from "./SignUp";
 import ForgotPassword from "./ForgotPassword";
-export { Login, Register, ForgotPassword, ActiveAccount };
+export { SignIn, SignUp, ForgotPassword, ActiveAccount };

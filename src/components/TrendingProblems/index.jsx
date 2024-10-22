@@ -1,17 +1,30 @@
 import React from "react";
 import { View, Text, FlatList } from "react-native";
 import TrendingItem from "./TrendingItem";
-import { getProblemById } from "../../services/api/problem";
 import { useNavigation } from "@react-navigation/native";
-const TrendingProblems = ({ trendingProblems }) => {
+import { useSelector, useDispatch } from "react-redux";
+import { getProblemById } from "../../services/redux-toolkit/reducers/problemSlice";
+import { useTranslation } from "react-i18next";
+const TrendingProblems = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { trendingProblems, isloading } = useSelector((state) => state.problem);
+  const { t } = useTranslation();
   const handleSelectItem = async (problem) => {
     try {
-      const response = await getProblemById(problem.id);
-      console.log(response.data);
-      navigation.navigate("ProblemDetail", { problem: response.data });
-    } catch (error) {
-      console.error("Failed to navigate:", error);
+      const resultAction = await dispatch(getProblemById(problem.id));
+      if (getProblemById.rejected.match(resultAction))
+        await dispatch(
+          setError(
+            `${t("features.collapsibles.getProblemById.failure")}: ${error}`
+          )
+        );
+    } catch (e) {
+      dispatch(
+        setError(
+          `${t("features.collapsibles.getProblemById.failure")}: ${e.message}`
+        )
+      );
     }
   };
 

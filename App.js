@@ -1,12 +1,12 @@
-import { StatusBar } from "expo-status-bar";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import GlobalProvider from "./src/services/providers/GlobalProvider";
 import { useFonts } from "expo-font";
 import DrawerNavigator from "./src/navigation/DrawerNavigator";
-import BottomTabNavigator from "./src/navigation/BottomTabNavigator";
-const Stack = createNativeStackNavigator();
+import i18n from "./src/services/i18n"; // Assuming you have i18n setup
+// Assuming you have this component
+import AppWrapper from "./src/components/AppWrapper";
+import AppLayout from "./src/components/AppLayout";
 
 export default function App() {
   const [fontsLoaded, error] = useFonts({
@@ -21,6 +21,7 @@ export default function App() {
     "SairaSemiCondensed-Thin": require("./assets/fonts/SairaSemiCondensed-Thin.ttf"),
   });
 
+  // Loading indicator for fonts
   if (!fontsLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -29,6 +30,7 @@ export default function App() {
     );
   }
 
+  // Error handling for fonts loading
   if (error) {
     console.error(error);
     return (
@@ -39,10 +41,12 @@ export default function App() {
   }
 
   return (
-    <GlobalProvider>
-      <NavigationContainer>
-        <DrawerNavigator />
-      </NavigationContainer>
-    </GlobalProvider>
+    <AppWrapper>
+      <AppLayout>
+        <NavigationContainer>
+          <DrawerNavigator />
+        </NavigationContainer>
+      </AppLayout>
+    </AppWrapper>
   );
 }

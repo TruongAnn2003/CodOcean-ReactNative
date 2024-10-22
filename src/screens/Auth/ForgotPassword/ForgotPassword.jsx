@@ -11,58 +11,13 @@ import {
 import FormGetEmail from "./FormGetEmail";
 import FormResetPasswordVerifyOTP from "./FormResetPasswordVerifyOTP";
 import { images as Imgs } from "../../../constants";
-import { requestOTP, forgotPassword } from "../../../services/api/auth";
-import { useGlobalContext } from "../../../services/providers";
-import * as _const from "../../../utils/_const";
+import { useSelector } from "react-redux";
+
 const ForgotPassword = ({ navigation }) => {
-  const { loading, setLoading } = useGlobalContext();
-  const [email, setEmail] = useState(null);
-  const [isOtpSent, setIsOtpSent] = useState(false);
-
+  const { isLoading, error } = useSelector((state) => state.auth); // error có thể là object
+  const [email, setEmail] = useState("");
   const handleContinue = async (email) => {
-    setLoading(true);
-    try {
-      setEmail(email);
-      const response = await requestOTP({ email });
-      if (response.status === _const.RESPONSE_STATUS.Created) {
-        setIsOtpSent(true);
-        Alert.alert("Success", "OTP has been sent to your email.");
-      } else {
-        Alert.alert("Error", "Failed to send OTP. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error requesting OTP:", error);
-      Alert.alert("Error", "An error occurred while requesting OTP.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerify = async (newPassword, otp) => {
-    setLoading(true);
-    try {
-      if (!newPassword || !otp) {
-        Alert.alert("Error", "Please provide both OTP and new password.");
-        return;
-      }
-
-      const response = await forgotPassword({ email, otp, newPassword });
-
-      if (response.status === _const.RESPONSE_STATUS.Ok) {
-        Alert.alert("Success", "Your password has been successfully reset.");
-        navigation.navigate("Login");
-      } else {
-        Alert.alert("Error", "Failed to reset password. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error during password reset:", error);
-      Alert.alert(
-        "Error",
-        "An error occurred while resetting password. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
+    setEmail(email);
   };
 
   return (
@@ -73,21 +28,19 @@ const ForgotPassword = ({ navigation }) => {
           <Text className="text-2xl mb-6 font-sscsemibold text-secondary">
             Forgot Password
           </Text>
-          {isOtpSent ? (
-            <FormResetPasswordVerifyOTP
-              loading
-              email={email}
-              onVerify={handleVerify}
-            />
-          ) : (
+          {email === "" ? (
             <FormGetEmail loading onContinue={handleContinue} />
+          ) : (
+            <FormResetPasswordVerifyOTP
+              email={email}
+            />
           )}
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+          <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
             <Text className="text-secondary text-base font-sscregular">
-              Login
+              Sign In
             </Text>
           </TouchableOpacity>
-          {loading && <ActivityIndicator size="large" />}
+          {isLoading && <ActivityIndicator size="large" />}
         </View>
       </View>
     </SafeAreaView>

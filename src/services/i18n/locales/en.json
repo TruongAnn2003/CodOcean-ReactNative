@@ -1,0 +1,67 @@
+{
+  "language": "Language",
+  "home": {
+    "title": "Home"
+  },
+  "features": {
+    "title": "Features",
+    "collapsibles": {
+      "signIn": {
+        "success": "Login successful.",
+        "failure": "Login failed.",
+        "invalidCredentials": "Incorrect email or password."
+      },
+      "signUp": {
+        "success": "Sign up successful.",
+        "failure": "Sign up failed.",
+        "emailTaken": "Email is already registered.",
+        "phoneNumberTaken": "Phone number is already registered."
+      },
+      "requestOTP": {
+        "success": "OTP has been sent to your email.",
+        "failure": "OTP request failed, please click 'Send OTP' to resend OTP."
+      },
+      "activeAccount": {
+        "success": "Account activation successful.",
+        "failure": "Account activation failed, please check the OTP you entered."
+      },
+      "resetPassword": {
+        "success": "Password reset successful.",
+        "failure": "Password reset failed, please check the OTP you entered."
+      },
+      "getCurrentUser": {
+        "failure": "Unable to retrieve current user information."
+      },
+      "signOut": {
+        "failure": "Sign out failed."
+      },
+
+      "role": {
+        "undefined": "UserRole is undefined."
+      },
+      "getTopics": {
+        "failure": "Fetch topics failed."
+      },
+      "getProblems": {
+        "failure": "Fetch problems failed."
+      },
+      "getProblemById": {
+        "failure": "Fetch problem by id failed."
+      },
+      "getTrending": {
+        "failure": "Fetch trending failed."
+      },
+      "getStatistics": {
+        "failure": "Fetch statistics failed."
+      },
+      "profile": {
+        "getAllSolvedProblems": {
+          "failure": "Fetch all solved problems failed."
+        },
+        "getAllUploadedProblems": {
+          "failure": "Fetch all uploaded problems failed."
+        }
+      }
+    }
+  }
+}

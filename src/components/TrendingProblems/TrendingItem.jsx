@@ -2,16 +2,15 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
-import * as _const from "../../utils/_const";
-
+import { PROBLEM_DIFFICULTY } from "../../constants";
 const TrendingItem = ({ problem, onSelect }) => {
   const difficultyStyleColor = () => {
-    switch (problem.difficultyLevel) {
-      case _const.PROBLEM_DIFFICULTY[1]:
+    switch (problem.difficulty) {
+      case PROBLEM_DIFFICULTY[1]:
         return "font-sscregular text-green bg-white";
-      case _const.PROBLEM_DIFFICULTY[2]:
+      case PROBLEM_DIFFICULTY[2]:
         return "font-sscregular text-yellow bg-white";
-      case _const.PROBLEM_DIFFICULTY[3]:
+      case PROBLEM_DIFFICULTY[3]:
         return "font-sscregular text-pink bg-white";
       default:
         return "font-sscregular text-gray bg-white";
@@ -25,7 +24,7 @@ const TrendingItem = ({ problem, onSelect }) => {
       onPress={() => onSelect(problem)}
     >
       <Text className="font-sscsemibold text-lg text-secondary mb-2">
-        {problem.name}
+        {problem.title}
       </Text>
 
       <View className="flex-row items-center mb-1">

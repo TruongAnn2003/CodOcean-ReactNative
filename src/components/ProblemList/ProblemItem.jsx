@@ -1,18 +1,22 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import * as _const from "../../utils/_const";
+import { PROBLEM_STATUS, PROBLEM_DIFFICULTY } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
-import { getProblemById } from "../../services/api/problem";
-
+import { useDispatch } from "react-redux";
+import { getProblemById } from "../../services/redux-toolkit/reducers/problemSlice";
+import { setError } from "../../services/redux-toolkit/reducers/errorSlice";
+import { useTranslation } from "react-i18next";
 const ProblemItem = ({ problem, index }) => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
   const difficultyStyleColor = () => {
     switch (problem.difficulty) {
-      case _const.PROBLEM_DIFFICULTY[1]:
+      case PROBLEM_DIFFICULTY[1]:
         return "font-sscregular text-green bg-white";
-      case _const.PROBLEM_DIFFICULTY[2]:
+      case PROBLEM_DIFFICULTY[2]:
         return "font-sscregular text-yellow bg-white";
-      case _const.PROBLEM_DIFFICULTY[3]:
+      case PROBLEM_DIFFICULTY[3]:
         return "font-sscregular text-pink bg-white";
       default:
         return "font-sscregular text-gray bg-white";
@@ -21,11 +25,19 @@ const ProblemItem = ({ problem, index }) => {
 
   const handlePress = async () => {
     try {
-      const response = await getProblemById(problem.id);
-      console.log(response.data);
-      navigation.navigate("ProblemDetail", { problem: response.data });
-    } catch (error) {
-      console.error("Failed to navigate:", error);
+      const resultAction = await dispatch(getProblemById(problem.id));
+      if (getAllSolvedProblems.rejected.match(resultAction))
+        await dispatch(
+          setError(
+            `${t("features.collapsibles.getProblemById.failure")}: ${error}`
+          )
+        );
+    } catch (e) {
+      dispatch(
+        setError(
+          `${t("features.collapsibles.getProblemById.failure")}: ${e.message}`
+        )
+      );
     }
   };
   return (
