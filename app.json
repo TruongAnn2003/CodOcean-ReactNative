@@ -23,10 +23,15 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "fonts": {
       "SairaSemiCondensed-Thin": "./assets/fonts/SairaSemiCondensed-Thin.ttf",
       "SairaSemiCondensed-ExtraLight": "./assets/fonts/SairaSemiCondensed-ExtraLight.ttf"
-    }
+    },
+    "plugins": [
+      "expo-localization"
+    ]
   }
 }

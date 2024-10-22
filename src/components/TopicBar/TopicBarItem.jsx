@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Text, View } from "react-native";
-import * as _formatting from "../../utils/_formatting";
+import * as _formatting from "../../utils/formatting";
 function TopicBarItem({ topic, onSelect }) {
   return (
     <TouchableOpacity

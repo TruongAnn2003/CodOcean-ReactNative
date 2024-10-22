@@ -1,89 +1,55 @@
-import axios from "axios";
-import * as _const from "../../../utils/_const";
-import * as _helpers from "../../../utils/_helpers";
-import queryString from "query-string";
+import { axiosInstance } from '../api';
+import queryString from 'query-string';
+import { getTokens } from '../../../utils/tokenUtils';
 
-const BASE_URL = `${_const.REACT_APP_BASE_API_URL}/api/auth/v1`;
+export const signUpAPI = (formData) => axiosInstance.post('/auth/v1/sign-up', formData);
 
-/*
-{
-  "fullName": "John Doe",
-  "email": "teomzxc@gmail.com",
-  "phoneNumber": "2234567890",
-  "password": "abcdef",
-  "dateOfBirth": "1990-01-01T00:00:00",
-  "urlImage": "https://example.com/path/to/new-avatar.jpg"
-}
-*/
-const register = async (request) => {
-  const requestURL = `${BASE_URL}/register`;
-  return await axios.post(requestURL, request);
+export const signInAPI = (formData) => axiosInstance.post('/auth/v1/sign-in', formData);
+
+export const requestOTPForActivationAPI = () =>
+  axiosInstance.get('/auth/v1/request-otp', {
+    requiresAuth: true,
+  });
+
+export const requestOTPByEmailAPI = (email) => {
+  const paramsString = queryString.stringify({ email });
+  return axiosInstance.get(`/auth/v1/request-otp?${paramsString}`);
 };
 
-/*
-{
-  "email": "abc@gmail.com",
-  "password": "123456Abc@"
-}
-*/
-const login = async (request) => {
-  const requestURL = `${BASE_URL}/sign-in`;
-  return await axios.post(requestURL, request);
-};
+export const verifyOTPAPI = (formData) =>
+  axiosInstance.post('/auth/v1/verify-otp', formData, {
+    requiresAuth: true,
+  });
+export const forgotPasswordAPI = (formData) => axiosInstance.post('/auth/v1/forgot-password', formData);
 
-const activeAccountRequestOTP = async (token) => {
-  const requestURL = `${BASE_URL}/request-otp`;
-  return await axios.get(requestURL, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+export const getCurrentUserAPI = () => {
+  return axiosInstance.get('/user/current', {
+    requiresAuth: true,
   });
 };
 
-/*
-{
-  "email": "abc@gmail.com"
-}
-*/
-const requestOTP = async (request) => {
-  const paramsString = queryString.stringify(request);
-  const requestURL = `${BASE_URL}/request-otp?${paramsString}`;
-  return await axios.get(requestURL);
-};
-
-/*
-{
-  "otp": "646172"
-}
-*/
-const verifyOTP = async (token, request) => {
-  const requestURL = `${BASE_URL}/verify-otp`;
-  return await axios.post(requestURL, request, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+export const refreshAccessTokenAPI = async () => {
+  const { refreshToken } = await getTokens();
+  return axiosInstance.post(
+    '/auth/v1/refresh-token',
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+      },
     },
-  });
+  );
 };
 
-/*
-{
-  "email": "abc@gmail.com",
-  "newPassword": "123456Abc@",
-  "otp": "646172",
-}
-*/
-const forgotPassword = async (request) => {
-  const requestURL = `${BASE_URL}/forgot-password`;
-  return await axios.post(requestURL, request);
-};
-
-export {
-  register,
-  login,
-  activeAccountRequestOTP,
-  requestOTP,
-  verifyOTP,
-  forgotPassword,
+export const signOutAPI = async () => {
+  const { refreshToken } = await getTokens();
+  return axiosInstance.post(
+    '/auth/v1/sign-out',
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+      },
+    },
+  );
 };

@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, Dimensions,ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Dimensions,
+  ScrollView,
+} from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import {
   getAllSolvedProblems,
   getAllUploadedProblems,
-} from "../../../services/api/problem";
+} from "../../../services/redux-toolkit/reducers/profileSlice";
 import ProblemList from "../../../components/ProblemList";
+import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const UploadedProblemsRoute = ({ problems, loading }) => {
   return (
@@ -38,31 +46,54 @@ const MyProblems = () => {
     { key: "solved", title: "Solved" },
   ]);
 
-  const [solvedProblems, setSolvedProblems] = useState([]);
-  const [uploadedProblems, setUploadedProblems] = useState([]);
-  const [loadingSolved, setLoadingSolved] = useState(true);
-  const [loadingUploaded, setLoadingUploaded] = useState(true);
+  const { solvedProblems, uploadedProblems, isLoading, error } = useSelector(
+    (state) => state.profile
+  );
 
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
   useEffect(() => {
     const fetchSolvedProblems = async () => {
       try {
-        const response = await getAllSolvedProblems();
-        setSolvedProblems(response.data);
-      } catch (error) {
-        console.error("Error fetching solved problems:", error);
-      } finally {
-        setLoadingSolved(false);
+        const resultAction = await dispatch(getAllSolvedProblems());
+        if (getAllSolvedProblems.rejected.match(resultAction))
+          await dispatch(
+            setError(
+              `${t(
+                "features.collapsibles.profile.getAllSolvedProblems.failure"
+              )}: ${error}`
+            )
+          );
+      } catch (e) {
+        dispatch(
+          setError(
+            `${t(
+              "features.collapsibles.profile.getAllSolvedProblems.failure"
+            )}: ${e.message}`
+          )
+        );
       }
     };
 
     const fetchUploadedProblems = async () => {
       try {
-        const response = await getAllUploadedProblems();
-        setUploadedProblems(response.data);
-      } catch (error) {
-        console.error("Error fetching uploaded problems:", error);
-      } finally {
-        setLoadingUploaded(false);
+        const resultAction = await dispatch(getAllUploadedProblems());
+        if (getAllUploadedProblems.rejected.match(resultAction))
+          await dispatch(
+            setError(
+              `${t(
+                "features.collapsibles.profile.getAllUploadedProblems.failure"
+              )}: ${error}`
+            )
+          );
+      } catch (e) {
+        dispatch(
+          setError(
+            `${t(
+              "features.collapsibles.profile.getAllUploadedProblems.failure"
+            )}: ${e.message}`
+          )
+        );
       }
     };
 
@@ -72,13 +103,10 @@ const MyProblems = () => {
 
   const renderScene = SceneMap({
     uploaded: () => (
-      <UploadedProblemsRoute
-        problems={uploadedProblems}
-        loading={loadingUploaded}
-      />
+      <UploadedProblemsRoute problems={uploadedProblems} loading={isLoading} />
     ),
     solved: () => (
-      <SolvedProblemsRoute problems={solvedProblems} loading={loadingSolved} />
+      <SolvedProblemsRoute problems={solvedProblems} loading={isLoading} />
     ),
   });
 

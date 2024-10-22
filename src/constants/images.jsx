@@ -12,3 +12,4 @@ export default {
   WelcomeFrame,
   WhaleBg,
 };
+

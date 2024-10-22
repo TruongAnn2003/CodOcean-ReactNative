@@ -1,36 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import PieChart from "../../../components/Charts/PieChart";
 import LineChart from "../../../components/Charts/LineChart";
-import { getDataStatistics } from "../../../services/api/user";
-import { useGlobalContext } from "../../../services/providers";
+import { getDataStatistics } from "../../../services/redux-toolkit/reducers/problemSlice";
+import { setError } from "../../../services/redux-toolkit/reducers/errorSlice";
 const Statistics = () => {
-  const [dataStatistics, setDataStatistics] = useState({
-    totalEasy: 0,
-    totalNormal: 0,
-    totalHard: 0,
-    easy: [0, 0, 0, 0, 0, 0, 0],
-    normal: [0, 0, 0, 0, 0, 0, 0],
-    hard: [0, 0, 0, 0, 0, 0, 0],
-  });
-  const { loading, setLoading, error, setError } = useGlobalContext();
-
+  const { isloading, error, statisticsDatasets } = useSelector(
+    (state) => state.problem
+  );
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getDataStatistics();
-        setDataStatistics(response.data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        const resultAction = await dispatch(getDataStatistics());
+        if (getDataStatistics.rejected.match(resultAction)) {
+          await dispatch(
+            setError(
+              `${t("features.collapsibles.getStatistics.failure")} (${error})`
+            )
+          );
+        }
+      } catch (e) {
+        await dispatch(
+          setError(
+            `${t("features.collapsibles.getStatistics.failure")} (${e.message})`
+          )
+        );
       }
     };
 
     fetchData();
   }, []);
 
-  if (loading) {
+  if (isloading) {
     return <ActivityIndicator size="large" color="#024873" />; // Show loading indicator
   }
 
@@ -45,21 +50,21 @@ const Statistics = () => {
           data={[
             {
               name: "Easy",
-              population: dataStatistics.totalEasy,
+              population: statisticsDatasets.totalEasy,
               color: "#00B485",
               legendFontColor: "#024873",
               legendFontSize: 15,
             },
             {
               name: "Normal",
-              population: dataStatistics.totalNormal,
+              population: statisticsDatasets.totalNormal,
               color: "#FBD601",
               legendFontColor: "#024873",
               legendFontSize: 15,
             },
             {
               name: "Hard",
-              population: dataStatistics.totalHard,
+              population: statisticsDatasets.totalHard,
               color: "#DC4C67",
               legendFontColor: "#024873",
               legendFontSize: 15,
@@ -82,19 +87,19 @@ const Statistics = () => {
             ],
             datasets: [
               {
-                data: dataStatistics.easy,
+                data: statisticsDatasets.easy,
                 color: () => "#00B485",
                 strokeWidth: 2,
                 label: "Easy",
               },
               {
-                data: dataStatistics.normal,
+                data: statisticsDatasets.normal,
                 color: () => "#FBD601",
                 strokeWidth: 2,
                 label: "Normal",
               },
               {
-                data: dataStatistics.hard,
+                data: statisticsDatasets.hard,
                 color: () => "#DC4C67",
                 strokeWidth: 2,
                 label: "Hard",

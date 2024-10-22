@@ -1,10 +1,10 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import UserInfoCard from "../../../components/UserInfoCard";
-import { useGlobalContext } from "../../../services/providers";
+import { useSelector } from "react-redux";
 
 const Profile = ({ navigation }) => {
-  const { user } = useGlobalContext();
+  const { user } = useSelector((state) => state.auth);
 
   const handleNavigate = (screen) => {
     navigation.navigate(screen);

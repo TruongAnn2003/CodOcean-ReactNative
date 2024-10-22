@@ -1,0 +1,66 @@
+{
+  "language": "Ngôn ngữ",
+  "home": {
+    "title": "Trang chủ"
+  },
+  "features": {
+    "title": "Tính năng",
+    "collapsibles": {
+      "signIn": {
+        "success": "Đăng nhập thành công.",
+        "failure": "Đăng nhập thất bại.",
+        "invalidCredentials": "Email hoặc mật khẩu bị sai."
+      },
+      "signUp": {
+        "success": "Đăng ký thành công.",
+        "failure": "Đăng ký thất bại.",
+        "emailTaken": "Email đã được đăng ký trước đó.",
+        "phoneNumberTaken": "Số điện thoại đã được đăng ký trước đó."
+      },
+      "requestOTP": {
+        "success": "OTP đã được gửi đến email của bạn.",
+        "failure": "Yêu cầu OTP thất bại, vui lòng chọn nút 'Gửi OTP' tiếp tục gửi OTP."
+      },
+      "activeAccount": {
+        "success": "Kích hoạt tài khoản thành công.",
+        "failure": "Kích hoạt tài khoản thất bại, vui lòng kiểm tra lại mã OTP đã nhập."
+      },
+      "resetPassword": {
+        "success": "Thay đổi mật khẩu thành công.",
+        "failure": "Thay đổi mật khẩu thất bại, vui lòng kiểm tra lại mã OTP đã nhập."
+      },
+      "getCurrentUser": {
+        "failure": "Không thể lấy được thông tin người dùng hiện tại."
+      },
+      "signOut": {
+        "failure": "Đăng xuất thất bại."
+      },
+      "role": {
+        "undefined": "Vai trò của người dùng không hợp lệ."
+      },
+      "getTopics": {
+        "failure": "Lấy danh sách chủ đề bài toán thất bại."
+      },
+      "getProblems": {
+        "failure": "Lấy danh sách bài toán thất bại."
+      },
+      "getProblemById": {
+        "failure": "Lấy danh sách bài toán theo id thất bại."
+      },
+      "getTrending": {
+        "failure": "Lấy danh sách bài toán thịnh hành thất bại."
+      },
+      "getStatistics": {
+        "failure": "Lấy dữ liệu thống kê thất bại."
+      },
+      "profile": {
+        "getAllSolvedProblems": {
+          "failure": "Lấy danh sách các bài toán đã làm thất bại."
+        },
+        "getAllUploadedProblems": {
+          "failure": "Lấy danh sách các bài toán đã đăng thất bại."
+        }
+      }
+    }
+  }
+}

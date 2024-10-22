@@ -4,24 +4,36 @@ import { TouchableOpacity, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Home from "../../screens/Home";
 import ProblemDetail from "../../components/ProblemDetail";
-import {
-  Login,
-  ActiveAccount,
-  Register,
-  ForgotPassword,
-} from "../../screens/Auth";
-// import Problems from "../../screens/Problems";
-import {
-  Profile,
-  ChangeInfo,
-  MyProblems,
-  Statistics,
-  MyDiscuss,
-} from "../../screens/User";
+// import {
+//   SignIn,
+//   ActiveAccount,
+//   SignUp,
+//   ForgotPassword,
+// } from "../../screens/Auth";
+// import {
+//   Profile,
+//   ChangeInfo,
+//   MyProblems,
+//   Statistics,
+//   MyDiscuss,
+// } from "../../screens/User";
 import Discuss from "../../screens/Discuss";
 import Setting from "../../screens/Setting";
 const Stack = createNativeStackNavigator();
 const Problems = React.lazy(() => import("../../screens/Problems"));
+const Profile = React.lazy(() => import("../../screens/User/Profile"));
+const MyProblems = React.lazy(() => import("../../screens/User/MyProblems"));
+const Statistics = React.lazy(() => import("../../screens/User/Statistics"));
+const MyDiscuss = React.lazy(() => import("../../screens/User/MyDiscuss"));
+const ChangeInfo = React.lazy(() => import("../../screens/User/ChangeInfo"));
+const SignIn = React.lazy(() => import("../../screens/Auth/SignIn/SignIn"));
+const SignUp = React.lazy(() => import("../../screens/Auth/SignUp"));
+const ForgotPassword = React.lazy(() =>
+  import("../../screens/Auth/ForgotPassword")
+);
+const ActiveAccount = React.lazy(() =>
+  import("../../screens/Auth/SignIn/ActiveAccount")
+);
 const MainStack = ({ navigation }) => (
   <Stack.Navigator>
     <Stack.Screen
@@ -32,8 +44,8 @@ const MainStack = ({ navigation }) => (
       }}
     />
     <Stack.Screen
-      name="Login"
-      component={Login}
+      name="SignIn"
+      component={SignIn}
       options={{ headerShown: false }}
     />
     <Stack.Screen
@@ -47,8 +59,8 @@ const MainStack = ({ navigation }) => (
       options={{ headerShown: false }}
     />
     <Stack.Screen
-      name="Register"
-      component={Register}
+      name="SignUp"
+      component={SignUp}
       options={{ headerShown: false }}
     />
     <Stack.Screen
@@ -60,7 +72,7 @@ const MainStack = ({ navigation }) => (
             <Ionicons
               name="menu"
               size={24}
-              color="#030BA6"
+              color="#0a0c0d"
               style={{ marginRight: 15 }}
             />
           </TouchableOpacity>
@@ -91,7 +103,7 @@ const MainStack = ({ navigation }) => (
             <Ionicons
               name="menu"
               size={24}
-              color="#030BA6"
+              color="#0a0c0d"
               style={{ marginRight: 15 }}
             />
           </TouchableOpacity>
@@ -109,7 +121,7 @@ const MainStack = ({ navigation }) => (
             <Ionicons
               name="menu"
               size={24}
-              color="#030BA6"
+              color="#0a0c0d"
               style={{ marginRight: 15 }}
             />
           </TouchableOpacity>
@@ -127,7 +139,7 @@ const MainStack = ({ navigation }) => (
             <Ionicons
               name="menu"
               size={24}
-              color="#030BA6"
+              color="#0a0c0d"
               style={{ marginRight: 15 }}
             />
           </TouchableOpacity>

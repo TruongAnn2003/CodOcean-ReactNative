@@ -1,16 +1,15 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
-import { useGlobalContext } from "../../services/providers";
 // import UserAvatar from "react-native-user-avatar";
 import UserAvatar from "../UserAvatar";
 import getAvatarLink from "../../services/dicebear-avt";
 import { MaterialIcons } from "@expo/vector-icons";
 import { images as Imgs } from "../../constants";
 import Icon from "react-native-vector-icons/Feather";
-
+import { useSelector } from "react-redux";
 const CustomDrawerContent = (props) => {
-  const { user } = useGlobalContext();
+  const { user } = useSelector((state) => state.auth);
 
   return (
     <DrawerContentScrollView {...props} style={styles.drawer}>
