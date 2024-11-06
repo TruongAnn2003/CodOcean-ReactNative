@@ -1,18 +1,35 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import UserInfoCard from "../../../components/UserInfoCard";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import { getProfile } from "../../../services/redux-toolkit/reducers/profileSlice";
+import { setError } from "../../../services/redux-toolkit/reducers/messageSlice";
 
-const Profile = ({ navigation }) => {
-  const { user } = useSelector((state) => state.auth);
-
+const Profile = () => {
+  const { user } = useSelector((state) => state.profile);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
   const handleNavigate = (screen) => {
     navigation.navigate(screen);
   };
 
+  const fetchProfileUser = async () => {
+    try {
+      const resultAction = await dispatch(getProfile());
+      if (getProfile.rejected.match(resultAction)) {
+        dispatch(setError("Fetch Profile Fail!"));
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    fetchProfileUser();
+  }, []);
+
   return (
     <View className="flex-1 bg-white p-4">
-      <UserInfoCard user={user} />
+      <UserInfoCard />
 
       <View className="flex-row justify-around my-4 border-t border-gray-300 pt-4">
         <TouchableOpacity

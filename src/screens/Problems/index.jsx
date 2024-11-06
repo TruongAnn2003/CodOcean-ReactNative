@@ -1,34 +1,31 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  View,
   ActivityIndicator,
-  Alert,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
+  View
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import {
-  FILTER_DEFAULT,
-  PROBLEM_STATUS,
   PROBLEM_DIFFICULTY,
+  PROBLEM_STATUS
 } from "../../constants";
+import { setError } from "../../services/redux-toolkit/reducers/messageSlice";
 import {
-  setFilters,
   getProblems,
   getTopics,
   getTrending,
-  getDataStatistics,
+  setFilters
 } from "../../services/redux-toolkit/reducers/problemSlice";
-import { setError } from "../../services/redux-toolkit/reducers/errorSlice";
-import { useTranslation } from "react-i18next";
-import { useSelector, useDispatch } from "react-redux";
 
-import ProblemList from "../../components/ProblemList";
-import TopicBar from "../../components/TopicBar";
-import SelectInput from "../../components/SelectInput";
-import TrendingProblems from "../../components/TrendingProblems";
 import Icon from "react-native-vector-icons/Feather";
+import ProblemList from "../../components/ProblemList";
+import SelectInput from "../../components/SelectInput";
+import TopicBar from "../../components/TopicBar";
+import TrendingProblems from "../../components/TrendingProblems";
 import { formatString } from "../../utils/formatting";
 
 const Problems = () => {
@@ -51,13 +48,11 @@ const Problems = () => {
       const resultAction = await dispatch(getTopics());
       if (getTopics.rejected.match(resultAction))
         await dispatch(
-          setError(`${t("features.collapsibles.getTopics.failure")}: ${error}`)
+          setError(`${t("features.problem.getTopics.failure")}: ${error}`)
         );
     } catch (e) {
       dispatch(
-        setError(
-          `${t("features.collapsibles.getTopics.failure")}: ${e.message}`
-        )
+        setError(`${t("features.problem.getTopics.failure")}: ${e.message}`)
       );
     }
   };
@@ -67,15 +62,11 @@ const Problems = () => {
       const resultAction = await dispatch(getProblems(filters));
       if (getProblems.rejected.match(resultAction))
         await dispatch(
-          setError(
-            `${t("features.collapsibles.getProblems.failure")}: ${error}`
-          )
+          setError(`${t("features.problem.getProblems.failure")}: ${error}`)
         );
     } catch (e) {
       dispatch(
-        setError(
-          `${t("features.collapsibles.getProblems.failure")}: ${e.message}`
-        )
+        setError(`${t("features.problem.getProblems.failure")}: ${e.message}`)
       );
     }
   };
@@ -85,15 +76,11 @@ const Problems = () => {
       const resultAction = await dispatch(getTrending());
       if (getTrending.rejected.match(resultAction))
         await dispatch(
-          setError(
-            `${t("features.collapsibles.getTrending.failure")}: ${error}`
-          )
+          setError(`${t("features.problem.getTrending.failure")}: ${error}`)
         );
     } catch (e) {
       dispatch(
-        setError(
-          `${t("features.collapsibles.getTrending.failure")}: ${e.message}`
-        )
+        setError(`${t("features.problem.getTrending.failure")}: ${e.message}`)
       );
     }
   };
@@ -104,35 +91,35 @@ const Problems = () => {
   }, []);
 
   useEffect(() => {
-    fetchProblems(); // Fetch problems with updated filters
+    fetchProblems();
   }, [filters]);
 
-  const loadMoreProblems = () => {
-    updateFilters({
+  const loadMoreProblems = async () => {
+    await updateFilters({
       ...filters,
       pageNumber:
-        filters.pageNumber === totalPage ? totalPage : filters.pageNumber + 1,
+        filters.pageNumber >= totalPage-1 ? 0 : filters.pageNumber + 1,
     });
   };
 
   const scrollViewRef = useRef(null);
 
-  const handleScroll = (event) => {
+  const handleScroll = async (event) => {
     const scrollY = event.nativeEvent.contentOffset.y;
     const contentHeight = event.nativeEvent.contentSize.height;
     const layoutHeight = event.nativeEvent.layoutMeasurement.height;
 
     if (scrollY + layoutHeight >= contentHeight - 50 && !isLoading) {
-      loadMoreProblems();
+      await loadMoreProblems();
     }
   };
 
-  const updateFilters = (newFilters) => {
-    dispatch(setFilters({ newFilters })); // Update filters
+  const updateFilters = async (newFilters) => {
+    await dispatch(setFilters({ newFilters })); // Update filters
   };
 
-  const handleFilterChange = (name, value) => {
-    updateFilters({ ...filters, [name]: value, pageNumber: 0 });
+  const handleFilterChange = async (name, value) => {
+    await updateFilters({ ...filters, [name]: value, pageNumber: 0 });
   };
 
   if (isLoading && problems.length === 0) {

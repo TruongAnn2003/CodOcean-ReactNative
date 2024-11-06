@@ -1,16 +1,22 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 // import UserAvatar from "react-native-user-avatar";
-import UserAvatar from "../UserAvatar";
-import getAvatarLink from "../../services/dicebear-avt";
-import { MaterialIcons } from "@expo/vector-icons";
-import { images as Imgs } from "../../constants";
 import Icon from "react-native-vector-icons/Feather";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { WhaleBg } from "../../constants/images";
+import UserAvatar from "../UserAvatar";
+import { signOut } from "../../services/redux-toolkit/reducers/authSlice";
+
 const CustomDrawerContent = (props) => {
   const { user } = useSelector((state) => state.auth);
-
+  const dispatch = useDispatch();
+  const handleSignOut = async () => {
+    const resultAction = await dispatch(signOut());
+    if (signOut.fulfilled.match(resultAction))
+      props.navigation.navigate("SignIn");
+    else dispatch(setError(t("signOut.failure")));
+  };
   return (
     <DrawerContentScrollView {...props} style={styles.drawer}>
       <View className="flex items-center mb-6 p-4 border-b">
@@ -46,8 +52,8 @@ const CustomDrawerContent = (props) => {
           }}
         />
         <DrawerItem
-          label="Discuss"
-          onPress={() => props.navigation.navigate("Discuss")}
+          label="Discussions"
+          onPress={() => props.navigation.navigate("Discussions")}
           icon={() => <Icon name="message-square" size={24} color="#ffff" />}
           className="p-3 rounded-lg mb-3"
           labelStyle={{
@@ -83,7 +89,7 @@ const CustomDrawerContent = (props) => {
         />
         <DrawerItem
           label="Logout"
-          onPress={() => props.navigation.navigate("Login")}
+          onPress={handleSignOut}
           icon={() => <Icon name="log-out" size={24} color="#ffff" />}
           className="p-3 rounded-lg mb-3"
           labelStyle={{
@@ -96,7 +102,7 @@ const CustomDrawerContent = (props) => {
       </View>
 
       <View className="w-full items-center">
-        <Imgs.WhaleBg />
+        <WhaleBg />
       </View>
     </DrawerContentScrollView>
   );

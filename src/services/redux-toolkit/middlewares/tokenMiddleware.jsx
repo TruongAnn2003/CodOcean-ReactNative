@@ -1,5 +1,5 @@
 import { refreshAccessToken, signOut } from '../reducers/authSlice';
-import { setError } from "../reducers/errorSlice";
+import { setError } from "../reducers/messageSlice";
 import { getTokens, saveTokens, isTokenExpired } from '../../../utils/tokenUtils';
 import { axiosInstance } from '../../api/api';
 

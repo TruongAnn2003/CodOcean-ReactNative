@@ -1,11 +1,12 @@
 import axios from "axios";
 import { getTokens } from "../../utils/tokenUtils";
 import axiosRetry from "axios-retry";
-import { REACT_APP_API_URL } from "@env";
-// Set up axios instance
+// import { REACT_APP_API_URL } from "@env";
+// // Set up axios instance
 // console.log("REACT_APP_API_URL", REACT_APP_API_URL);
 
-// const REACT_APP_API_URL = process.env["REACT_APP_API_URL"];
+const REACT_APP_API_URL =
+  "https://bfb4-2001-ee0-5209-7c70-901b-90a-aa00-e99c.ngrok-free.app/api";
 const axiosInstance = axios.create({
   baseURL: REACT_APP_API_URL,
 });

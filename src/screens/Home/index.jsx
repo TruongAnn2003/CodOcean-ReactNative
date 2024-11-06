@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
-import { View, SafeAreaView, StatusBar, Text } from "react-native";
-import { images as Imgs, aminations } from "../../constants";
+import { View, SafeAreaView, StatusBar, Image } from "react-native";
+import { LogoBgWhite, WelcomeFrame } from "../../constants/images";
+import { aminations } from "../../constants";
 import LottieView from "lottie-react-native";
 export default function Home({ navigation }) {
   useEffect(() => {
@@ -14,8 +15,9 @@ export default function Home({ navigation }) {
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-secondary">
       <StatusBar hidden={true} />
-      <Imgs.LogoBgWhite></Imgs.LogoBgWhite>
-      <Imgs.WelcomeFrame></Imgs.WelcomeFrame>
+      <LogoBgWhite></LogoBgWhite>
+      <WelcomeFrame></WelcomeFrame>
+
       <LottieView
         source={aminations.Loading}
         style={{ width: "25%", height: "25%" }}

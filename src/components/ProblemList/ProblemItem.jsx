@@ -4,7 +4,7 @@ import { PROBLEM_STATUS, PROBLEM_DIFFICULTY } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { getProblemById } from "../../services/redux-toolkit/reducers/problemSlice";
-import { setError } from "../../services/redux-toolkit/reducers/errorSlice";
+import { setError } from "../../services/redux-toolkit/reducers/messageSlice";
 import { useTranslation } from "react-i18next";
 const ProblemItem = ({ problem, index }) => {
   const navigation = useNavigation();
@@ -29,13 +29,13 @@ const ProblemItem = ({ problem, index }) => {
       if (getAllSolvedProblems.rejected.match(resultAction))
         await dispatch(
           setError(
-            `${t("features.collapsibles.getProblemById.failure")}: ${error}`
+            `${t("features.problem.getProblemById.failure")}: ${error}`
           )
         );
     } catch (e) {
       dispatch(
         setError(
-          `${t("features.collapsibles.getProblemById.failure")}: ${e.message}`
+          `${t("features.problem.getProblemById.failure")}: ${e.message}`
         )
       );
     }

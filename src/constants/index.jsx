@@ -33,3 +33,11 @@ export const FILTER_DEFAULT = {
 
 export const PROBLEM_STATUS = ["ALL", "SOLVED", "TODO", "ATTEMPTED"];
 export const PROBLEM_DIFFICULTY = ["ALL", "EASY", "NORMAL", "HARD"];
+export const MESSAGE_TYPE = {
+  ERROR: "error",
+  INFO: "info",
+  WARNING: "warning",
+  SUCCESS: "success",
+  DEBUG: "debug",
+  LOADING: "loading",
+};

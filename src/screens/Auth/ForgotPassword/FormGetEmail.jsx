@@ -1,6 +1,6 @@
-import React from "react";
-import { View, Text, TextInput, Button, Alert } from "react-native";
 import { Formik } from "formik";
+import React from "react";
+import { Button, Text, TextInput, View } from "react-native";
 import {
   commonValidationSchema,
   createValidationSchema,

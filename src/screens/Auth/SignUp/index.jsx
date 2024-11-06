@@ -1,27 +1,25 @@
+import DateTimePicker from "@react-native-community/datetimepicker"; // Import DateTimePicker
+import { Formik } from "formik";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  View,
+  ActivityIndicator,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
   Text,
   TextInput,
-  SafeAreaView,
-  Alert,
-  ScrollView,
-  Pressable,
   TouchableOpacity,
-  ActivityIndicator, // Đừng quên import ActivityIndicator nếu bạn dùng nó
+  View
 } from "react-native";
-import getAvatarLink from "../../../services/dicebear-avt";
-import DateTimePicker from "@react-native-community/datetimepicker"; // Import DateTimePicker
-import { images as Imgs } from "../../../constants";
-import { Formik } from "formik";
-import { setError } from "../../../services/redux-toolkit/reducers/errorSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { LogoBgBlue } from "../../../constants/images";
 import { signUp } from "../../../services/redux-toolkit/reducers/authSlice";
+import { setError } from "../../../services/redux-toolkit/reducers/messageSlice";
 import {
   commonValidationSchema,
   createValidationSchema,
 } from "../../../services/yup/commonValidationSchema";
-import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
 import { formatDateToISO } from "../../../utils/dateUtils";
 const SignUp = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -52,11 +50,11 @@ const SignUp = ({ navigation }) => {
       if (signUp.fulfilled.match(resultAction)) {
           navigation.navigate("SignIn");
       } else {
-        dispatch(setError(t("features.collapsibles.signUp.failure")));
+        dispatch(setError(t("features.signUp.failure")));
       }
     } catch (e) {
       console.error("SignUpForm/handleSubmit: ", e);
-      dispatch(setError(t("features.collapsibles.signUp.failure")));
+      dispatch(setError(t("features.signUp.failure")));
     }
   };
 
@@ -71,7 +69,7 @@ const SignUp = ({ navigation }) => {
         }}
       >
         <View className="flex items-center w-full">
-          <Imgs.LogoBgBlue className="mb-4" />
+          <LogoBgBlue className="mb-4" />
           <View className="w-full p-4 justify-center items-center ">
             <Text className="text-2xl mb-6 font-sscsemibold text-secondary">
               Sign Up
