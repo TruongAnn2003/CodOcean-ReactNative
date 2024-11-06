@@ -3,6 +3,9 @@ import { axiosInstance } from "../api";
 export const addDiscussionAPI = (request) =>
   axiosInstance.post("/discusses", request, {
     requiresAuth: true,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
 
 export const updateDiscussionAPI = (id, discussion) =>

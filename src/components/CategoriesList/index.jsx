@@ -1,110 +1,126 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  TextInput,
+  FlatList,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
 } from "react-native";
-import PropTypes from "prop-types";
+import { Ionicons } from "@expo/vector-icons"; // Cài đặt Ionicons cho React Native
 
-export function CategoriesList({ categories, onSelect }) {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [expandedCategory, setExpandedCategory] = useState(null);
+export default function CategoriesList({categories, onSelect }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredCategories, setFilteredCategories] = useState(categories);
 
-  const handleSelect = (category) => {
-    setSelectedCategory(category);
-    if (onSelect) {
-      onSelect(category);
-    }
-  };
-
-  const handleToggleDescription = (category) => {
-    setExpandedCategory(expandedCategory === category ? null : category);
-  };
+  useEffect(() => {
+    const filtered = categories.filter(
+      (category) =>
+        category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        category.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredCategories(filtered);
+  }, [searchTerm]);
 
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={styles.categoriesList}
-    >
-      {/* Add the "All" category */}
-      <View style={styles.categoryContainer}>
-        <TouchableOpacity
-          style={[
-            styles.categoryItem,
-            selectedCategory === "ALL" && styles.selected,
-          ]}
-          onPress={() => handleSelect("ALL")}
-        >
-          <Text style={styles.categoryText}>All</Text>
-        </TouchableOpacity>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Categories</Text>
+        <Text style={styles.subtitle}>
+          Explore our diverse range of topics and find what interests you
+        </Text>
       </View>
 
-      {categories.map((category, index) => (
-        <View key={index} style={styles.categoryContainer}>
+      <View style={styles.searchContainer}>
+        <Ionicons
+          name="search"
+          size={24}
+          color="gray"
+          style={styles.searchIcon}
+        />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search categories..."
+          value={searchTerm}
+          onChangeText={(text) => setSearchTerm(text)}
+        />
+      </View>
+
+      <FlatList
+        data={filteredCategories}
+        keyExtractor={(item) => item.name}
+        renderItem={({ item }) => (
           <TouchableOpacity
-            style={[
-              styles.categoryItem,
-              selectedCategory === category.name && styles.selected,
-            ]}
-            onPress={() => handleSelect(category.name)}
+            style={styles.categoryCard}
+            onPress={() => onSelect(item.name)}
           >
-            <Text style={styles.categoryText}>{category.name}</Text>
+            <Text style={styles.categoryName}>{item.name}</Text>
+            <Text style={styles.categoryDescription}>{item.description}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleToggleDescription(category.name)}
-          >
-            {expandedCategory === category.name && (
-              <Text style={styles.categoryDescription}>
-                {category.description}
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      ))}
-    </ScrollView>
+        )}
+        contentContainerStyle={styles.listContainer}
+      />
+    </View>
   );
 }
 
-CategoriesList.propTypes = {
-  categories: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  onSelect: PropTypes.func,
-};
-
 const styles = StyleSheet.create({
-  categoriesList: {
+  container: {
+    flex: 1,
+    backgroundColor: "#f8f8f8",
+    padding: 16,
+  },
+  header: {
+    alignItems: "center",
     marginBottom: 16,
-    paddingVertical: 10,
   },
-  categoryContainer: {
-    marginRight: 10,
-    alignItems: "center",
-  },
-  categoryItem: {
-    padding: 15,
-    borderRadius: 8,
-    backgroundColor: "#f0f0f0",
-    alignItems: "center",
-  },
-  selected: {
-    backgroundColor: "#007bff", // Background color when selected
-  },
-  categoryText: {
+  title: {
+    fontSize: 28,
     fontWeight: "bold",
     color: "#333",
   },
-  categoryDescription: {
+  subtitle: {
+    fontSize: 16,
     color: "#666",
-    fontSize: 12,
-    marginTop: 5,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingLeft: 8,
+    fontSize: 16,
+  },
+  listContainer: {
+    paddingBottom: 16,
+  },
+  categoryCard: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  categoryName: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  categoryDescription: {
+    fontSize: 16,
+    color: "#666",
   },
 });
-
-export default CategoriesList;

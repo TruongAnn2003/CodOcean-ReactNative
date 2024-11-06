@@ -1,26 +1,20 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  TextInput,
-  Button,
-  ScrollView,
-  Text,
-  StyleSheet,
-} from "react-native";
 import { useTranslation } from "react-i18next";
+import { Button, ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import CategoriesList from "../../components/CategoriesList";
+import DiscussionForm from "../../components/DiscussionForm";
+import DiscussionPost from "../../components/DiscussionPost";
+import { FilterStatus } from "../../components/FilterStatus";
+import { addDiscussion } from "../../services/redux-toolkit/reducers/manageDiscussionSlice";
 import { setError } from "../../services/redux-toolkit/reducers/messageSlice";
-import { DiscussionPost } from "../../components/DiscussionPost";
 import {
   getCategories,
   getDiscussions,
   setFilters,
 } from "../../services/redux-toolkit/reducers/searchDiscussionSlice";
-import { FilterStatus } from "../../components/FilterStatus";
-import { CategoriesList } from "../../components/CategoriesList";
-import DiscussionForm from "../../components/DiscussionForm"; // Import the DiscussionForm component
 
-const Discussions = ({ navigation }) => {
+export default function Discussions() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const { discussionPosts, filters, error, categories } = useSelector(
@@ -97,16 +91,24 @@ const Discussions = ({ navigation }) => {
     setFormVisible(true);
   };
 
-  const handleFormSubmit = (discussionData) => {
+  const handleFormSubmit = async (discussionData) => {
     console.log("Discussion data:", discussionData);
+    try {
+      const resultAction = await dispatch(addDiscussion(discussionData));
+      if (addDiscussion.fulfilled.match(resultAction)) {
+        dispatch(setSuccess("Add Discussion successfully"));
+      } else {
+        dispatch(setError("Error add discussion"));
+      }
+    } catch (e) {
+      console.error("Error add discussion:", e);
+    }
     setFormVisible(false);
   };
 
   return (
     <ScrollView style={styles.container} nestedScrollEnabled={true}>
       <CategoriesList categories={categories} onSelect={handleFilterCategory} />
-
-      {/* Search bar with submit button */}
       <View style={styles.searchContainer}>
         <TextInput
           placeholder={"Discussion Title"}
@@ -132,16 +134,18 @@ const Discussions = ({ navigation }) => {
       <ScrollView style={styles.discussionsContainer}>
         {discussionPosts.map((discussion) => (
           <View key={discussion.id}>
-            <DiscussionPost
+            {/* <DiscussionPost
+        
               discussion={discussion}
               onEdit={() => handleEditDiscussion(discussion)} // Pass edit function
-            />
+            /> */}
+            <DiscussionPost post={discussion}></DiscussionPost>
           </View>
         ))}
       </ScrollView>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -167,5 +171,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
-export default Discussions;

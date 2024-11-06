@@ -8,10 +8,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  FlatList,
+  Platform,
 } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { useSelector } from "react-redux";
-import * as ImagePicker from "expo-image-picker"; // Import expo-image-picker
+import * as ImagePicker from "expo-image-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const DiscussionForm = ({ initialData, onSubmit }) => {
   const [title, setTitle] = useState(initialData ? initialData.title : "");
@@ -21,12 +24,17 @@ const DiscussionForm = ({ initialData, onSubmit }) => {
   const [selectedCategories, setSelectedCategories] = useState(
     initialData ? initialData.categories : []
   );
-  const [image, setImage] = useState(initialData ? initialData.image : "");
+  const [images, setImages] = useState(
+    initialData ? initialData.images || [] : []
+  );
+  const [endAt, setEndAt] = useState(
+    initialData && initialData.endAt ? new Date(initialData.endAt) : new Date()
+  );
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   const { categories } = useSelector((state) => state.searchDiscussion);
 
-  // Hàm xử lý chọn ảnh từ thư viện thiết bị
   const handleImagePick = async () => {
-    // Yêu cầu quyền truy cập thư viện ảnh
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
@@ -36,25 +44,52 @@ const DiscussionForm = ({ initialData, onSubmit }) => {
       return;
     }
 
-    // Mở thư viện ảnh
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri); // Lưu đường dẫn ảnh đã chọn
+      setImages((prevImages) => [...prevImages, result.assets[0].uri]);
     }
   };
 
+  const createFormData = (images, selectedCategories) => {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    const categoryList = selectedCategories.map((category) => ({
+      name: category.name,
+      description: category.description,
+    }));
+
+    formData.append("categories", JSON.stringify(categoryList));
+    images.forEach((uri, index) => {
+      formData.append("imageUrls", {
+        uri,
+        name: `photo_${index}.jpg`,
+        type: "image/jpeg",
+      });
+    });
+    formData.append("endAt", new Date(endAt).toISOString().replace("Z", "")); // Adding endAt to the formData
+
+    return formData;
+  };
+
   const handleSubmit = () => {
-    const discussionData = {
-      title,
-      description,
-      categories: selectedCategories,
-      image,
-    };
-    onSubmit(discussionData);
+    const formData = createFormData(images, selectedCategories);
+    onSubmit(formData);
+  };
+
+  const renderImageItem = ({ item }) => (
+    <Image source={{ uri: item }} style={styles.imagePreview} />
+  );
+
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false); // Hide the date picker after selection
+    if (event.type === "set") {
+      setEndAt(selectedDate || endAt); // Update endAt with the selected date
+    } // If canceled, do nothing
   };
 
   return (
@@ -76,8 +111,8 @@ const DiscussionForm = ({ initialData, onSubmit }) => {
         multiline
       />
       <Text style={styles.label}>Categories:</Text>
-      {categories.map((category) => (
-        <View key={category.name} style={styles.checkboxContainer}>
+      {categories.map((category, index) => (
+        <View key={category.name + index} style={styles.checkboxContainer}>
           <BouncyCheckbox
             isChecked={selectedCategories.includes(category.name)}
             onPress={(isChecked) =>
@@ -94,13 +129,41 @@ const DiscussionForm = ({ initialData, onSubmit }) => {
         </View>
       ))}
 
-      <Text style={styles.label}>Image:</Text>
+      <Text style={styles.label}>End Date:</Text>
+      <TouchableOpacity
+        style={styles.dateButton}
+        onPress={() => setShowDatePicker(true)}
+      >
+        <Text style={styles.dateButtonText}>
+          {endAt ? new Date(endAt).toLocaleString() : "Select Date"}
+        </Text>
+      </TouchableOpacity>
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={new Date(endAt) || new Date()}
+          mode="datetime"
+          is24Hour={true}
+          display="default"
+          onChange={handleDateChange}
+        />
+      )}
+
+      <Text style={styles.label}>Images:</Text>
       <TouchableOpacity style={styles.imageButton} onPress={handleImagePick}>
         <Text style={styles.imageButtonText}>Pick an Image</Text>
       </TouchableOpacity>
-      {image ? (
-        <Image source={{ uri: image }} style={styles.imagePreview} />
-      ) : null}
+
+      {images.length > 0 && (
+        <FlatList
+          data={images}
+          renderItem={renderImageItem}
+          keyExtractor={(item, index) => index.toString()}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.imageList}
+        />
+      )}
 
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitButtonText}>
@@ -169,10 +232,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  imagePreview: {
-    width: "100%",
-    height: 200,
+  imageList: {
     marginVertical: 15,
+  },
+  imagePreview: {
+    width: 100,
+    height: 100,
+    marginRight: 10,
     borderRadius: 5,
     resizeMode: "cover",
   },
@@ -186,6 +252,18 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: "#fff",
     fontSize: 18,
+    fontWeight: "bold",
+  },
+  dateButton: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginBottom: 15,
+    alignItems: "center",
+  },
+  dateButtonText: {
+    color: "#fff",
+    fontSize: 16,
     fontWeight: "bold",
   },
 });

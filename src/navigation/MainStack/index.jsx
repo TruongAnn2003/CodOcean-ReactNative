@@ -4,7 +4,6 @@ import { TouchableOpacity, ActivityIndicator, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Home from "../../screens/Home";
 import ProblemDetail from "../../components/ProblemDetail";
-import Discussions from "../../screens/Discussions";
 import Setting from "../../screens/Setting";
 
 const Stack = createNativeStackNavigator();
@@ -61,6 +60,10 @@ const ForgotPassword = LazyLoadableScreen(() =>
 );
 const ActiveAccount = LazyLoadableScreen(() =>
   import("../../screens/Auth/SignIn/ActiveAccount")
+);
+
+const Discussions = LazyLoadableScreen(() =>
+  import("../../screens/Discussions")
 );
 
 const MainStack = ({ navigation }) => {
