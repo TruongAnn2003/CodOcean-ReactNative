@@ -1,24 +1,28 @@
 import React, { memo, useRef, useState } from "react";
 import {
-    FlatList,
-    Image,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import * as ImageManipulator from "expo-image-manipulator";
+import * as FileSystem from "expo-file-system";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { useTranslation } from "react-i18next";
 import { Button } from "react-native-elements";
+import { Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { addDiscussion } from "../../services/redux-toolkit/reducers/discussionSlice";
 import {
-    setError,
-    setSuccess,
+  setError,
+  setInfo,
+  setSuccess,
 } from "../../services/redux-toolkit/reducers/messageSlice";
 import CategoryMenu from "../CategoryMenu";
 
@@ -36,23 +40,35 @@ const AddDiscussion = ({ onClose }) => {
   const dispatch = useDispatch();
   const { error } = useSelector((state) => state.discussion);
 
-//   const handleFileChange = async () => {
-//     const result = await ImagePicker.launchImageLibraryAsync({
-//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-//       allowsMultipleSelection: true,
-//       aspect: [4, 3],
-//       quality: 1,
-//     });
+  // const handleFileChange = async () => {
+  //   const permissionResult =
+  //     await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-//     if (result.assets && !result.cancelled) {
-//       const newFiles = result.assets.map((file) => ({
-//         url: file.uri,
-//         file: file,
-//       }));
-//       setSelectedFiles((prev) => [...prev, ...newFiles]);
-//     }
-//   };
+  //   if (permissionResult.granted === false) {
+  //     Alert.alert("Permission to access camera roll is required!");
+  //     return;
+  //   }
 
+  //   const result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     quality: 1,
+  //   });
+
+  //   if (!result.cancelled) {
+  //     if (result.assets && result.assets.length > 0) {
+  //       const file = result.assets[0];
+  //       if (file.fileSize > 5000000) {
+  //         dispatch(setError("File size should be less than 5MB"));
+  //       } else {
+  //         const newFiles = result.assets.map((file) => ({
+  //           url: file.uri,
+  //           file: file,
+  //         }));
+  //         setSelectedFiles((prev) => [...prev, ...newFiles]);
+  //       }
+  //     }
+  //   }
+  // };
   const handleFileChange = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -64,25 +80,68 @@ const AddDiscussion = ({ onClose }) => {
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
+      quality: 1, // Chất lượng ảnh gốc
     });
 
-    if (!result.cancelled) {
+    if (!result.canceled) {
       if (result.assets && result.assets.length > 0) {
         const file = result.assets[0];
-        if (file.fileSize > 5000000) {
-          dispatch(setError("File size should be less than 5MB"));
+        const fileSize = file.fileSize || (await getFileSize(file.uri)); // Luôn đảm bảo lấy được kích thước file
+
+        // Kiểm tra kích thước file trước khi xử lý
+        if (fileSize > 5000000) {
+          // Nén và resize ảnh
+          try {
+            const resizedImage = await ImageManipulator.manipulateAsync(
+              file.uri,
+              [{ resize: { width: 1024 } }], // Resize chiều rộng xuống 1024
+              { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG } // Nén 80%, định dạng JPEG
+            );
+
+            const compressedFile = {
+              ...file,
+              uri: resizedImage.uri,
+              fileSize:
+                resizedImage.fileSize || (await getFileSize(resizedImage.uri)), // Cập nhật kích thước
+            };
+
+            // Kiểm tra lại kích thước sau khi nén
+            if (compressedFile.fileSize > 5000000) {
+              dispatch(
+                setError("File size should be less than 5MB after resizing")
+              );
+            } else {
+              const newFiles = [
+                {
+                  url: compressedFile.uri,
+                  file: compressedFile,
+                },
+              ];
+              setSelectedFiles((prev) => [...prev, ...newFiles]);
+            }
+          } catch (error) {
+            console.error("Error resizing image:", error.message);
+            dispatch(setError("Failed to resize image"));
+          }
         } else {
-          const newFiles = result.assets.map((file) => ({
-            url: file.uri,
-            file: file,
-          }));
+          // Nếu file đã nhỏ hơn 5MB
+          const newFiles = [
+            {
+              url: file.uri,
+              file: file,
+            },
+          ];
           setSelectedFiles((prev) => [...prev, ...newFiles]);
         }
       }
     }
   };
 
+  // Hàm lấy kích thước file
+  const getFileSize = async (uri) => {
+    const info = await FileSystem.getInfoAsync(uri);
+    return info.size;
+  };
 
   const removeImage = (index) => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
@@ -107,35 +166,31 @@ const AddDiscussion = ({ onClose }) => {
 
   const handleAddDiscussion = async () => {
     const formData = new FormData();
-    formData.append(
-      "request",
-      new Blob(
-        [
-          JSON.stringify({
-            title,
-            description,
-            endAt,
-            categories: selectedCategories,
-          }),
-        ],
-        {
-          type: "application/json",
-        }
-      )
-    );
+    const request = {
+      title,
+      description,
+      endAt,
+      categories: selectedCategories,
+    };
+    
+    // Convert the request object to a JSON string
+    formData.append("request", JSON.stringify(request));
+
+    // Append selected files
     selectedFiles.forEach((file) => {
       formData.append("multipartFiles", {
         uri: file.url,
-        name: file.file.fileName || "photo.png",
-        type: "image/png", 
+        type: file.file.type || "image/jpeg",
+        name: file.file.fileName || "photo.jpg",
       });
     });
 
-
     try {
       const resultAction = await dispatch(addDiscussion(formData));
+      console.log("Result action:", JSON.stringify(resultAction, null, 2));
+
       if (addDiscussion.fulfilled.match(resultAction)) {
-        dispatch(setSuccess("Add Discussion successfully"));
+        await dispatch(setSuccess("Add Discussion successfully"));
         clearState();
       } else {
         dispatch(setError(`Error add discussion (${error})`));

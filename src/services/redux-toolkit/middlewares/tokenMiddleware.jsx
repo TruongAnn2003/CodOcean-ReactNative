@@ -3,6 +3,7 @@ import { setError } from "../reducers/messageSlice";
 import { getTokens, saveTokens, isTokenExpired } from '../../../utils/tokenUtils';
 import { axiosInstance } from '../../api/api';
 
+
 let isRefreshing = false;
 let refreshSubscribers = [];
 
@@ -10,16 +11,21 @@ function addSubscriber(callback) {
   refreshSubscribers.push(callback);
 }
 
+function notifySubscribers(newToken) {
+  refreshSubscribers.forEach((callback) => callback(newToken));
+  refreshSubscribers = [];
+}
+
 const tokenMiddleware = (storeAPI) => (next) => async (action) => {
-  // Proceed with the action
-  const result = next(action);
   const { accessToken, refreshToken } = await getTokens();
 
-  if (action.type.endsWith('/pending') && action.type.includes('/request-auth')) {
-    // if (refreshToken && isTokenExpired(refreshToken)) {
-    //   await storeAPI.dispatch(signOut());
-    //   return result;
-    // }
+  if (action.type && action.type.includes("/request-auth")) {
+    if (refreshToken && isTokenExpired(refreshToken)) {
+      await storeAPI.dispatch(signOut());
+      await removeTokens();
+      window.location.href = "/auth/sign-in";
+      return;
+    }
 
     if (accessToken && isTokenExpired(accessToken)) {
       if (!isRefreshing) {
@@ -30,29 +36,40 @@ const tokenMiddleware = (storeAPI) => (next) => async (action) => {
           if (refreshAccessToken.fulfilled.match(resultAction)) {
             const newAccessToken = resultAction.payload.accessToken;
             await saveTokens(newAccessToken, refreshToken);
+            axiosInstance.defaults.headers.common[
+              "Authorization"
+            ] = `Bearer ${newAccessToken}`;
+            notifySubscribers(newAccessToken);
           } else {
-            await storeAPI.dispatch(setError('Failed to refresh token'));
+            await storeAPI.dispatch(setError("Failed to refresh token"));
+            notifySubscribers(null);
           }
-        } catch (error) {
-          console.error('Token refresh failed:', error);
-          await storeAPI.dispatch(setError('Failed to refresh token'));
-          // await storeAPI.dispatch(signOut());
+        } catch (e) {
+          await storeAPI.dispatch(
+            setError(`Failed to refresh token: ${e.message}`)
+          );
+          notifySubscribers(null);
         } finally {
           isRefreshing = false;
         }
       }
 
-      // Return a promise that resolves once the token is refreshed
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         addSubscriber((newToken) => {
-          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-          resolve(next(action)); // Retry the original action with the new token
+          if (newToken) {
+            axiosInstance.defaults.headers.common[
+              "Authorization"
+            ] = `Bearer ${newToken}`;
+            resolve(next(action));
+          } else {
+            reject(new Error("Token refresh failed"));
+          }
         });
       });
     }
   }
 
-  return result;
+  return next(action);
 };
 
 export default tokenMiddleware;

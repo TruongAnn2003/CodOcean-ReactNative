@@ -8,7 +8,12 @@ import {
   StyleSheet,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import { getRepliesCommentById, deleteComment, updateComment, replyComment } from "../../services/redux-toolkit/reducers/discussionSlice";
+import {
+  getRepliesCommentById,
+  deleteComment,
+  updateComment,
+  replyComment,
+} from "../../services/redux-toolkit/reducers/discussionSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import CommentSection from "./CommentSection";
@@ -101,7 +106,6 @@ const Comment = ({ comment }) => {
             setError(`${t("features.discussion.editFailed")} (${error})`)
           );
         }
-     
       } catch (e) {
         dispatch(setError(`${t("features.discussion.editFailed")} (${error})`));
       }
@@ -113,7 +117,7 @@ const Comment = ({ comment }) => {
     try {
       const resultAction = await dispatch(deleteComment(id));
       if (deleteComment.fulfilled.match(resultAction)) {
-       await dispatch(setSuccess(`${t("features.discussion.deleteSuccess")}`));
+        await dispatch(setSuccess(`${t("features.discussion.deleteSuccess")}`));
       } else {
         dispatch(
           setError(`${t("features.discussion.deleteFailed")} (${error})`)
@@ -127,7 +131,7 @@ const Comment = ({ comment }) => {
   return (
     <View style={styles.commentContainer}>
       <View style={styles.header}>
-        <Image source={{ uri: ownerImageUrl }} style={styles.avatar} />
+        <Image source={{ uri: ownerImageUrl || "" }} style={styles.avatar} />
         <View style={styles.headerContent}>
           <Text style={styles.ownerName}>{ownerName}</Text>
           <Text style={styles.updatedAt}>

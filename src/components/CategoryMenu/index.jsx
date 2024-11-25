@@ -73,45 +73,43 @@ const CategoryMenu = ({ onSelectedCategoriesChange }) => {
           </TouchableOpacity>
           {error ? <Text style={styles.errorMessage}>{error}</Text> : null}
 
-            <FlatList
-              data={categories}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.card}
+          <FlatList
+            data={categories}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.card}
+                onPress={() => handleSelectCategory(item)}
+              >
+                <CheckBox
+                  checked={selectedCategories.some((cat) => cat.id === item.id)}
                   onPress={() => handleSelectCategory(item)}
-                >
-                  <CheckBox
-                    checked={selectedCategories.some(
-                      (cat) => cat.id === item.id
-                    )}
-                    onPress={() => handleSelectCategory(item)}
-                    containerStyle={styles.checkbox}
-                  />
-                  <View style={styles.cardContent}>
-                    {item.imageUrl.endsWith(".svg") ? (
-                      <SvgUri
-                        width={40} // Adjusted size
-                        height={40} // Adjusted size
-                        uri={item.imageUrl}
-                        style={styles.image}
-                      />
-                    ) : (
-                      <Image
-                        source={{ uri: item.imageUrl }}
-                        style={styles.image}
-                      />
-                    )}
+                  containerStyle={styles.checkbox}
+                />
+                <View style={styles.cardContent}>
+                  {item.imageUrl.endsWith(".svg") ? (
+                    <SvgUri
+                      width={40} // Adjusted size
+                      height={40} // Adjusted size
+                      uri={item.imageUrl}
+                      style={styles.image}
+                    />
+                  ) : (
+                    <Image
+                      source={{ uri: item.imageUrl || "" }}
+                      style={styles.image}
+                    />
+                  )}
 
-                    <View style={styles.infoContainer}>
-                      <Text style={styles.categoryName}>{item.name}</Text>
-                      <Text style={styles.description}>{item.description}</Text>
-                      <Text style={styles.categoryId}>ID: {item.id}</Text>
-                    </View>
+                  <View style={styles.infoContainer}>
+                    <Text style={styles.categoryName}>{item.name}</Text>
+                    <Text style={styles.description}>{item.description}</Text>
+                    <Text style={styles.categoryId}>ID: {item.id}</Text>
                   </View>
-                </TouchableOpacity>
-              )}
-            />
+                </View>
+              </TouchableOpacity>
+            )}
+          />
         </View>
       )}
     </View>

@@ -5,7 +5,8 @@ import { tokenMiddleware } from "./middlewares";
 const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(tokenMiddleware, logger),
+    getDefaultMiddleware().concat(tokenMiddleware),
+  // getDefaultMiddleware().concat(tokenMiddleware, logger),
 });
 
 // const persistor = persistStore(store);

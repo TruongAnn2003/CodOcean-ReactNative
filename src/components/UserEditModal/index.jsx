@@ -22,7 +22,7 @@ const UserEditModal = ({
   onChangeFullName,
   onChangePhoneNumber,
   onChangeDateOfBirth,
-  onChangeEmail,
+  // onChangeEmail,
 }) => {
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
@@ -119,10 +119,10 @@ const UserEditModal = ({
 
     if (editableFields[field]) {
       switch (field) {
-        case "email":
-          handleSendOTP(formData[field]);
-          setShowVerifyView(true);
-          return;
+        // case "email":
+        //   handleSendOTP(formData[field]);
+        //   setShowVerifyView(true);
+        //   return;
         case "phone":
           onChangePhoneNumber(formData[field]);
           return;
@@ -143,51 +143,51 @@ const UserEditModal = ({
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleOtpChange = (value, index) => {
-    if (value.length > 1 || isNaN(value)) return; // Prevent multiple digits or non-numeric input
+  // const handleOtpChange = (value, index) => {
+  //   if (value.length > 1 || isNaN(value)) return; // Prevent multiple digits or non-numeric input
 
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
+  //   const newOtp = [...otp];
+  //   newOtp[index] = value;
+  //   setOtp(newOtp);
 
-    if (value && index < otp.length - 1) {
-      // Check if the next ref exists
-      const nextRef = otpRefs.current[index + 1];
-      if (nextRef && nextRef.current) {
-        setTimeout(() => {
-          nextRef.current.focus();
-        }, 100);
-      }
-    }
-  };
+  //   if (value && index < otp.length - 1) {
+  //     // Check if the next ref exists
+  //     const nextRef = otpRefs.current[index + 1];
+  //     if (nextRef && nextRef.current) {
+  //       setTimeout(() => {
+  //         nextRef.current.focus();
+  //       }, 100);
+  //     }
+  //   }
+  // };
 
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace") {
-      if (!otp[index] && index > 0) {
-        const newOtp = [...otp];
-        newOtp[index - 1] = ""; // Remove the previous digit
-        setOtp(newOtp);
-        otp[index - 1].focus(); // Move focus back
-      }
-    }
-  };
+  // const handleKeyDown = (e, index) => {
+  //   if (e.key === "Backspace") {
+  //     if (!otp[index] && index > 0) {
+  //       const newOtp = [...otp];
+  //       newOtp[index - 1] = ""; // Remove the previous digit
+  //       setOtp(newOtp);
+  //       otp[index - 1].focus(); // Move focus back
+  //     }
+  //   }
+  // };
 
-  const handleVerifyOTP = async () => {
-    const otpValue = otp.join("");
-    if (otpValue.length !== 6) {
-      return;
-    }
-    setLoading(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      onChangeEmail(formData["email"], otpValue);
-    } catch (e) {
-      dispatch(setError("Verify OTP Failed! " + e));
-    } finally {
-      setShowVerifyView(false);
-      setLoading(false);
-    }
-  };
+  // const handleVerifyOTP = async () => {
+  //   const otpValue = otp.join("");
+  //   if (otpValue.length !== 6) {
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   try {
+  //     await new Promise((resolve) => setTimeout(resolve, 2000));
+  //     onChangeEmail(formData["email"], otpValue);
+  //   } catch (e) {
+  //     dispatch(setError("Verify OTP Failed! " + e));
+  //   } finally {
+  //     setShowVerifyView(false);
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <>
@@ -319,19 +319,32 @@ const UserEditModal = ({
                       }
                       aria-invalid={errors[field] ? "true" : "false"}
                     />
-                    <TouchableOpacity
-                      onPress={() => handleEdit(field)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600"
-                      aria-label={`${
-                        editableFields[field] ? "Save" : "Edit"
-                      } ${field}`}
-                    >
-                      {editableFields[field] ? (
-                        <FontAwesomeIcon icon={faSave} size={20} color="#000" />
-                      ) : (
-                        <FontAwesomeIcon icon={faPen} size={20} color="#000" />
-                      )}
-                    </TouchableOpacity>
+                    {field === "email" ? (
+                      <></>
+                    ) : (
+                      <TouchableOpacity
+                        onPress={() => handleEdit(field)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600"
+                        aria-label={`${
+                          editableFields[field] ? "Save" : "Edit"
+                        } ${field}`}
+                      >
+                        {editableFields[field] ? (
+                          <FontAwesomeIcon
+                            icon={faSave}
+                            size={20}
+                            color="#000"
+                          />
+                        ) : (
+                          <FontAwesomeIcon
+                            icon={faPen}
+                            size={20}
+                            color="#000"
+                          />
+                        )}
+                      </TouchableOpacity>
+                    )}
+
                     {errors[field] && (
                       <Text className="text-red-600 text-sm mt-1">
                         {errors[field]}
@@ -341,7 +354,7 @@ const UserEditModal = ({
                 )}
               </View>
             ))}
-
+            {/* 
             {showVerifyView && (
               <>
                 <View className="mb-4">
@@ -386,7 +399,7 @@ const UserEditModal = ({
                   )}
                 </TouchableOpacity>
               </>
-            )}
+            )} */}
 
             <View className="mt-8 flex-row justify-end space-x-4">
               <TouchableOpacity

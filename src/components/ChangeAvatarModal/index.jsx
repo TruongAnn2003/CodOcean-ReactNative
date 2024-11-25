@@ -137,7 +137,7 @@ const ChangeAvatarModal = ({ isOpen, onClose }) => {
               <View style={styles.previewSection}>
                 <Text style={styles.avatarTitle}>Preview</Text>
                 <Image
-                  source={{ uri: selectedAvatar }}
+                  source={{ uri: selectedAvatar || "" }}
                   style={styles.previewImage}
                 />
               </View>

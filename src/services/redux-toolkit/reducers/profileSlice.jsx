@@ -164,7 +164,6 @@ const profileSlice = createSlice({
       .addCase(changeAvatar.pending, handlePending)
       .addCase(changeAvatar.fulfilled, (state, action) => {
         handleFulfilled(state, action);
-        console.warn("profile", state.profile);
         state.profile = { ...state.profile, urlImage: action.payload };
       })
       .addCase(changeAvatar.rejected, handleRejected)

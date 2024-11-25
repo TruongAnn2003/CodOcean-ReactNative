@@ -9,7 +9,6 @@ export default function Home({ navigation }) {
       navigation.navigate("SignIn");
     }, 3000); // 3 seconds
 
-    // Clear timeout if the component is unmounted before the timer ends
     return () => clearTimeout(timer);
   }, [navigation]);
   return (

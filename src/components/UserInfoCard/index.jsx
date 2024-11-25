@@ -13,10 +13,7 @@ import {
   setError,
   setSuccess,
 } from "../../services/redux-toolkit/reducers/messageSlice";
-import {
-  ChangeEmail,
-  ChangeProfile,
-} from "../../services/redux-toolkit/reducers/profileSlice";
+import { changeProfile } from "../../services/redux-toolkit/reducers/profileSlice";
 import ChangeAvatarModal from "../ChangeAvatarModal";
 import UserAvatar from "../UserAvatar";
 import UserEditModal from "../UserEditModal";
@@ -88,8 +85,8 @@ const UserInfoCard = () => {
 
   const handleChangeFullName = async (value) => {
     try {
-      const resultAction = await dispatch(ChangeProfile({ fullName: value }));
-      if (ChangeProfile.fulfilled.match(resultAction)) {
+      const resultAction = await dispatch(changeProfile({ fullName: value }));
+      if (changeProfile.fulfilled.match(resultAction)) {
         dispatch(setSuccess("Fullname changed successfully"));
       } else {
         dispatch(setError("Error changing fullname"));
@@ -102,9 +99,9 @@ const UserInfoCard = () => {
   const handleChangePhoneNumber = async (value) => {
     try {
       const resultAction = await dispatch(
-        ChangeProfile({ phoneNumber: value })
+        changeProfile({ phoneNumber: value })
       );
-      if (ChangeProfile.fulfilled.match(resultAction)) {
+      if (changeProfile.fulfilled.match(resultAction)) {
         dispatch(setSuccess("Phone number changed successfully"));
       } else {
         dispatch(setError("Error changing phone number: " + error));
@@ -117,9 +114,9 @@ const UserInfoCard = () => {
   const handleChangeDateOfBirth = async (value) => {
     try {
       const resultAction = await dispatch(
-        ChangeProfile({ dateOfBirth: value })
+        changeProfile({ dateOfBirth: value })
       );
-      if (ChangeProfile.fulfilled.match(resultAction)) {
+      if (changeProfile.fulfilled.match(resultAction)) {
         dispatch(setSuccess("Date of birth changed successfully"));
       } else {
         dispatch(setError("Error changing date of birth: " + error));
@@ -189,7 +186,7 @@ const UserInfoCard = () => {
 
       <UserEditModal
         onChangeDateOfBirth={handleChangeDateOfBirth}
-        onChangeEmail={handleChangeEmail}
+        // onChangeEmail={handleChangeEmail}
         onChangeFullName={handleChangeFullName}
         onChangePhoneNumber={handleChangePhoneNumber}
       />

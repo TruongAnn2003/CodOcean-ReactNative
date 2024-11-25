@@ -321,7 +321,7 @@ const discussionSlice = createSlice({
       .addCase(addDiscussion.pending, handlePending)
       .addCase(addDiscussion.fulfilled, (state, action) => {
         handleFulfilled(state, action);
-        state.discussions.push(action.payload.discussDTOs);
+        state.discussions = [...state.discussions, action.payload.discussDTOs];
       })
       .addCase(addDiscussion.rejected, handleRejected)
 
