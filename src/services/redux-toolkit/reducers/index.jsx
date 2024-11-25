@@ -5,6 +5,7 @@ import profileSlice from "./profileSlice";
 import messageSlice from "./messageSlice";
 import problemSlice from "./problemSlice";
 import discussionSlice from "./discussionSlice";
+import notificationSlice from "../../../components/NotificationComponent/services/slice";
 const rootReducer = combineReducers({
   auth: authSlice,
   theme: themeSlice,
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
   message: messageSlice,
   problem: problemSlice,
   discussion: discussionSlice,
+  notification: notificationSlice,
 });
 
 export default rootReducer;

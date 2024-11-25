@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Home from "../../screens/Home";
 import ProblemDetail from "../../components/ProblemDetail";
 import Setting from "../../screens/Setting";
+import NotificationComponent from "../../components/NotificationComponent";
 
 const Stack = createNativeStackNavigator();
 
@@ -67,19 +68,22 @@ const Discussions = LazyLoadableScreen(() =>
 );
 
 const MainStack = ({ navigation }) => {
-  const commonHeaderOptions = {
-    headerShown: true,
-    headerRight: () => (
-      <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
-        <Ionicons
-          name="menu"
-          size={24}
-          color="#0a0c0d"
-          style={{ marginRight: 15 }}
-        />
-      </TouchableOpacity>
-    ),
-  };
+ const commonHeaderOptions = {
+   headerShown: true,
+   headerRight: () => (
+     <View style={{ flexDirection: "row", alignItems: "center" }}>
+       <NotificationComponent /> 
+       <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+         <Ionicons
+           name="menu"
+           size={24}
+           color="#0a0c0d"
+           style={{ marginRight: 15 }}
+         />
+       </TouchableOpacity>
+     </View>
+   ),
+ };
 
   return (
     <Stack.Navigator>
