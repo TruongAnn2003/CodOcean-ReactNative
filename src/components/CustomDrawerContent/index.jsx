@@ -1,16 +1,23 @@
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-// import UserAvatar from "react-native-user-avatar";
 import Icon from "react-native-vector-icons/Feather";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { WhaleBg } from "../../constants/images";
-import UserAvatar from "../UserAvatar";
 import { signOut } from "../../services/redux-toolkit/reducers/authSlice";
+import UserAvatar from "../UserAvatar";
 
 const CustomDrawerContent = (props) => {
-  const { user } = useSelector((state) => state.auth);
+  const { profile } = useSelector((state) => state.profile);
+  const [avatar, setAvatar] = useState(
+    "https://res.cloudinary.com/du5medjhm/image/upload/v1730996001/avatar-40_d7hhex.png"
+  );
+  const [name, setName] = useState("");
   const dispatch = useDispatch();
+  useEffect(() => {
+    setAvatar(profile.urlImage);
+    setName(profile.fullName);
+  }, [profile]);
   const handleSignOut = async () => {
     const resultAction = await dispatch(signOut());
     if (signOut.fulfilled.match(resultAction))
@@ -20,9 +27,9 @@ const CustomDrawerContent = (props) => {
   return (
     <DrawerContentScrollView {...props} style={styles.drawer}>
       <View className="flex items-center mb-6 p-4 border-b">
-        <UserAvatar size={60} src={user?.urlImage} className="mb-2" />
+        <UserAvatar size={60} src={profile?.urlImage} className="mb-2" />
         <Text className="text-lg text-white font-sscbold">
-          {user?.fullName}
+          {profile?.fullName}
         </Text>
       </View>
 
@@ -113,4 +120,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-export default CustomDrawerContent;
+export default React.memo(CustomDrawerContent);

@@ -1,28 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, ScrollView, StyleSheet, TextInput, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import CategoriesList from "../../components/CategoriesList";
-import DiscussionForm from "../../components/DiscussionForm";
-import DiscussionPost from "../../components/DiscussionPost";
-import { FilterStatus } from "../../components/FilterStatus";
-import { addDiscussion } from "../../services/redux-toolkit/reducers/manageDiscussionSlice";
-import { setError } from "../../services/redux-toolkit/reducers/messageSlice";
 import {
+  ScrollView,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Text,
+} from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { Input, Button, Icon } from "react-native-elements";
+import CategoryList from "../../components/CategoryList";
+import DiscussionPost from "../../components/DiscussionPost";
+import FilterStatus from "../../components/FilterStatus";
+import UpdateDiscussion from "../../components/UpdateDiscussion";
+import {
+  addDiscussion,
   getCategories,
   getDiscussions,
   setFilters,
-} from "../../services/redux-toolkit/reducers/searchDiscussionSlice";
+} from "../../services/redux-toolkit/reducers/discussionSlice";
+import {
+  setError,
+  setSuccess,
+} from "../../services/redux-toolkit/reducers/messageSlice";
+import AddDiscussion from "../../components/AddDiscussion";
 
 export default function Discussions() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { discussionPosts, filters, error, categories } = useSelector(
-    (state) => state.searchDiscussion
+  const { discussionPosts, filters, error } = useSelector(
+    (state) => state.discussion
   );
   const [inputValue, setInputValue] = useState("");
-  const [isFormVisible, setFormVisible] = useState(false); // State to control form visibility
-  const [currentDiscussion, setCurrentDiscussion] = useState(); // State for current discussion data
+  const [isFormVisible, setFormVisible] = useState(false);
 
   useEffect(() => {
     dispatch(getCategories())
@@ -58,91 +68,58 @@ export default function Discussions() {
     updateFilters({ ...filters, searchTerm: inputValue });
   };
 
-  const handleFilterCategory = (value) => {
-    updateFilters({ ...filters, category: value });
-  };
-
-  const handleRemoveStatusFilter = (status) => {
-    let removedStatus = {};
-    const entry = Object.entries(filters).find(
-      ([key, value]) => value === status
-    );
-    if (entry && entry[0] === "searchTerm") {
-      removedStatus = { searchTerm: "" };
-    } else {
-      removedStatus[entry[0]] = "ALL";
-    }
-    updateFilters({ ...filters, ...removedStatus });
-  };
-
-  const handleNewDiscussion = () => {
-    setCurrentDiscussion({
-      title: "",
-      description: "",
-      categories: [],
-      endAt: "",
-      image: "",
-    });
-    setFormVisible(true);
-  };
-
-  const handleEditDiscussion = (discussion) => {
-    setCurrentDiscussion(discussion);
-    setFormVisible(true);
-  };
-
-  const handleFormSubmit = async (discussionData) => {
-    console.log("Discussion data:", discussionData);
-    try {
-      const resultAction = await dispatch(addDiscussion(discussionData));
-      if (addDiscussion.fulfilled.match(resultAction)) {
-        dispatch(setSuccess("Add Discussion successfully"));
-      } else {
-        dispatch(setError("Error add discussion"));
-      }
-    } catch (e) {
-      console.error("Error add discussion:", e);
-    }
-    setFormVisible(false);
-  };
-
   return (
-    <ScrollView style={styles.container} nestedScrollEnabled={true}>
-      <CategoriesList categories={categories} onSelect={handleFilterCategory} />
+    <ScrollView style={styles.container}>
+      <CategoryList />
+
       <View style={styles.searchContainer}>
-        <TextInput
-          placeholder={"Discussion Title"}
-          style={styles.input}
+        <Input
+          placeholder={t("features.discussion.search.placeholder")}
           value={inputValue}
           onChangeText={setInputValue}
-          onSubmitEditing={handleSearchSubmit} // Allow submit via keyboard
+          onSubmitEditing={handleSearchSubmit}
+          leftIcon={<Icon name="search" size={24} color="#007bff" />}
+          rightIcon={
+            inputValue ? (
+              <Icon
+                name="clear"
+                size={24}
+                color="#007bff"
+                onPress={() => setInputValue("")}
+              />
+            ) : null
+          }
+          containerStyle={styles.inputContainer}
+          inputContainerStyle={styles.inputStyle}
         />
-        <Button title={"Search"} onPress={handleSearchSubmit} />
+        <Button
+          title={t("features.discussion.search.button")}
+          onPress={handleSearchSubmit}
+          containerStyle={styles.searchButtonContainer}
+          buttonStyle={styles.searchButtonStyle}
+        />
       </View>
 
-      <FilterStatus onRemoveFilter={handleRemoveStatusFilter} />
+      <FilterStatus />
 
-      <Button title={"New Discussion"} onPress={handleNewDiscussion} />
+      <TouchableOpacity
+        style={styles.newDiscussionButton}
+        onPress={() => setFormVisible((prev) => !prev)}
+      >
+        <Text style={styles.newDiscussionButtonText}>
+          {t("features.discussion.newDiscussion")}
+        </Text>
+      </TouchableOpacity>
 
       {isFormVisible && (
-        <DiscussionForm
-          initialData={currentDiscussion}
-          onSubmit={handleFormSubmit}
-        />
+        <AddDiscussion onClose={() => setFormVisible((prev) => !prev)} />
       )}
 
-      <ScrollView style={styles.discussionsContainer}>
+      <View style={styles.discussionsContainer}>
         {discussionPosts.map((discussion) => (
-          <View key={discussion.id}>
-            {/* <DiscussionPost
-        
-              discussion={discussion}
-              onEdit={() => handleEditDiscussion(discussion)} // Pass edit function
-            /> */}
-            <DiscussionPost post={discussion}></DiscussionPost>
-          </View>
+          <DiscussionPost key={discussion.id} post={discussion} />
         ))}
-      </ScrollView>
+      </View>
     </ScrollView>
   );
 }
@@ -151,21 +128,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#f8f9fa",
   },
   searchContainer: {
-    flexDirection: "row",
+    marginBottom: 16,
+  },
+  inputContainer: {
+    marginBottom: 8,
+  },
+  inputStyle: {
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: "#007bff",
+    paddingLeft: 16,
+  },
+  searchButtonContainer: {
+    marginTop: 8,
+  },
+  searchButtonStyle: {
+    backgroundColor: "#007bff",
+    borderRadius: 25,
+  },
+  newDiscussionButton: {
+    backgroundColor: "#007bff",
+    borderRadius: 25,
+    padding: 12,
     alignItems: "center",
     marginBottom: 16,
   },
-  input: {
-    height: 40,
-    flex: 1, // Take up all available space
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    marginRight: 10, // Spacing between input and button
+  newDiscussionButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   discussionsContainer: {
     flex: 1,

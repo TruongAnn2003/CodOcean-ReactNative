@@ -4,16 +4,14 @@ import themeSlice from "./themeSlice";
 import profileSlice from "./profileSlice";
 import messageSlice from "./messageSlice";
 import problemSlice from "./problemSlice";
-import searchDiscussionSlice from "./searchDiscussionSlice";
-import manageDiscussionSlice from "./manageDiscussionSlice";
+import discussionSlice from "./discussionSlice";
 const rootReducer = combineReducers({
   auth: authSlice,
   theme: themeSlice,
   profile: profileSlice,
   message: messageSlice,
   problem: problemSlice,
-  searchDiscussion: searchDiscussionSlice,
-  manageDiscussion: manageDiscussionSlice,
+  discussion: discussionSlice,
 });
 
 export default rootReducer;

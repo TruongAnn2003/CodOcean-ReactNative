@@ -4,7 +4,7 @@ import { View, Text } from "react-native";
 const MyDiscuss = () => {
   return (
     <View>
-      <Text>Statistics Screen</Text>
+      <Text>MyDiscuss Screen</Text>
     </View>
   );
 };

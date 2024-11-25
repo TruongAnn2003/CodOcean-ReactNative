@@ -1,19 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   getProfileAPI,
-  getAllSolvedProblemsAPI,
+  getAllUploadedDiscussionsAPI,
   getAllUploadedProblemsAPI,
+  getAllSolvedProblemsAPI,
   ChangeAvatarAPI,
   ChangeEmailAPI,
   ChangeProfileAPI,
 } from "../../api/profile";
-
-import {
-  addReactDiscussionAPI,
-  deleteReactDiscussionAPI,
-} from "../../api/discuss/searchAPI";
-import { deleteDiscussionAPI } from "../../api/discuss/manageAPI";
-
 const initialState = {
   isLoading: false,
   profile: {
@@ -35,7 +29,7 @@ const initialState = {
 };
 
 export const getProfile = createAsyncThunk(
-  "/profile/get-profile",
+  "/profile/get-profile/request-auth",
   async (_, { rejectWithValue }) => {
     try {
       const response = await getProfileAPI();
@@ -47,7 +41,7 @@ export const getProfile = createAsyncThunk(
 );
 
 export const getAllSolvedProblems = createAsyncThunk(
-  "/profile/get-all-solved-problems",
+  "/profile/get-all-solved-problems/request-auth",
   async (_, { rejectWithValue }) => {
     try {
       const response = await getAllSolvedProblemsAPI();
@@ -60,22 +54,8 @@ export const getAllSolvedProblems = createAsyncThunk(
   }
 );
 
-export const getAllUploadedProblems = createAsyncThunk(
-  "/profile/get-all-uploaded-problems",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await getAllUploadedProblemsAPI();
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(
-        error.response.data || "Failed to fetch all uploaded problems"
-      );
-    }
-  }
-);
-
 export const getAllUploadedDiscussions = createAsyncThunk(
-  "/profile/get-all-uploaded-discussions",
+  "/profile/get-all-uploaded-discussions/request-auth",
   async (_, { rejectWithValue }) => {
     try {
       const response = await getAllUploadedDiscussionsAPI();
@@ -88,48 +68,22 @@ export const getAllUploadedDiscussions = createAsyncThunk(
   }
 );
 
-export const addReactDiscussion = createAsyncThunk(
-  "/profile/add-react-discussion",
-  async (request, { rejectWithValue }) => {
+export const getAllUploadedProblems = createAsyncThunk(
+  "/profile/get-all-uploaded-problems/request-auth",
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await addReactDiscussionAPI(request);
+      const response = await getAllUploadedProblemsAPI();
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response.data || "Add react discussion failed"
+        error.response.data || "Failed to fetch all uploaded problems"
       );
     }
   }
 );
 
-export const deleteReactDiscussion = createAsyncThunk(
-  "/profile/delete-react-discussion",
-  async (request, { rejectWithValue }) => {
-    try {
-      const response = await deleteReactDiscussionAPI(request);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(
-        error.response.data || "Delete react discussion failed"
-      );
-    }
-  }
-);
-
-export const deleteDiscussion = createAsyncThunk(
-  "/profile/delete-discussion",
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await deleteDiscussionAPI(id);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data || "Delete discussion failed");
-    }
-  }
-);
-
-export const ChangeAvatar = createAsyncThunk(
-  "/profile/change-avatar",
+export const changeAvatar = createAsyncThunk(
+  "/profile/change-avatar/request-auth",
   async (formData, { rejectWithValue }) => {
     try {
       const response = await ChangeAvatarAPI(formData);
@@ -140,8 +94,8 @@ export const ChangeAvatar = createAsyncThunk(
   }
 );
 
-export const ChangeEmail = createAsyncThunk(
-  "/profile/change-email",
+export const changeEmail = createAsyncThunk(
+  "/profile/change-email/request-auth",
   async (formData, { rejectWithValue }) => {
     try {
       const response = await ChangeEmailAPI(formData);
@@ -152,8 +106,8 @@ export const ChangeEmail = createAsyncThunk(
   }
 );
 
-export const ChangeProfile = createAsyncThunk(
-  "/profile/change-profile",
+export const changeProfile = createAsyncThunk(
+  "/profile/change-profile/request-auth",
   async (formData, { rejectWithValue }) => {
     try {
       const response = await ChangeProfileAPI(formData);
@@ -171,7 +125,6 @@ const handlePending = (state) => {
 
 const handleFulfilled = (state, action) => {
   state.isLoading = false;
-  state.profile = action.payload.profile || null;
   state.error = null;
 };
 
@@ -197,49 +150,36 @@ const profileSlice = createSlice({
       })
       .addCase(getProfile.rejected, handleRejected)
       .addCase(getAllSolvedProblems.pending, handlePending)
-      .addCase(getAllSolvedProblems.fulfilled, (state, action) => {
-        handleFulfilled(state, action);
-        state.solvedProblems = action.payload;
-      })
+      .addCase(getAllSolvedProblems.fulfilled, handleFulfilled)
       .addCase(getAllSolvedProblems.rejected, handleRejected)
-      .addCase(getAllUploadedProblems.pending, handlePending)
-      .addCase(getAllUploadedProblems.fulfilled, (state, action) => {
-        handleFulfilled(state, action);
-        state.uploadedProblems = action.payload;
-      })
-      .addCase(getAllUploadedProblems.rejected, handleRejected)
       .addCase(getAllUploadedDiscussions.pending, handlePending)
       .addCase(getAllUploadedDiscussions.fulfilled, (state, action) => {
         handleFulfilled(state, action);
         state.discussionPosts = action.payload;
       })
       .addCase(getAllUploadedDiscussions.rejected, handleRejected)
-      .addCase(addReactDiscussion.pending, handlePending)
-      .addCase(addReactDiscussion.fulfilled, handleFulfilled)
-      .addCase(addReactDiscussion.rejected, handleRejected)
-      .addCase(deleteReactDiscussion.pending, handlePending)
-      .addCase(deleteReactDiscussion.fulfilled, handleFulfilled)
-      .addCase(deleteReactDiscussion.rejected, handleRejected)
-      .addCase(deleteDiscussion.pending, handlePending)
-      .addCase(deleteDiscussion.fulfilled, handleFulfilled)
-      .addCase(deleteDiscussion.rejected, handleRejected)
-      .addCase(ChangeAvatar.pending, handlePending)
-      .addCase(ChangeAvatar.fulfilled, (state, action) => {
+      .addCase(getAllUploadedProblems.pending, handlePending)
+      .addCase(getAllUploadedProblems.fulfilled, handleFulfilled)
+      .addCase(getAllUploadedProblems.rejected, handleRejected)
+      .addCase(changeAvatar.pending, handlePending)
+      .addCase(changeAvatar.fulfilled, (state, action) => {
         handleFulfilled(state, action);
-        state.profile.urlImage = action.payload;
+        console.warn("profile", state.profile);
+        state.profile = { ...state.profile, urlImage: action.payload };
       })
-      .addCase(ChangeAvatar.rejected, handleRejected)
-      .addCase(ChangeEmail.pending, handlePending)
-      .addCase(ChangeEmail.fulfilled, (state, action) => {
+      .addCase(changeAvatar.rejected, handleRejected)
+      .addCase(changeEmail.pending, handlePending)
+      .addCase(changeEmail.fulfilled, handleFulfilled)
+      .addCase(changeEmail.rejected, handleRejected)
+      .addCase(changeProfile.pending, handlePending)
+      .addCase(changeProfile.fulfilled, (state, action) => {
         handleFulfilled(state, action);
+        const newProfile = {
+          ...action.payload.profile,
+        };
+        state.profile = newProfile;
       })
-      .addCase(ChangeEmail.rejected, handleRejected)
-      .addCase(ChangeProfile.pending, handlePending)
-      .addCase(ChangeProfile.fulfilled, (state, action) => {
-        handleFulfilled(state, action);
-        state.profile = action.payload.profile;
-      })
-      .addCase(ChangeProfile.rejected, handleRejected);
+      .addCase(changeProfile.rejected, handleRejected);
   },
 });
 

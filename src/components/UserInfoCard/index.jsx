@@ -17,7 +17,7 @@ import {
   ChangeEmail,
   ChangeProfile,
 } from "../../services/redux-toolkit/reducers/profileSlice";
-import ChangeAvatarModal from "../ChangeAvatarModal/ChangeAvatarModal";
+import ChangeAvatarModal from "../ChangeAvatarModal";
 import UserAvatar from "../UserAvatar";
 import UserEditModal from "../UserEditModal";
 
@@ -33,9 +33,11 @@ const UserInfoCard = () => {
   const [email, setEmail] = useState(profile?.email || "");
   const [phoneNumber, setPhoneNumber] = useState(profile?.phoneNumber || "");
   const [dateOfBirth, setDateOfBirth] = useState(profile?.dateOfBirth || "");
+  const [urlImage, setUrlImage] = useState(profile?.urlImage || "");
 
   useEffect(() => {
     setFullName(profile?.fullName);
+    setUrlImage(profile?.urlImage);
     setEmail(profile?.email);
     setPhoneNumber(profile?.phoneNumber);
     setDateOfBirth(profile?.dateOfBirth);
@@ -72,7 +74,7 @@ const UserInfoCard = () => {
   const handleChangeEmail = async (email, otp) => {
     try {
       const resultAction = await dispatch(ChangeEmail({ email, otp }));
-      if (ChangeAvatar.fulfilled.match(resultAction)) {
+      if (ChangeEmail.fulfilled.match(resultAction)) {
         dispatch(setSuccess("Email changed successfully"));
         console.log("Email changed successfully:", resultAction.payload);
       } else {
@@ -130,7 +132,7 @@ const UserInfoCard = () => {
   return (
     <View style={styles.cardContainer}>
       <TouchableOpacity onPress={handleAvatarPress}>
-        <UserAvatar size={100} src={profile?.urlImage} className="mb-2" />
+        <UserAvatar size={100} src={urlImage} className="mb-2" />
       </TouchableOpacity>
       <Text style={styles.userName}>{fullName}</Text>
       <View style={styles.infoContainer}>
@@ -148,15 +150,6 @@ const UserInfoCard = () => {
         <Text style={styles.value}>{phoneNumber}</Text>
       </View>
 
-      {/* Edit Profile Button */}
-      {/* <TouchableOpacity
-        style={styles.editProfileButton}
-        onPress={() => setEditModalVisible(true)}
-      >
-        <Text style={styles.buttonText}>Edit Profile</Text>
-      </TouchableOpacity> */}
-
-      {/* Modal for Avatar Options */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -190,54 +183,9 @@ const UserInfoCard = () => {
         </View>
       </Modal>
       <ChangeAvatarModal
-        visible={modalEditAvatarVisible}
+        isOpen={modalEditAvatarVisible}
         onClose={() => setModalEditAvatarVisible(false)}
       />
-      {/* Modal for Editing Profile */}
-      {/* <Modal
-        animationType="slide"
-        transparent={true}
-        visible={editModalVisible}
-        onRequestClose={() => setEditModalVisible(false)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.editModalContainer}>
-            <Text style={styles.editModalTitle}>Edit Profile</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Full Name"
-              value={fullName}
-              onChangeText={setFullName}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Phone Number"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              keyboardType="phone-pad"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Date of Birth"
-              value={dateOfBirth}
-              onChangeText={setDateOfBirth}
-            />
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setEditModalVisible(false)}
-            >
-              <Text style={styles.buttonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal> */}
 
       <UserEditModal
         onChangeDateOfBirth={handleChangeDateOfBirth}

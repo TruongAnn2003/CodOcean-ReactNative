@@ -180,7 +180,20 @@
       "send": "Send",
       "confirmDelete": "Are you sure you want to delete this discussion?",
       "updateButton": "Update",
-      "deleteButton": "Delete"
+      "deleteButton": "Delete",
+      "getReplysCommentById": {
+        "failure": "Failed to load replies."
+      },
+      "replyFailed": "Reply Failed!",
+      "editFailed": "Edit Comment Failed",
+      "deleteSuccess": "Delete Comment Success!",
+      "deleteFailed": "Delete Comment Failed!",
+      "reply": "Reply",
+      "search": {
+        "placeholder": "Search discussions...",
+        "button": "Search"
+      },
+      "newDiscussion": "New Discussion"
     },
     "collapsibles": {}
   }

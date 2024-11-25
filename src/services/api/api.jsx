@@ -6,7 +6,7 @@ import axiosRetry from "axios-retry";
 // console.log("REACT_APP_API_URL", REACT_APP_API_URL);
 
 const REACT_APP_API_URL =
-  "https://e5d4-2001-ee0-5209-7c70-6894-fec0-5f4a-6c5e.ngrok-free.app/api";
+  "https://7644-2001-ee0-1b0d-1c56-a99b-3340-1907-da99.ngrok-free.app/api";
 const axiosInstance = axios.create({
   baseURL: REACT_APP_API_URL,
 });

@@ -1,58 +1,80 @@
-// src/components/FilterStatus.js
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useSelector } from "react-redux";
+import { View, Text } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { Icon, Chip, Button } from "react-native-elements";
 import PropTypes from "prop-types";
+import { setFilters } from "../../services/redux-toolkit/reducers/discussionSlice";
 
-export function FilterStatus ({ onRemoveFilter }) {
-  const { filters } = useSelector((state) => state.searchDiscussion);
+const FilterStatus = ()=> {
+  const { filters } = useSelector((state) => state.discussion);
   const [statusFilters, setStatusFilters] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const { category, searchTerm } = filters;
     setStatusFilters(
       [category, searchTerm].filter(
-        (i) => i && i !== "all" && i !== "ALL" && i !== ""
+        (i) => i && i !== "all" && i !== "ALL" && i !== "All" && i !== ""
       )
     );
   }, [filters]);
 
+  const handleClearFilters = () => {
+    const newFilters = {
+      pageNumber: 0,
+      limit: 10,
+      searchTerm: "",
+      category: "",
+    };
+    dispatch(setFilters({ newFilters }));
+    setStatusFilters([]);
+  };
+
+  const handleRemoveStatusFilter = (status) => {
+    let removedStatus = {};
+    const entry = Object.entries(filters).find(
+      ([key, value]) => value === status
+    );
+
+    if (entry && entry[0] === "searchTerm") {
+      removedStatus = { searchTerm: "" };
+    } else {
+      removedStatus[entry[0]] = "ALL";
+    }
+    const newFilters = { ...filters, ...removedStatus };
+
+    dispatch(setFilters({ newFilters }));
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 16 }}>
       {statusFilters.map((status, index) => (
-        <View style={styles.item} key={index}>
-          <Text>{typeof status === "string" ? status.toLowerCase() : ""}</Text>
-          <TouchableOpacity onPress={() => onRemoveFilter(status)}>
-            <Text style={styles.closeButton}>X</Text>
-          </TouchableOpacity>
-        </View>
+        <Chip
+          key={index}
+          title={typeof status === "string" ? status.toLowerCase() : ""}
+          icon={<Icon name="close" size={18} color="white" />}
+          onPress={() => handleRemoveStatusFilter(status)}
+          containerStyle={{ marginRight: 8, marginBottom: 8 }}
+          buttonStyle={{
+            backgroundColor: "#007bff", // Button color
+            borderRadius: 20, // Rounded corners
+          }}
+          iconRight
+        />
       ))}
+
+      {statusFilters.length > 0 && (
+        <Button
+          title="Clear All Filters"
+          onPress={handleClearFilters}
+          containerStyle={{ marginTop: 8 }}
+          buttonStyle={{
+            backgroundColor: "#f44336", // Red color
+            borderRadius: 20, // Rounded corners
+          }}
+        />
+      )}
     </View>
   );
-};
-
-FilterStatus.propTypes = {
-  onRemoveFilter: PropTypes.func,
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 16,
-  },
-  item: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 8,
-    padding: 4,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 4,
-  },
-  closeButton: {
-    marginLeft: 4,
-    color: "red",
-  },
-});
-
-
+}
+export default React.memo(FilterStatus);

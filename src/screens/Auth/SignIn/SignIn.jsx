@@ -6,7 +6,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +20,7 @@ import {
   commonValidationSchema,
   createValidationSchema,
 } from "../../../services/yup/commonValidationSchema";
+import { getProfile } from "../../../services/redux-toolkit/reducers/profileSlice";
 
 const SignIn = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -56,7 +57,7 @@ const SignIn = ({ navigation }) => {
             await dispatch(getCurrentUser());
             await navigation.navigate("ActiveAccount");
           } else {
-            await dispatch(getCurrentUser());
+            await dispatch(getProfile());
             await navigation.navigate("Problems");
           }
         } else {

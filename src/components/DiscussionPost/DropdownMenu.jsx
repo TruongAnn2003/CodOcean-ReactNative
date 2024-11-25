@@ -1,34 +1,60 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 
-export default function DropdownMenu({ onEdit, onDelete }) {
+function DropdownMenu({ onEdit, onDelete }) {
   return (
-    <View
-      className={
-        "absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg"
-      }
-    >
-      <View>
-        <TouchableOpacity
-          className={"px-4 py-2 hover:bg-gray-100"}
-          onPress={onEdit}
-        >
-          <Text className={"flex-row items-center"}>
-            <FontAwesomeIcon icon={faEdit} className={"mr-2"} /> Edit
-          </Text>
+    <View style={styles.menuContainer}>
+      <View style={styles.menuItem}>
+        <TouchableOpacity onPress={() => onEdit()} style={styles.menuItemButton}>
+          <FontAwesomeIcon icon={faEdit} color="#333" size={20} />
+          <Text style={styles.menuText}>Edit</Text>
         </TouchableOpacity>
+      </View>
+      <View style={styles.menuItem}>
         <TouchableOpacity
-          className={"px-4 py-2 hover:bg-gray-100"}
-          onPress={onDelete}
+          onPress={() => onDelete()}
+          style={styles.menuItemButton}
         >
-          <Text className={"flex-row items-center"}>
-            <FontAwesomeIcon icon={faTrash} className={"mr-2"} />
-            Delete
-          </Text>
+          <FontAwesomeIcon icon={faTrash} color="#e74c3c" size={20} />
+          <Text style={styles.menuText}>Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  menuContainer: {
+    position: "absolute",
+    right: 0,
+    top: 40,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
+    borderColor: "#e5e5e5",
+    borderWidth: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  menuItemButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  menuText: {
+    marginLeft: 12,
+    fontSize: 16,
+    color: "#333",
+  },
+});
+
+export default React.memo(DropdownMenu);

@@ -1,13 +1,12 @@
-import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import UserInfoCard from "../../../components/UserInfoCard";
-import { useSelector, useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { getProfile } from "../../../services/redux-toolkit/reducers/profileSlice";
+import React, { useEffect } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
+import { useDispatch } from "react-redux";
+import UserInfoCard from "../../../components/UserInfoCard";
 import { setError } from "../../../services/redux-toolkit/reducers/messageSlice";
+import { getProfile } from "../../../services/redux-toolkit/reducers/profileSlice";
 
 const Profile = () => {
-  const { user } = useSelector((state) => state.profile);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const handleNavigate = (screen) => {
