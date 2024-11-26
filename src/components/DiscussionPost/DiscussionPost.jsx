@@ -19,6 +19,7 @@ import { setError } from "../../services/redux-toolkit/reducers/messageSlice";
 import CommentSection from "./CommentSection";
 import DropdownMenu from "../../components/DiscussionPost/DropdownMenu";
 import UpdateDiscussion from "../UpdateDiscussion";
+import useWebSocket from "../../hooks/useWebSocket";
 
 const DiscussionPost = ({ post }) => {
   const { error } = useSelector((state) => state.discussion);
@@ -60,7 +61,38 @@ const DiscussionPost = ({ post }) => {
     setLiked(post.liked);
   }, [post]);
 
-  const fetchComments = async () => {
+  const stompClientRef = useWebSocket((message) => {
+    console.log("Received message:", message);
+    switch (message.type) {
+      case "COMMENT":
+        setComments((prevComments) => {
+          if (!prevComments.some((comment) => comment.id === message.id)) {
+            setCommentCount((prevCommentCount) => prevCommentCount + 1);
+
+            return [message, ...prevComments];
+          }
+          return prevComments;
+        });
+        break;
+      case "UPDATE":
+        setComments((prevComments) => {
+          const index = prevComments.findIndex(
+            (comment) => comment.id === message.id
+          );
+          if (index !== -1) {
+            const updatedComments = [...prevComments];
+            updatedComments[index] = message;
+            return updatedComments;
+          }
+          return prevComments;
+        });
+        break;
+      default:
+        break;
+    }
+  }, `/topic/discuss/${post.id}`);
+
+  const fetchComments = useCallback(async () => {
     try {
       const resultAction = await dispatch(getComments(id));
       if (getComments.fulfilled.match(resultAction)) {
@@ -75,7 +107,7 @@ const DiscussionPost = ({ post }) => {
         setError(`${t("features.comment.getComments.failure")} (${e.message})`)
       );
     }
-  };
+  }, []);
 
   const handleAddComment = async (text) => {
     if (text.trim()) {
@@ -83,9 +115,7 @@ const DiscussionPost = ({ post }) => {
         const resultAction = await dispatch(
           addComment({ discussId: id, text })
         );
-        if (addComment.fulfilled.match(resultAction)) {
-          setComments((prev) => [...prev, resultAction.payload]);
-        } else {
+        if (!addComment.fulfilled.match(resultAction)) {
           dispatch(
             setError(`${t("features.comment.addComment.failure")} (${error})`)
           );
@@ -97,17 +127,53 @@ const DiscussionPost = ({ post }) => {
       }
     }
   };
+  const handleEditDiscussion = async (discussion) => {
+    try {
+      const resultAction = await dispatch(updateDiscussion({ id, discussion }));
+      if (updateDiscussion.fulfilled.match(resultAction)) {
+        setTitle(discussion.title);
+        setDescription(discussion.description);
+        setEndAt(discussion.endAt);
+        dispatch(setSuccess("Update Discussion is success!"));
+      } else {
+        dispatch(setError(`Edit Discussion Failed (${error})`));
+      }
+      setIsEditting(false);
+    } catch (e) {
+      dispatch(setError(`Edit Discussion Failed (${error})`));
+    }
+  };
+
   const handleDeleteDiscussion = async () => {
-    setShowOptions((prev) => !prev);
     try {
       const resultAction = await dispatch(deleteDiscussion(id));
       if (deleteDiscussion.fulfilled.match(resultAction)) {
+        onDelete(post);
         dispatch(setSuccess(`Delete Discussion Success!`));
       } else {
         dispatch(setError(`Delete Discussion Failed! (${error})`));
       }
     } catch (e) {
       dispatch(setError(`Delete Discussion Failed! (${error})`));
+    }
+  };
+
+  const onDeleteComment = async (commentId) => {
+    try {
+      const resultAction = await dispatch(deleteComment(commentId));
+      if (deleteComment.fulfilled.match(resultAction)) {
+        setComments((prevComments) =>
+          prevComments.filter((comment) => comment.id !== commentId)
+        );
+        setCommentCount((prevCount) => prevCount - 1);
+        console.log("commentCount in Delete: ", commentCount);
+
+        dispatch(setSuccess("Delete Comment Success!"));
+      } else {
+        dispatch(setError(`Delete Comment Failed! (${error})`));
+      }
+    } catch (e) {
+      dispatch(setError(`Delete Comment Failed! (${e.message})`));
     }
   };
   useEffect(() => {
@@ -297,15 +363,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   ownerName: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "bold",
   },
   createdAt: {
-    fontSize: 12,
+    fontSize: 10,
     color: "#6b7280",
   },
   title: {
-    fontSize: 18,
+    fontSize: 13,
     fontWeight: "bold",
     marginBottom: 8,
   },
@@ -313,11 +379,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   description: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#4b5563",
   },
   toggleText: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#1d4ed8",
     marginTop: 5,
   },
@@ -332,17 +398,17 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   showMoreText: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#1d4ed8",
   },
   lockMessageOpen: {
     color: "red",
-    fontSize: 14,
+    fontSize: 12,
     marginBottom: 8,
   },
   lockMessageClosed: {
     color: "green",
-    fontSize: 14,
+    fontSize: 12,
     marginBottom: 8,
   },
   footer: {
@@ -356,7 +422,7 @@ const styles = StyleSheet.create({
   },
   reactionCount: {
     marginLeft: 8,
-    fontSize: 14,
+    fontSize: 12,
     color: "#4b5563",
   },
   optionsContainer: {

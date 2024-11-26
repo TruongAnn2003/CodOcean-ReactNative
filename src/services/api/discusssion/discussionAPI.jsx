@@ -3,7 +3,7 @@ import queryString from "query-string";
 import { cleanRequestParams } from "../../../utils/helpers";
 
 const BASE_URL = "/discusses";
-const BASE_URL_PROFILE = "/api/profile";
+const BASE_URL_PROFILE = "/profile";
 
 export const getDiscussionsAPI = (filters) => {
   const requestParams = cleanRequestParams(filters);
@@ -23,9 +23,6 @@ export const getMyDiscussionsAPI = () => {
 export const addDiscussionAPI = (request) =>
   axiosInstance.post(`${BASE_URL}`, request, {
     requiresAuth: true,
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
   });
 
 export const updateDiscussionAPI = (id, discussion) =>

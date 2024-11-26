@@ -166,25 +166,29 @@ const AddDiscussion = ({ onClose }) => {
 
   const handleAddDiscussion = async () => {
     const formData = new FormData();
-    const request = {
-      title,
-      description,
-      endAt,
-      categories: selectedCategories,
-    };
-    
-    // Convert the request object to a JSON string
-    formData.append("request", JSON.stringify(request));
+    formData.append(
+      "request",
+      new Blob(
+        [
+          JSON.stringify({
+            title,
+            description,
+            endAt,
+            categories: selectedCategories,
+          }),
+        ],
+        { type: "application/json" }
+      )
+    );
 
-    // Append selected files
     selectedFiles.forEach((file) => {
       formData.append("multipartFiles", {
-        uri: file.url,
-        type: file.file.type || "image/jpeg",
-        name: file.file.fileName || "photo.jpg",
+        uri: file.uri.startsWith("file://") ? file.uri : `file://${file.uri}`,
+        type: file.type || "image/jpeg",
+        name: file.name || "photo.jpg",
       });
     });
-
+    console.log("formData:", JSON.stringify(formData, null, 2));
     try {
       const resultAction = await dispatch(addDiscussion(formData));
       console.log("Result action:", JSON.stringify(resultAction, null, 2));
@@ -210,12 +214,14 @@ const AddDiscussion = ({ onClose }) => {
       handleAddDiscussion();
     }
   };
+
   const onChange = async (event, selectedDate) => {
     const currentDate = selectedDate || date;
     await setShowDatePicker(false);
     await setDate(currentDate);
     await setEndAt(currentDate.toISOString());
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create New Discussion</Text>

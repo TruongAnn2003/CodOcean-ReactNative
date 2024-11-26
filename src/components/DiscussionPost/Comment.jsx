@@ -20,6 +20,7 @@ import CommentSection from "./CommentSection";
 import DropdownMenu from "./DropdownMenu";
 import CommentInputBox from "./CommentInputBox";
 import { setError } from "../../services/redux-toolkit/reducers/messageSlice";
+import useWebSocket from "../../hooks/useWebSocket";
 
 const Comment = ({ comment }) => {
   const { profile } = useSelector((state) => state.profile);
@@ -47,25 +48,56 @@ const Comment = ({ comment }) => {
     setUpdatedAt(comment.updatedAt);
   }, [comment]);
 
+  const stompClientRef = useWebSocket((message) => {
+    console.log("Received message in Comment:", message);
+    switch (message.type) {
+      case "DELETE":
+        setReplies((prevReplies) => {
+          const findAndRemoveReply = (replies) => {
+            for (let i = 0; i < replies.length; i++) {
+              if (replies[i].id === message.id) {
+                replies.splice(i, 1);
+                return replies;
+              }
+              if (replies[i].replies) {
+                replies[i].replies = findAndRemoveReply(replies[i].replies);
+              }
+            }
+            return replies;
+          };
+          return findAndRemoveReply(prevReplies);
+        });
+        break;
+      case "REPLY":
+        setReplies((prevReplies) => {
+          return [message, ...prevReplies];
+        });
+        break;
+      case "UPDATE":
+        setId(message.id);
+        setText(message.text);
+        setOwnerName(message.ownerName);
+        setOwnerImageUrl(message.ownerImageUrl);
+        setUpdatedAt(message.updatedAt);
+        break;
+      default:
+        break;
+    }
+  }, `/topic/discuss-comment/${id}`);
+
   const handleFetchReplies = async () => {
     try {
       const resultAction = await dispatch(getRepliesCommentById(id));
       if (getRepliesCommentById.fulfilled.match(resultAction)) {
-        setReplies([...resultAction.payload]);
+        setReplies(resultAction.payload);
       } else {
-        dispatch(
-          setError(
-            `${t(
-              "features.discussion.getReplysCommentById.failure"
-            )} (${error})`
-          )
+        console.error(
+          `${t("features.comment.getReplysCommentById.failure")} (${error})`
         );
       }
     } catch (e) {
-      dispatch(
-        setError(
-          `${t("features.discussion.getReplysCommentById.failure")} (${e})`
-        )
+      console.error(
+        `${t("features.comment.getReplysCommentById.failure")} (${e})`
       );
     }
   };
@@ -80,21 +112,19 @@ const Comment = ({ comment }) => {
         const resultAction = await dispatch(
           replyComment({ commentId: id, text: replyText })
         );
-        if (replyComment.fulfilled.match(resultAction)) {
-          setReplies((prev) => [...prev, resultAction.payload]);
-        } else {
+
+        if (!replyComment.fulfilled.match(resultAction)) {
           dispatch(
-            setError(`${t("features.discussion.replyFailed")} (${error})`)
+            setError(`${t("features.comment.replyComment.failure")} (${error})`)
           );
         }
       } catch (e) {
         dispatch(
-          setError(`${t("features.discussion.replyFailed")} (${error})`)
+          setError(`${t("features.comment.replyComment.failure")} (${e})`)
         );
       }
     }
   };
-
   const handleEditComment = async (text) => {
     if (text.trim()) {
       try {
@@ -210,12 +240,12 @@ const styles = StyleSheet.create({
   },
   ownerName: {
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 12,
     marginBottom: 4,
   },
   updatedAt: {
     color: "#6b7280",
-    fontSize: 14,
+    fontSize: 10,
   },
   optionsContainer: {
     position: "absolute",
@@ -226,7 +256,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   commentText: {
-    fontSize: 16,
+    fontSize: 12,
     color: "#333",
   },
   replyButton: {
@@ -234,7 +264,7 @@ const styles = StyleSheet.create({
   },
   replyText: {
     color: "#3b82f6",
-    fontSize: 14,
+    fontSize: 12,
   },
   repliesContainer: {
     marginLeft: 32,

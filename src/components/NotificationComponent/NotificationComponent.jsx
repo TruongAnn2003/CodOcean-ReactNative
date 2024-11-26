@@ -5,6 +5,9 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  StyleSheet,
+  Modal,
+  Pressable,
 } from "react-native";
 import { Avatar } from "react-native-paper";
 import Icon from "react-native-vector-icons/Feather";
@@ -16,7 +19,6 @@ import {
 } from "./services/slice";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
-import Constants from "expo-constants";
 import useWebSocket from "../../hooks/useWebSocket";
 
 // Thiết lập handler cho thông báo
@@ -46,7 +48,6 @@ async function registerForPushNotificationsAsync(setExpoPushToken) {
 
       const pushToken = (await Notifications.getExpoPushTokenAsync()).data;
       setExpoPushToken(pushToken);
-      console.log("Expo Push Token:", pushToken);
       return pushToken;
     } else {
       throw new Error("Must use physical device for push notifications");
@@ -72,9 +73,8 @@ const NotificationComponent = () => {
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
-        // Thêm thông báo vừa nhận vào danh sách thông báo
         setNotifications((prev) => [notification.request.content, ...prev]);
-        setUnreadCount((prev) => prev + 1); // Tăng số lượng thông báo chưa đọc
+        setUnreadCount((prev) => prev + 1);
       });
 
     responseListener.current =
@@ -92,7 +92,6 @@ const NotificationComponent = () => {
 
   const handleWebSocketMessage = (message) => {
     if (message.content) {
-      // Push thông báo tới thiết bị
       Notifications.scheduleNotificationAsync({
         content: {
           title: message.title || "New Notification",
@@ -149,83 +148,127 @@ const NotificationComponent = () => {
 
   const renderNotificationItem = ({ item }) => (
     <View
-      style={{
-        padding: 10,
-        backgroundColor: item.read ? "#f0f0f0" : "#fff",
-        borderBottomWidth: 1,
-        borderColor: "#ccc",
-      }}
+      style={[
+        styles.notificationItem,
+        { backgroundColor: item.read ? "#f0f0f0" : "#fff" },
+      ]}
     >
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Avatar.Image size={40} source={{ uri: item.ownerImageUrl }} />
-        <View style={{ flex: 1, marginLeft: 10 }}>
-          <Text style={{ fontWeight: "bold" }}>{item.ownerName}</Text>
-          <Text>{item.content}</Text>
-        </View>
-        {!item.read && (
-          <TouchableOpacity onPress={() => markAsRead(item.id)}>
-            <Icon name="check" size={24} color="#048cbf" />
-          </TouchableOpacity>
-        )}
+      <Avatar.Image size={40} source={{ uri: item.ownerImageUrl }} />
+      <View style={styles.notificationTextContainer}>
+        <Text style={styles.ownerName}>{item.ownerName}</Text>
+        <Text>{item.content}</Text>
       </View>
+      {!item.read && (
+        <TouchableOpacity onPress={() => markAsRead(item.id)}>
+          <Icon name="check" size={24} color="#048cbf" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 
   return (
-    <View>
+    <View style={styles.container}>
       <TouchableOpacity
-        onPress={() => setIsNotificationOpen(!isNotificationOpen)}
-        style={{ position: "relative", padding: 10 }}
+        onPress={() => setIsNotificationOpen(true)}
+        style={styles.bellContainer}
       >
         <Icon name="bell" size={24} color="#048cbf" />
         {unreadCount > 0 && (
-          <View
-            style={{
-              position: "absolute",
-              top: -5,
-              right: -5,
-              backgroundColor: "red",
-              borderRadius: 10,
-              padding: 5,
-            }}
-          >
-            <Text style={{ color: "white", fontSize: 12 }}>{unreadCount}</Text>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{unreadCount}</Text>
           </View>
         )}
       </TouchableOpacity>
-      {isNotificationOpen && (
-        <View
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: 10,
-            padding: 10,
-            maxHeight: 300,
-            overflow: "hidden",
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingBottom: 10,
-            }}
-          >
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-              Notifications
-            </Text>
+
+      <Modal
+        visible={isNotificationOpen}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsNotificationOpen(false)}
+      >
+        <Pressable
+          style={styles.overlay}
+          onPress={() => setIsNotificationOpen(false)}
+        />
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Notifications</Text>
             <TouchableOpacity onPress={markAllAsRead}>
-              <Text style={{ color: "blue" }}>Mark all as read</Text>
+              <Text style={styles.markAllText}>Mark all as read</Text>
             </TouchableOpacity>
           </View>
           <FlatList
             data={notifications}
             renderItem={renderNotificationItem}
             keyExtractor={(item) => item.id.toString()}
+            style={styles.notificationList}
           />
         </View>
-      )}
+      </Modal>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    position: "relative",
+  },
+  bellContainer: {
+    padding: 10,
+  },
+  badge: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    backgroundColor: "red",
+    borderRadius: 10,
+    padding: 5,
+  },
+  badgeText: {
+    color: "white",
+    fontSize: 12,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    padding: 15,
+    maxHeight: "70%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  modalTitle: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  markAllText: {
+    color: "blue",
+  },
+  notificationList: {
+    flex: 1,
+  },
+  notificationItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+  },
+  notificationTextContainer: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  ownerName: {
+    fontWeight: "bold",
+  },
+});
 
 export default NotificationComponent;
