@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { Icon, Chip, Button } from "react-native-elements";
-import PropTypes from "prop-types";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { setFilters } from "../../services/redux-toolkit/reducers/discussionSlice";
 
-const FilterStatus = ()=> {
+const FilterStatus = () => {
   const { filters } = useSelector((state) => state.discussion);
   const [statusFilters, setStatusFilters] = useState([]);
   const dispatch = useDispatch();
@@ -19,7 +18,7 @@ const FilterStatus = ()=> {
     );
   }, [filters]);
 
-  const handleClearFilters = () => {
+  const handleClearFilters = React.useCallback(() => {
     const newFilters = {
       pageNumber: 0,
       limit: 10,
@@ -28,9 +27,9 @@ const FilterStatus = ()=> {
     };
     dispatch(setFilters({ newFilters }));
     setStatusFilters([]);
-  };
+  }, [dispatch]);
 
-  const handleRemoveStatusFilter = (status) => {
+  const handleRemoveStatusFilter = React.useCallback((status) => {
     let removedStatus = {};
     const entry = Object.entries(filters).find(
       ([key, value]) => value === status
@@ -42,39 +41,42 @@ const FilterStatus = ()=> {
       removedStatus[entry[0]] = "ALL";
     }
     const newFilters = { ...filters, ...removedStatus };
-
     dispatch(setFilters({ newFilters }));
-  };
+  }, [filters, dispatch]);
 
   return (
-    <View style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 16 }}>
-      {statusFilters.map((status, index) => (
-        <Chip
-          key={index}
-          title={typeof status === "string" ? status.toLowerCase() : ""}
-          icon={<Icon name="close" size={18} color="white" />}
-          onPress={() => handleRemoveStatusFilter(status)}
-          containerStyle={{ marginRight: 8, marginBottom: 8 }}
-          buttonStyle={{
-            backgroundColor: "#007bff", // Button color
-            borderRadius: 20, // Rounded corners
-          }}
-          iconRight
-        />
-      ))}
+    <View className="mb-4">
+      <View className="flex-row flex-wrap">
+        {statusFilters.map((status, index) => (
+          <View
+            key={index}
+            className="flex-row items-center bg-blue-50 rounded-full px-3 py-1.5 mr-2 mb-2"
+          >
+            <Text className="text-secondary font-sscregular mr-2">
+              {typeof status === "string" ? status.toLowerCase() : ""}
+            </Text>
+            <TouchableOpacity
+              onPress={() => handleRemoveStatusFilter(status)}
+              className="p-1"
+            >
+              <FontAwesome name="times" size={16} color="#024873" />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
 
       {statusFilters.length > 0 && (
-        <Button
-          title="Clear All Filters"
+        <TouchableOpacity
           onPress={handleClearFilters}
-          containerStyle={{ marginTop: 8 }}
-          buttonStyle={{
-            backgroundColor: "#f44336", // Red color
-            borderRadius: 20, // Rounded corners
-          }}
-        />
+          className="bg-secondary py-2 px-4 rounded-full self-start mt-2"
+        >
+          <Text className="text-white font-sscsemibold">
+            Clear All Filters
+          </Text>
+        </TouchableOpacity>
       )}
     </View>
   );
-}
+};
+
 export default React.memo(FilterStatus);

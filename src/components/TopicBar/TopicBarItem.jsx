@@ -4,14 +4,14 @@ import * as _formatting from "../../utils/formatting";
 function TopicBarItem({ topic, onSelect }) {
   return (
     <TouchableOpacity
-      className="w-auto h-10 px-4 py-2 bg-white rounded-full mx-2 flex-row items-center"
+      className="w-auto px-4 py-2.5 bg-white rounded-full mx-2 flex-row items-center border border-gray-100 shadow-sm hover:shadow-md active:bg-gray-50"
       onPress={() => onSelect(topic?.name)}
     >
-      <Text className="text-secondary text-base font-sscregular mr-2">
+      <Text className="text-secondary text-base font-sscsemibold mr-3">
         {_formatting.formatString(topic?.name) || "Error name"}
       </Text>
-      <View className="w-8 h-8 bg-gray-300 rounded-full justify-center items-center">
-        <Text className="text-secondary-100 font-sscregular">
+      <View className="min-w-[28px] h-7 bg-blue-50 rounded-full justify-center items-center px-2">
+        <Text className="text-secondary font-sscsemibold text-sm">
           {topic?.quantity !== undefined ? topic.quantity : "0"}
         </Text>
       </View>

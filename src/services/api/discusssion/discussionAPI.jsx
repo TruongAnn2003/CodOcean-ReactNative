@@ -23,6 +23,10 @@ export const getMyDiscussionsAPI = () => {
 export const addDiscussionAPI = (request) =>
   axiosInstance.post(`${BASE_URL}`, request, {
     requiresAuth: true,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "multipart/form-data",
+    },
   });
 
 export const updateDiscussionAPI = (id, discussion) =>

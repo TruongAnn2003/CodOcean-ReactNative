@@ -3,11 +3,13 @@ import {
   FlatList,
   Image,
   Platform,
+  Modal,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
+  ScrollView,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -223,130 +225,169 @@ const AddDiscussion = ({ onClose }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create New Discussion</Text>
+    <Modal visible={true} animationType="slide" transparent>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          <ScrollView>
+            <View style={styles.modalHeader}>
+              <Text style={styles.title}>Create New Discussion</Text>
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <FontAwesome name="times" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
 
-      <View style={styles.form}>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Title</Text>
-          <TextInput
-            style={[styles.input, errors.title ? styles.errorInput : null]}
-            value={title}
-            onChangeText={setTitle}
-            placeholder="Enter title"
-          />
-          {errors.title && <Text style={styles.errorMsg}>{errors.title}</Text>}
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Description</Text>
-          <TextInput
-            style={[
-              styles.textarea,
-              errors.description ? styles.errorInput : null,
-            ]}
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={4}
-            placeholder="Enter description"
-            ref={inputRef}
-          />
-          {errors.description && (
-            <Text style={styles.errorMsg}>{errors.description}</Text>
-          )}
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>End Date & Time</Text>
-          <TouchableOpacity
-            style={[styles.input, errors.endAt ? styles.errorInput : null]}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text>
-              {endAt
-                ? new Date(endAt).toLocaleString()
-                : "Select date and time"}
-            </Text>
-          </TouchableOpacity>
-          {errors.endAt && <Text style={styles.errorMsg}>{errors.endAt}</Text>}
-        </View>
-
-        {showDatePicker && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            is24Hour={true}
-            display={"spinner"}
-            onChange={onChange}
-          />
-        )}
-
-        <CategoryMenu
-          onSelectedCategoriesChange={handleSelectedCategoriesChange}
-        />
-
-        <View style={styles.imagesSection}>
-          <Text style={styles.label}>Images</Text>
-          <TouchableOpacity
-            style={styles.uploadButton}
-            onPress={handleFileChange}
-          >
-            <FontAwesome name="plus" size={24} />
-            <Text>Add Images</Text>
-          </TouchableOpacity>
-
-          <FlatList
-            data={selectedFiles}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item, index }) => (
-              <View style={styles.imageContainer}>
-                <Image source={{ uri: item.url }} style={styles.image} />
-                <TouchableOpacity
-                  onPress={() => removeImage(index)}
-                  style={styles.removeImageButton}
-                >
-                  <FontAwesome name="times" size={16} color="white" />
-                </TouchableOpacity>
+            <View style={styles.form}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Title</Text>
+                <TextInput
+                  style={[
+                    styles.input,
+                    errors.title ? styles.errorInput : null,
+                  ]}
+                  value={title}
+                  onChangeText={setTitle}
+                  placeholder="Enter title"
+                />
+                {errors.title && (
+                  <Text style={styles.errorMsg}>{errors.title}</Text>
+                )}
               </View>
-            )}
-            numColumns={3}
-          />
-        </View>
 
-        <View style={styles.submitButtonContainer}>
-          <Button
-            title="Cancel"
-            onPress={onClose}
-            buttonStyle={styles.cancelButton}
-          />
-          <Button
-            title="Create Discussion"
-            onPress={handleSubmit}
-            buttonStyle={styles.submitButton}
-          />
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Description</Text>
+                <TextInput
+                  style={[
+                    styles.textarea,
+                    errors.description ? styles.errorInput : null,
+                  ]}
+                  value={description}
+                  onChangeText={setDescription}
+                  multiline
+                  numberOfLines={4}
+                  placeholder="Enter description"
+                  ref={inputRef}
+                />
+                {errors.description && (
+                  <Text style={styles.errorMsg}>{errors.description}</Text>
+                )}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>End Date & Time</Text>
+                <TouchableOpacity
+                  style={[
+                    styles.input,
+                    errors.endAt ? styles.errorInput : null,
+                  ]}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Text>
+                    {endAt
+                      ? new Date(endAt).toLocaleString()
+                      : "Select date and time"}
+                  </Text>
+                </TouchableOpacity>
+                {errors.endAt && (
+                  <Text style={styles.errorMsg}>{errors.endAt}</Text>
+                )}
+              </View>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={date}
+                  mode="date"
+                  is24Hour={true}
+                  display={"spinner"}
+                  onChange={onChange}
+                />
+              )}
+
+              <CategoryMenu
+                onSelectedCategoriesChange={handleSelectedCategoriesChange}
+              />
+
+              <View style={styles.imagesSection}>
+                <Text style={styles.label}>Images</Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                  onPress={handleFileChange}
+                >
+                  <FontAwesome name="plus" size={24} />
+                  <Text style={styles.uploadButtonText}>Add Images</Text>
+                </TouchableOpacity>
+
+                <FlatList
+                  data={selectedFiles}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({ item, index }) => (
+                    <View style={styles.imageContainer}>
+                      <Image source={{ uri: item.url }} style={styles.image} />
+                      <TouchableOpacity
+                        onPress={() => removeImage(index)}
+                        style={styles.removeImageButton}
+                      >
+                        <FontAwesome name="times" size={16} color="white" />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                  numColumns={3}
+                />
+              </View>
+
+              <View style={styles.submitButtonContainer}>
+                <Button
+                  title="Cancel"
+                  onPress={onClose}
+                  buttonStyle={styles.cancelButton}
+                />
+                <Button
+                  title="Create Discussion"
+                  onPress={handleSubmit}
+                  buttonStyle={styles.submitButton}
+                />
+              </View>
+            </View>
+          </ScrollView>
         </View>
       </View>
-    </View>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: "100%",
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "90%",
+    maxHeight: "90%",
     backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
     elevation: 5,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
+  },
+  closeButton: {
+    padding: 5,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
   },
   form: {
     display: "flex",
@@ -358,12 +399,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: "600",
+    marginBottom: 5,
   },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
     padding: 10,
+    backgroundColor: "#fff",
   },
   textarea: {
     minHeight: 100,
@@ -372,6 +415,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     textAlignVertical: "top",
+    backgroundColor: "#fff",
   },
   errorInput: {
     borderColor: "red",
@@ -387,10 +431,18 @@ const styles = StyleSheet.create({
   uploadButton: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
+    justifyContent: "center",
+    padding: 12,
     backgroundColor: "#f0f0f0",
     borderRadius: 5,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderStyle: "dashed",
+  },
+  uploadButtonText: {
+    marginLeft: 8,
+    fontSize: 16,
   },
   imageContainer: {
     position: "relative",
@@ -408,7 +460,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 5,
     right: 5,
-    backgroundColor: "red",
+    backgroundColor: "rgba(255, 0, 0, 0.8)",
     borderRadius: 50,
     padding: 5,
   },
@@ -416,13 +468,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 20,
+    paddingVertical: 10,
   },
   submitButton: {
     backgroundColor: "#007BFF",
+    paddingHorizontal: 20,
   },
   cancelButton: {
     backgroundColor: "#FF6F61",
+    paddingHorizontal: 20,
   },
 });
 
 export default memo(AddDiscussion);
+

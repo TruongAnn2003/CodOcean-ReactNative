@@ -13,7 +13,7 @@ import {
   setError,
   setSuccess,
 } from "../../services/redux-toolkit/reducers/messageSlice";
-import { changeProfile } from "../../services/redux-toolkit/reducers/profileSlice";
+import { changeProfile, ChangeEmail } from "../../services/redux-toolkit/reducers/profileSlice";
 import ChangeAvatarModal from "../ChangeAvatarModal";
 import UserAvatar from "../UserAvatar";
 import UserEditModal from "../UserEditModal";
@@ -104,10 +104,10 @@ const UserInfoCard = () => {
       if (changeProfile.fulfilled.match(resultAction)) {
         dispatch(setSuccess("Phone number changed successfully"));
       } else {
-        dispatch(setError("Error changing phone number: " + error));
+        dispatch(setError(`Error changing phone number: ${error?.message || error}`));
       }
     } catch (error) {
-      dispatch(setError("Error changing phone number: " + error));
+      dispatch(setError(`Error changing phone number: ${error?.message || error}`));
     }
   };
 
@@ -127,24 +127,33 @@ const UserInfoCard = () => {
   };
 
   return (
-    <View style={styles.cardContainer}>
-      <TouchableOpacity onPress={handleAvatarPress}>
-        <UserAvatar size={100} src={urlImage} className="mb-2" />
-      </TouchableOpacity>
-      <Text style={styles.userName}>{fullName}</Text>
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Email:</Text>
-        <Text style={styles.value}>{email}</Text>
-      </View>
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Date of Birth:</Text>
-        <Text style={styles.value}>
-          {new Date(dateOfBirth).toLocaleDateString()}
+    <View className="bg-white rounded-2xl shadow-md p-6 m-4">
+      <View className="flex items-center">
+        <TouchableOpacity onPress={handleAvatarPress}>
+          <UserAvatar size={100} src={urlImage} className="mb-4" />
+        </TouchableOpacity>
+        <Text className="text-2xl font-bold text-gray-800 mb-6">
+          {fullName}
         </Text>
       </View>
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Phone Number:</Text>
-        <Text style={styles.value}>{phoneNumber}</Text>
+
+      <View className="space-y-4">
+        <View className="flex flex-col py-2 border-b border-gray-100">
+          <Text className="text-gray-600 font-medium mb-1">Email</Text>
+          <Text className="text-gray-800 break-all">{email}</Text>
+        </View>
+
+        <View className="flex flex-row items-center justify-between py-2 border-b border-gray-100">
+          <Text className="text-gray-600 font-medium">Date of Birth</Text>
+          <Text className="text-gray-800">
+            {new Date(dateOfBirth).toLocaleDateString()}
+          </Text>
+        </View>
+
+        <View className="flex flex-row items-center justify-between py-2 border-b border-gray-100">
+          <Text className="text-gray-600 font-medium">Phone Number</Text>
+          <Text className="text-gray-800">{phoneNumber}</Text>
+        </View>
       </View>
 
       <Modal
@@ -153,63 +162,76 @@ const UserInfoCard = () => {
         visible={optionsModalVisible}
         onRequestClose={() => setOptionsModalVisible(false)}
       >
-        <View style={styles.modalBackground}>
+        <View className="flex-1 justify-center items-center bg-black/50">
           <Animated.View
-            style={[styles.modalContainer, { opacity: animation }]}
+            style={{ opacity: animation }}
+            className="bg-white rounded-xl p-6 w-[80%] shadow-lg"
           >
-            <Text style={styles.modalTitle}>Options</Text>
+            <Text className="text-xl font-bold text-gray-800 mb-4 text-center">
+              Options
+            </Text>
+
             <TouchableOpacity
-              style={styles.saveButton}
+              className="bg-blue-500 py-3 px-4 rounded-lg mb-3"
               onPress={handleViewImage}
             >
-              <Text style={styles.buttonText}>View Image</Text>
+              <Text className="text-white font-semibold text-center">
+                View Image
+              </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
-              style={styles.saveButton}
+              className="bg-blue-500 py-3 px-4 rounded-lg mb-3"
               onPress={() => setModalEditAvatarVisible(true)}
             >
-              <Text style={styles.buttonText}>Edit</Text>
+              <Text className="text-white font-semibold text-center">Edit</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
-              style={styles.cancelButton}
+              className="bg-red-500 py-3 px-4 rounded-lg"
               onPress={() => setOptionsModalVisible(false)}
             >
-              <Text style={styles.buttonText}>Cancel</Text>
+              <Text className="text-white font-semibold text-center">
+                Cancel
+              </Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
       </Modal>
+
       <ChangeAvatarModal
         isOpen={modalEditAvatarVisible}
         onClose={() => setModalEditAvatarVisible(false)}
       />
 
       <UserEditModal
+        isOpen={editModalVisible}
+        onClose={() => setEditModalVisible(false)}
         onChangeDateOfBirth={handleChangeDateOfBirth}
-        // onChangeEmail={handleChangeEmail}
         onChangeFullName={handleChangeFullName}
         onChangePhoneNumber={handleChangePhoneNumber}
       />
 
-      {/* Modal for Viewing Image */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={imageVisible}
         onRequestClose={closeImageModal}
       >
-        <View style={styles.modalBackground}>
-          <View style={styles.imageModalContainer}>
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View className="bg-white rounded-xl p-6 w-[80%] items-center">
             <Image
               source={{ uri: profile?.urlImage }}
-              style={styles.image}
+              className="w-[200px] h-[200px] rounded-lg mb-4"
               resizeMode="contain"
             />
             <TouchableOpacity
-              style={styles.closeButton}
+              className="bg-red-500 py-3 px-4 rounded-lg w-full"
               onPress={closeImageModal}
             >
-              <Text style={styles.buttonText}>Close</Text>
+              <Text className="text-white font-semibold text-center">
+                Close
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -217,143 +239,5 @@ const UserInfoCard = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  cardContainer: {
-    backgroundColor: "#ffffff",
-    padding: 15,
-    margin: 10,
-    borderRadius: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
-    elevation: 3,
-    alignItems: "center",
-  },
-  userName: {
-    fontSize: 24,
-    marginBottom: 10,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  infoContainer: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 5,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#555",
-  },
-  value: {
-    fontSize: 16,
-    color: "#777",
-  },
-  editProfileButton: {
-    backgroundColor: "#048cbf",
-    padding: 10,
-    borderRadius: 5,
-    width: "100%",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContainer: {
-    backgroundColor: "#ffffff",
-    padding: 20,
-    borderRadius: 10,
-    width: "80%",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
-    elevation: 3,
-  },
-  editModalContainer: {
-    backgroundColor: "#ffffff",
-    padding: 20,
-    borderRadius: 10,
-    width: "80%",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
-    elevation: 3,
-  },
-  editModalTitle: {
-    fontSize: 18,
-    marginBottom: 15,
-    fontWeight: "bold",
-  },
-  input: {
-    width: "100%",
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginVertical: 5,
-  },
-  saveButton: {
-    backgroundColor: "#048cbf",
-    padding: 10,
-    borderRadius: 5,
-    width: "100%",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  cancelButton: {
-    backgroundColor: "#DC4C67",
-    padding: 10,
-    borderRadius: 5,
-    width: "100%",
-    alignItems: "center",
-    marginTop: 5,
-  },
-  imageModalContainer: {
-    backgroundColor: "#ffffff",
-    padding: 20,
-    borderRadius: 10,
-    width: "80%",
-    alignItems: "center",
-  },
-  image: {
-    width: 200,
-    height: 200,
-  },
-  closeButton: {
-    backgroundColor: "#DC4C67",
-    padding: 10,
-    borderRadius: 5,
-    width: "100%",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  button: {
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 5,
-    backgroundColor: "#048cbf",
-    width: "100%",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-});
 
 export default UserInfoCard;

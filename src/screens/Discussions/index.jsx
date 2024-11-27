@@ -67,46 +67,65 @@ export default function Discussions() {
   const handleSearchSubmit = () => {
     updateFilters({ ...filters, searchTerm: inputValue });
   };
-
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView className="flex-1 bg-gray-50 p-4">
       <CategoryList />
 
-      <View style={styles.searchContainer}>
-        <Input
-          placeholder={t("features.discussion.search.placeholder")}
-          value={inputValue}
-          onChangeText={setInputValue}
-          onSubmitEditing={handleSearchSubmit}
-          leftIcon={<Icon name="search" size={24} color="#007bff" />}
-          rightIcon={
-            inputValue ? (
-              <Icon
-                name="clear"
-                size={24}
-                color="#007bff"
-                onPress={() => setInputValue("")}
-              />
-            ) : null
-          }
-          containerStyle={styles.inputContainer}
-          inputContainerStyle={styles.inputStyle}
-        />
-        <Button
-          title={t("features.discussion.search.button")}
-          onPress={handleSearchSubmit}
-          containerStyle={styles.searchButtonContainer}
-          buttonStyle={styles.searchButtonStyle}
-        />
+      <View className="mb-4 px-2">
+        <View className="flex-row items-center space-x-2">
+          <View className="flex-1">
+            <Input
+              placeholder={t("features.discussion.search.placeholder")} 
+              value={inputValue}
+              onChangeText={setInputValue}
+              onSubmitEditing={handleSearchSubmit}
+              leftIcon={<Icon name="search" size={20} color="#3b82f6" />}
+              rightIcon={
+                inputValue ? (
+                  <Icon
+                    name="clear"
+                    size={20} 
+                    color="#3b82f6"
+                    onPress={() => setInputValue("")}
+                  />
+                ) : null
+              }
+              containerStyle={{
+                paddingHorizontal: 0,
+                paddingVertical: 0,
+                height: 45
+              }}
+              inputContainerStyle={{
+                borderWidth: 1,
+                borderColor: '#e5e7eb',
+                borderRadius: 8,
+                paddingLeft: 8,
+                backgroundColor: 'white',
+                height: '100%'
+              }}
+              inputStyle={{
+                fontSize: 16
+              }}
+            />
+          </View>
+
+          <TouchableOpacity
+            className="bg-blue-500 h-[45px] px-4 rounded-lg justify-center"
+            onPress={handleSearchSubmit}
+            activeOpacity={0.7}
+          >
+            <Icon name="search" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FilterStatus />
-
       <TouchableOpacity
-        style={styles.newDiscussionButton}
+        className="bg-blue-500 py-3 px-5 rounded-lg mb-4 flex-row items-center justify-center space-x-2"
         onPress={() => setFormVisible((prev) => !prev)}
       >
-        <Text style={styles.newDiscussionButtonText}>
+        <Icon name="add" size={24} color="white" />
+        <Text className="text-white font-medium text-base">
           {t("features.discussion.newDiscussion")}
         </Text>
       </TouchableOpacity>
@@ -115,7 +134,7 @@ export default function Discussions() {
         <AddDiscussion onClose={() => setFormVisible((prev) => !prev)} />
       )}
 
-      <View style={styles.discussionsContainer}>
+      <View className="flex-1 space-y-4">
         {discussionPosts.map((discussion) => (
           <DiscussionPost key={discussion.id} post={discussion} />
         ))}
@@ -123,45 +142,3 @@ export default function Discussions() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#f8f9fa",
-  },
-  searchContainer: {
-    marginBottom: 16,
-  },
-  inputContainer: {
-    marginBottom: 8,
-  },
-  inputStyle: {
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: "#007bff",
-    paddingLeft: 16,
-  },
-  searchButtonContainer: {
-    marginTop: 8,
-  },
-  searchButtonStyle: {
-    backgroundColor: "#007bff",
-    borderRadius: 25,
-  },
-  newDiscussionButton: {
-    backgroundColor: "#007bff",
-    borderRadius: 25,
-    padding: 12,
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  newDiscussionButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  discussionsContainer: {
-    flex: 1,
-  },
-});

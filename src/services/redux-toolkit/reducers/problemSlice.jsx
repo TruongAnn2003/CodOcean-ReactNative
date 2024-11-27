@@ -13,7 +13,7 @@ const initialState = {
   error: null,
   filters: {
     pageNumber: 0,
-    limit: 2,
+    limit: 10,
     status: null,
     difficulty: null,
     topic: null,

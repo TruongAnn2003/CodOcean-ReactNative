@@ -189,14 +189,35 @@ const UserEditModal = ({
   //   }
   // };
 
+  const handleSaveAll = () => {
+    // Validate all fields
+    let hasErrors = false;
+    Object.entries(formData).forEach(([field, value]) => {
+      const error = validateField(field, value);
+      if (error) {
+        setErrors(prev => ({ ...prev, [field]: error }));
+        hasErrors = true;
+      }
+    });
+
+    if (!hasErrors) {
+      // Save all changes
+      onChangeFullName(formData.fullName);
+      onChangePhoneNumber(formData.phone);
+      onChangeDateOfBirth(formData.dob);
+      setIsOpen(false);
+    }
+  };
+
   return (
     <>
       <TouchableOpacity
         onPress={() => setIsOpen(true)}
-        className="px-4 py-2 bg-primary text-white rounded-md  transition-colors"
+        className="px-4 py-2 bg-blue-500 rounded-lg flex-row items-center justify-center space-x-2"
         aria-label="Open edit form"
       >
-        <Text>Edit Profile</Text>
+        <FontAwesomeIcon icon={faPen} size={16} color="#fff" />
+        <Text className="text-white font-medium">Edit Profile</Text>
       </TouchableOpacity>
 
       <Modal
@@ -206,78 +227,42 @@ const UserEditModal = ({
         onRequestClose={() => setIsOpen(false)}
       >
         <View
-          className="flex-1  bg-opacity-50 items-center justify-center"
+          className="flex-1 items-center justify-center px-4"
           style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
         >
-          <View className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
-            <TouchableOpacity
-              onPress={() => setIsOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-              aria-label="Close modal"
-            >
-              <FontAwesomeIcon icon={faClose} size={20} color="#000" />
-            </TouchableOpacity>
-
-            <Text className="text-2xl font-semibold mb-6">
-              Edit Profile Information
-            </Text>
+          <View className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-2xl font-bold text-gray-800">
+                Edit Profile
+              </Text>
+              <TouchableOpacity
+                onPress={() => setIsOpen(false)}
+                className="p-2 rounded-full bg-red-100 hover:bg-red-200"
+                aria-label="Close modal"
+              >
+                <FontAwesomeIcon icon={faClose} size={20} color="#EF4444" />
+              </TouchableOpacity>
+            </View>
 
             {Object.entries(formData).map(([field, value]) => (
-              <View key={field}>
+              <View key={field} className="mb-6">
                 {field === "dob" ? (
                   <>
-                    <View className="mb-4">
-                      <Text className="text-sm font-medium text-gray-700 mb-1">
-                        {field.charAt(0).toUpperCase() +
-                          field.slice(1).replace(/([A-Z])/g, " $1")}
+                    <View className="relative">
+                      <Text className="text-sm font-semibold text-gray-700 mb-2">
+                        {field === "dob" ? "Date of Birth" : field.charAt(0).toUpperCase() + field.slice(1)}
                       </Text>
                       <Pressable
-                        style={{
-                          width: "100%",
-                          height: 48,
-                          borderWidth: 1,
-                          borderColor: "#D1D5DB",
-                          borderRadius: 8,
-                          justifyContent: "center",
-                          paddingLeft: 16,
-                          marginBottom: 16,
-                        }}
+                        className="flex-row items-center justify-between px-4 py-3 border border-gray-300 rounded-lg bg-white"
                         onPress={() => setShowDatePicker(true)}
                       >
-                        <Text className="text-base font-regular text-[#D1D5DB]">
-                          {value
-                            ? new Date(value).toLocaleDateString()
-                            : "Select Date of Birth"}
+                        <Text className="text-gray-700">
+                          {value ? new Date(value).toLocaleDateString() : "Select Date of Birth"}
                         </Text>
+                        <FontAwesomeIcon icon={faPen} size={16} color="#6B7280" />
                       </Pressable>
-
-                      <TouchableOpacity
-                        onPress={() => handleEdit(field)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600"
-                        aria-label={`${
-                          editableFields[field] ? "Save" : "Edit"
-                        } ${field}`}
-                      >
-                        {editableFields[field] ? (
-                          <FontAwesomeIcon
-                            icon={faSave}
-                            size={20}
-                            color="#000"
-                          />
-                        ) : (
-                          <FontAwesomeIcon
-                            icon={faPen}
-                            size={20}
-                            color="#000"
-                          />
-                        )}
-                      </TouchableOpacity>
-                      {errors[field] && (
-                        <Text className="text-red-600 text-sm mt-1">
-                          {errors[field]}
-                        </Text>
-                      )}
                     </View>
+
                     {showDatePicker && (
                       <DateTimePicker
                         value={new Date(value) || new Date()}
@@ -293,60 +278,40 @@ const UserEditModal = ({
                     )}
                   </>
                 ) : (
-                  <View className="mb-4">
-                    <Text className="text-sm font-medium text-gray-700 mb-1">
-                      {field.charAt(0).toUpperCase() +
-                        field.slice(1).replace(/([A-Z])/g, " $1")}
+                  <View className="relative">
+                    <Text className="text-sm font-semibold text-gray-700 mb-2">
+                      {field === "fullName" ? "Full Name" : 
+                       field === "phoneNumber" ? "Phone Number" :
+                       field.charAt(0).toUpperCase() + field.slice(1)}
                     </Text>
-                    <TextInput
-                      value={value}
-                      onChangeText={(text) => handleChange(field, text)}
-                      editable={editableFields[field]}
-                      className={`w-full px-4 py-2 border rounded-md ${
-                        errors[field] ? "border-red-500" : "border-gray-300"
-                      } ${
-                        !editableFields[field] ? "bg-gray-50" : "bg-white"
-                      } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                      keyboardType={
-                        field === "phone"
-                          ? "phone-pad"
-                          : field === "dob"
-                          ? "default"
-                          : "default"
-                      }
-                      placeholder={
-                        field.charAt(0).toUpperCase() + field.slice(1)
-                      }
-                      aria-invalid={errors[field] ? "true" : "false"}
-                    />
-                    {field === "email" ? (
-                      <></>
-                    ) : (
-                      <TouchableOpacity
-                        onPress={() => handleEdit(field)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600"
-                        aria-label={`${
-                          editableFields[field] ? "Save" : "Edit"
-                        } ${field}`}
-                      >
-                        {editableFields[field] ? (
+                    <View className="relative">
+                      <TextInput
+                        value={value}
+                        onChangeText={(text) => handleChange(field, text)}
+                        editable={editableFields[field]}
+                        className={`w-full px-4 py-3 border rounded-lg ${
+                          errors[field] ? "border-red-500" : "border-gray-300"
+                        } ${
+                          !editableFields[field] ? "bg-gray-50" : "bg-white"
+                        }`}
+                        keyboardType={field === "phone" ? "phone-pad" : "default"}
+                        placeholder={`Enter your ${field === "fullName" ? "full name" : field}`}
+                      />
+                      {field !== "email" && (
+                        <TouchableOpacity
+                          onPress={() => handleEdit(field)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2"
+                        >
                           <FontAwesomeIcon
-                            icon={faSave}
-                            size={20}
-                            color="#000"
+                            icon={editableFields[field] ? faSave : faPen}
+                            size={18}
+                            color={editableFields[field] ? "#2563EB" : "#6B7280"}
                           />
-                        ) : (
-                          <FontAwesomeIcon
-                            icon={faPen}
-                            size={20}
-                            color="#000"
-                          />
-                        )}
-                      </TouchableOpacity>
-                    )}
-
+                        </TouchableOpacity>
+                      )}
+                    </View>
                     {errors[field] && (
-                      <Text className="text-red-600 text-sm mt-1">
+                      <Text className="text-red-500 text-sm mt-1">
                         {errors[field]}
                       </Text>
                     )}
@@ -354,59 +319,19 @@ const UserEditModal = ({
                 )}
               </View>
             ))}
-            {/* 
-            {showVerifyView && (
-              <>
-                <View className="mb-4">
-                  <Text className="text-sm font-medium text-gray-700">
-                    Verification Code
-                  </Text>
-                  <View className="flex-row justify-center mt-2">
-                    {otp.map((digit, index) => (
-                      <TextInput
-                        key={index}
-                        ref={otpRefs.current[index]} // Ref for focus management
-                        className={`w-12 h-12 border rounded-md text-center text-lg ${
-                          errors.otp ? "border-red-500" : "border-gray-300"
-                        }`}
-                        maxLength={1}
-                        value={digit}
-                        onChangeText={(value) => handleOtpChange(value, index)}
-                        onKeyPress={(e) => handleKeyDown(e, index)}
-                        keyboardType="numeric" // Ensure numeric keyboard
-                      />
-                    ))}
-                  </View>
-                  {errors.otp && (
-                    <Text className="text-red-600 text-sm mt-1 text-center">
-                      {errors.otp}
-                    </Text>
-                  )}
-                </View>
-                {isLoading && <Text>...waitting</Text>}
 
-                <TouchableOpacity
-                  className="bg-blue-600 rounded-md py-3 mt-4"
-                  onPress={handleVerifyOTP}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <ActivityIndicator size="small" color="#FFFFFF" />
-                  ) : (
-                    <Text className="text-white text-center text-lg font-semibold">
-                      Verify OTP
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </>
-            )} */}
-
-            <View className="mt-8 flex-row justify-end space-x-4">
+            <View className="flex-row justify-end space-x-3 mt-6">
               <TouchableOpacity
                 onPress={() => setIsOpen(false)}
-                className="px-4 py-2 bg-pink text-gray-600 hover:text-gray-800"
+                className="px-6 py-3 bg-red-500 rounded-lg"
               >
-                <Text>Cancel</Text>
+                <Text className="text-white font-medium">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSaveAll}
+                className="px-6 py-3 bg-blue-500 rounded-lg"
+              >
+                <Text className="text-white font-medium">Save Changes</Text>
               </TouchableOpacity>
             </View>
           </View>

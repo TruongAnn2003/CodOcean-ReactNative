@@ -5,56 +5,38 @@ import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function DropdownMenu({ onEdit, onDelete }) {
   return (
-    <View style={styles.menuContainer}>
-      <View style={styles.menuItem}>
-        <TouchableOpacity onPress={() => onEdit()} style={styles.menuItemButton}>
-          <FontAwesomeIcon icon={faEdit} color="#333" size={20} />
-          <Text style={styles.menuText}>Edit</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.menuItem}>
-        <TouchableOpacity
-          onPress={() => onDelete()}
-          style={styles.menuItemButton}
-        >
-          <FontAwesomeIcon icon={faTrash} color="#e74c3c" size={20} />
-          <Text style={styles.menuText}>Delete</Text>
-        </TouchableOpacity>
-      </View>
+    <View className="absolute right-2 top-9 bg-white rounded-lg shadow-md min-w-[150px] py-1">
+      <TouchableOpacity 
+        onPress={onEdit}
+        className="flex-row items-center px-4 py-3 hover:bg-gray-50"
+      >
+        <FontAwesomeIcon 
+          icon={faEdit} 
+          size={16}
+          className="text-gray-600" 
+        />
+        <Text className="ml-3 text-sm font-medium text-gray-600">
+          Chỉnh sửa
+        </Text>
+      </TouchableOpacity>
+
+      <View className="h-[1px] bg-gray-100" />
+
+      <TouchableOpacity
+        onPress={onDelete}
+        className="flex-row items-center px-4 py-3 hover:bg-gray-50"
+      >
+        <FontAwesomeIcon 
+          icon={faTrash} 
+          size={16}
+          className="text-red-600"
+        />
+        <Text className="ml-3 text-sm font-medium text-red-600">
+          Xóa
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  menuContainer: {
-    position: "absolute",
-    right: 0,
-    top: 40,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 5,
-    borderColor: "#e5e5e5",
-    borderWidth: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 8,
-  },
-  menuItemButton: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  menuText: {
-    marginLeft: 12,
-    fontSize: 16,
-    color: "#333",
-  },
-});
 
 export default React.memo(DropdownMenu);

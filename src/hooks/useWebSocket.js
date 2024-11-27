@@ -6,7 +6,7 @@ import { getTokens } from "../utils/tokenUtils";
 const useWebSocket = (onMessageReceived, subscribeUrl) => {
   const stompClientRef = useRef(null);
   const baseURL =
-    "https://1ab0-2001-ee0-154-9fa0-a032-c668-b173-3e7d.ngrok-free.app/ws";
+    "https://06f8-2001-ee0-51de-d090-95ab-7481-5212-94a3.ngrok-free.app/ws";
 
   const disconnectWebSocket = async () => {
     if (stompClientRef.current) {

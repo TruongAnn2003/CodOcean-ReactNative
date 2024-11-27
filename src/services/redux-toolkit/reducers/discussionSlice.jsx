@@ -179,6 +179,7 @@ export const addDiscussion = createAsyncThunk(
   "/discussion/add/request-auth",
   async (request, { rejectWithValue }) => {
     try {
+      console.log("request", request);
       const response = await addDiscussionAPI(request);
       return response.data;
     } catch (error) {

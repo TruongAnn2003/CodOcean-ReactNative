@@ -61,36 +61,36 @@ const DiscussionPost = ({ post }) => {
     setLiked(post.liked);
   }, [post]);
 
-  const stompClientRef = useWebSocket((message) => {
-    console.log("Received message:", message);
-    switch (message.type) {
-      case "COMMENT":
-        setComments((prevComments) => {
-          if (!prevComments.some((comment) => comment.id === message.id)) {
-            setCommentCount((prevCommentCount) => prevCommentCount + 1);
+  // const stompClientRef = useWebSocket((message) => {
+  //   console.log("Received message:", message);
+  //   switch (message.type) {
+  //     case "COMMENT":
+  //       setComments((prevComments) => {
+  //         if (!prevComments.some((comment) => comment.id === message.id)) {
+  //           setCommentCount((prevCommentCount) => prevCommentCount + 1);
 
-            return [message, ...prevComments];
-          }
-          return prevComments;
-        });
-        break;
-      case "UPDATE":
-        setComments((prevComments) => {
-          const index = prevComments.findIndex(
-            (comment) => comment.id === message.id
-          );
-          if (index !== -1) {
-            const updatedComments = [...prevComments];
-            updatedComments[index] = message;
-            return updatedComments;
-          }
-          return prevComments;
-        });
-        break;
-      default:
-        break;
-    }
-  }, `/topic/discuss/${post.id}`);
+  //           return [message, ...prevComments];
+  //         }
+  //         return prevComments;
+  //       });
+  //       break;
+  //     case "UPDATE":
+  //       setComments((prevComments) => {
+  //         const index = prevComments.findIndex(
+  //           (comment) => comment.id === message.id
+  //         );
+  //         if (index !== -1) {
+  //           const updatedComments = [...prevComments];
+  //           updatedComments[index] = message;
+  //           return updatedComments;
+  //         }
+  //         return prevComments;
+  //       });
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }, `/topic/discuss/${post.id}`);
 
   const fetchComments = useCallback(async () => {
     try {
@@ -216,32 +216,43 @@ const DiscussionPost = ({ post }) => {
           onClose={() => setIsEditing((prev) => !prev)}
         />
       ) : (
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Image source={{ uri: ownerImageUrl }} style={styles.avatar} />
-            <View style={styles.headerText}>
-              <Text style={styles.ownerName}>{ownerName}</Text>
-              <Text style={styles.createdAt}>
+        <View className="bg-white rounded-xl p-4 mb-4 shadow-md">
+          <View className="flex-row items-center mb-3">
+            <Image 
+              source={{ uri: ownerImageUrl }} 
+              className="w-10 h-10 rounded-full mr-3"
+            />
+            <View className="flex-1">
+              <Text className="font-bold text-gray-900">{ownerName}</Text>
+              <Text className="text-xs text-gray-500">
                 {new Date(createdAt).toLocaleString()}
               </Text>
             </View>
             {profile.fullName === ownerName && (
-              <TouchableOpacity onPress={() => setShowOptions(!showOptions)}>
+              <TouchableOpacity 
+                onPress={() => setShowOptions(!showOptions)}
+                className="p-2"
+              >
                 <FontAwesome name="ellipsis-h" size={20} color="#6b7280" />
               </TouchableOpacity>
             )}
           </View>
-          <Text style={styles.title}>{title}</Text>
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.description}>
-              {showFullDescription
-                ? description
+
+          <Text className="text-lg font-bold text-gray-900 mb-2">{title}</Text>
+
+          <View className="mb-3">
+            <Text className="text-gray-700 leading-relaxed">
+              {showFullDescription 
+                ? description 
                 : `${description.slice(0, 150)}...`}
             </Text>
 
             {description.length > 150 && (
-              <TouchableOpacity onPress={toggleDescription}>
-                <Text style={styles.toggleText}>
+              <TouchableOpacity 
+                onPress={toggleDescription}
+                className="mt-2"
+              >
+                <Text className="text-blue-600 font-medium">
                   {showFullDescription ? "Show less" : "Show more"}
                 </Text>
               </TouchableOpacity>
@@ -249,54 +260,60 @@ const DiscussionPost = ({ post }) => {
           </View>
 
           {imageUrls.length > 0 && (
-            <View style={styles.imageContainer}>
+            <View className="flex-row flex-wrap mb-3 -mx-1">
               {imageUrls.slice(0, 2).map((url, index) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => openImageModal(url)}
+                  className="w-1/2 p-1"
                 >
-                  <Image source={{ uri: url }} style={styles.imageThumbnail} />
+                  <Image 
+                    source={{ uri: url }} 
+                    className="w-full h-32 rounded-lg"
+                  />
                 </TouchableOpacity>
               ))}
               {imageUrls.length > 2 && (
-                <TouchableOpacity onPress={() => openImageModal(imageUrls[2])}>
-                  <Text style={styles.showMoreText}>...</Text>
+                <TouchableOpacity 
+                  onPress={() => openImageModal(imageUrls[2])}
+                  className="w-1/2 p-1 items-center justify-center bg-gray-100 rounded-lg h-32"
+                >
+                  <Text className="text-lg text-gray-600 font-bold">
+                    +{imageUrls.length - 2}
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
           )}
 
-          <Text
-            style={
-              isLocked() ? styles.lockMessageOpen : styles.lockMessageClosed
-            }
-          >
+          <Text className={`mb-3 text-sm ${isLocked() ? 'text-red-500' : 'text-green-500'}`}>
             {lockMessage()}
           </Text>
 
-          <View style={styles.footer}>
+          <View className="flex-row justify-between items-center border-t border-gray-100 pt-3">
             <TouchableOpacity
               onPress={() => dispatch(toggleReaction(id))}
-              style={styles.reactionButton}
+              className="flex-row items-center"
             >
               <FontAwesome
                 name="heart"
                 size={20}
-                color={liked ? "red" : "gray"}
+                color={liked ? "#ef4444" : "#9ca3af"}
               />
-              <Text style={styles.reactionCount}>{reactCount}</Text>
+              <Text className="ml-2 text-gray-600">{reactCount}</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               onPress={() => setShowComments(!showComments)}
-              style={styles.reactionButton}
+              className="flex-row items-center"
             >
-              <FontAwesome name="comment" size={20} color="gray" />
-              <Text style={styles.reactionCount}>{commentCount}</Text>
+              <FontAwesome name="comment" size={20} color="#9ca3af" />
+              <Text className="ml-2 text-gray-600">{commentCount}</Text>
             </TouchableOpacity>
           </View>
 
           {showOptions && (
-            <View style={styles.optionsContainer}>
+            <View className="absolute right-4 top-12 bg-white rounded-lg shadow-xl py-2 z-10">
               <DropdownMenu
                 onEdit={() => {
                   setShowOptions((prev) => !prev);
@@ -317,13 +334,17 @@ const DiscussionPost = ({ post }) => {
           <Modal
             visible={modalVisible}
             transparent={true}
-            animationType="slide"
+            animationType="fade"
             onRequestClose={closeImageModal}
           >
-            <View style={styles.modalContainer}>
-              <Image source={{ uri: selectedImage }} style={styles.fullImage} />
+            <View className="flex-1 bg-black/90 justify-center items-center">
+              <Image 
+                source={{ uri: selectedImage }} 
+                className="w-full h-4/5"
+                resizeMode="contain"
+              />
               <TouchableOpacity
-                style={styles.closeButton}
+                className="absolute top-10 right-6 p-2"
                 onPress={closeImageModal}
               >
                 <FontAwesome name="times" size={30} color="white" />
@@ -336,124 +357,4 @@ const DiscussionPost = ({ post }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 6,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  headerText: {
-    flex: 1,
-  },
-  ownerName: {
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  createdAt: {
-    fontSize: 10,
-    color: "#6b7280",
-  },
-  title: {
-    fontSize: 13,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  descriptionContainer: {
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: 12,
-    color: "#4b5563",
-  },
-  toggleText: {
-    fontSize: 12,
-    color: "#1d4ed8",
-    marginTop: 5,
-  },
-  imageContainer: {
-    flexDirection: "row",
-    marginBottom: 8,
-  },
-  imageThumbnail: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginRight: 8,
-  },
-  showMoreText: {
-    fontSize: 12,
-    color: "#1d4ed8",
-  },
-  lockMessageOpen: {
-    color: "red",
-    fontSize: 12,
-    marginBottom: 8,
-  },
-  lockMessageClosed: {
-    color: "green",
-    fontSize: 12,
-    marginBottom: 8,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 8,
-  },
-  reactionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  reactionCount: {
-    marginLeft: 8,
-    fontSize: 12,
-    color: "#4b5563",
-  },
-  optionsContainer: {
-    position: "absolute",
-    right: 10,
-    top: 40,
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 6,
-    zIndex: 10,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
-  },
-  fullImage: {
-    width: "90%",
-    height: "80%",
-    resizeMode: "contain",
-  },
-  closeButton: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-  },
-});
 export default DiscussionPost;

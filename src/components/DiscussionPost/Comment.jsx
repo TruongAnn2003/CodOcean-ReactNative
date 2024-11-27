@@ -48,42 +48,42 @@ const Comment = ({ comment }) => {
     setUpdatedAt(comment.updatedAt);
   }, [comment]);
 
-  const stompClientRef = useWebSocket((message) => {
-    console.log("Received message in Comment:", message);
-    switch (message.type) {
-      case "DELETE":
-        setReplies((prevReplies) => {
-          const findAndRemoveReply = (replies) => {
-            for (let i = 0; i < replies.length; i++) {
-              if (replies[i].id === message.id) {
-                replies.splice(i, 1);
-                return replies;
-              }
-              if (replies[i].replies) {
-                replies[i].replies = findAndRemoveReply(replies[i].replies);
-              }
-            }
-            return replies;
-          };
-          return findAndRemoveReply(prevReplies);
-        });
-        break;
-      case "REPLY":
-        setReplies((prevReplies) => {
-          return [message, ...prevReplies];
-        });
-        break;
-      case "UPDATE":
-        setId(message.id);
-        setText(message.text);
-        setOwnerName(message.ownerName);
-        setOwnerImageUrl(message.ownerImageUrl);
-        setUpdatedAt(message.updatedAt);
-        break;
-      default:
-        break;
-    }
-  }, `/topic/discuss-comment/${id}`);
+  // const stompClientRef = useWebSocket((message) => {
+  //   console.log("Received message in Comment:", message);
+  //   switch (message.type) {
+  //     case "DELETE":
+  //       setReplies((prevReplies) => {
+  //         const findAndRemoveReply = (replies) => {
+  //           for (let i = 0; i < replies.length; i++) {
+  //             if (replies[i].id === message.id) {
+  //               replies.splice(i, 1);
+  //               return replies;
+  //             }
+  //             if (replies[i].replies) {
+  //               replies[i].replies = findAndRemoveReply(replies[i].replies);
+  //             }
+  //           }
+  //           return replies;
+  //         };
+  //         return findAndRemoveReply(prevReplies);
+  //       });
+  //       break;
+  //     case "REPLY":
+  //       setReplies((prevReplies) => {
+  //         return [message, ...prevReplies];
+  //       });
+  //       break;
+  //     case "UPDATE":
+  //       setId(message.id);
+  //       setText(message.text);
+  //       setOwnerName(message.ownerName);
+  //       setOwnerImageUrl(message.ownerImageUrl);
+  //       setUpdatedAt(message.updatedAt);
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }, `/topic/discuss-comment/${id}`);
 
   const handleFetchReplies = async () => {
     try {
@@ -159,43 +159,59 @@ const Comment = ({ comment }) => {
   };
 
   return (
-    <View style={styles.commentContainer}>
-      <View style={styles.header}>
-        <Image source={{ uri: ownerImageUrl || "" }} style={styles.avatar} />
-        <View style={styles.headerContent}>
-          <Text style={styles.ownerName}>{ownerName}</Text>
-          <Text style={styles.updatedAt}>
-            {new Date(updatedAt).toLocaleString()}
-          </Text>
+    <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+      <View className="flex-row items-center justify-between mb-3">
+        <View className="flex-row items-center flex-1">
+          <Image 
+            source={{ uri: ownerImageUrl || "" }} 
+            className="w-10 h-10 rounded-full mr-3"
+          />
+          <View>
+            <Text className="font-bold text-gray-900">{ownerName}</Text>
+            <Text className="text-xs text-gray-500">
+              {new Date(updatedAt).toLocaleString()}
+            </Text>
+          </View>
         </View>
+
         {profile.fullName === ownerName && (
-          <TouchableOpacity onPress={() => setShowOptions(!showOptions)}>
+          <TouchableOpacity 
+            onPress={() => setShowOptions(!showOptions)}
+            className="p-2"
+          >
             <FontAwesome name="ellipsis-h" size={20} color="#6b7280" />
           </TouchableOpacity>
         )}
       </View>
 
-      <View style={styles.commentContent}>
+      <View className="mb-3">
         {isEditing ? (
           <CommentInputBox onSubmit={handleEditComment} initialValue={text} />
         ) : (
-          <Text style={styles.commentText}>{text}</Text>
+          <Text className="text-gray-700 text-base leading-relaxed">{text}</Text>
         )}
       </View>
-      <TouchableOpacity
-        onPress={() => setShowReplies((prev) => !prev)}
-        style={styles.replyButton}
-      >
-        <Text style={styles.replyText}>{t("features.discussion.reply")}</Text>
-      </TouchableOpacity>
+
+      <View className="flex-row items-center space-x-4">
+        <TouchableOpacity
+          onPress={() => setShowReplies((prev) => !prev)}
+          className="flex-row items-center space-x-1"
+        >
+          <FontAwesome name="reply" size={14} color="#3b82f6" />
+          <Text className="text-blue-500 font-medium">
+            {t("features.discussion.reply")}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {showReplies && (
-        <View style={styles.repliesContainer}>
+        <View className="mt-3 pl-4 border-l-2 border-gray-100">
           <CommentSection comments={replies} onAddComment={handleReply} />
         </View>
       )}
 
       {showOptions && (
-        <View style={styles.optionsContainer}>
+        <View className="absolute right-2 top-12 z-10">
           <DropdownMenu
             onEdit={() => {
               setShowOptions((prev) => !prev);
@@ -208,66 +224,5 @@ const Comment = ({ comment }) => {
     </View>
   );
 };
-const styles = StyleSheet.create({
-  commentContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
-  },
-  headerContent: {
-    flex: 1,
-  },
-  ownerName: {
-    fontWeight: "bold",
-    fontSize: 12,
-    marginBottom: 4,
-  },
-  updatedAt: {
-    color: "#6b7280",
-    fontSize: 10,
-  },
-  optionsContainer: {
-    position: "absolute",
-    right: 0,
-    top: 40,
-  },
-  commentContent: {
-    marginBottom: 12,
-  },
-  commentText: {
-    fontSize: 12,
-    color: "#333",
-  },
-  replyButton: {
-    alignSelf: "flex-start",
-  },
-  replyText: {
-    color: "#3b82f6",
-    fontSize: 12,
-  },
-  repliesContainer: {
-    marginLeft: 32,
-  },
-});
+
 export default Comment;

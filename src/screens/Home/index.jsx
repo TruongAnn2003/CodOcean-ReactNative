@@ -14,9 +14,8 @@ export default function Home({ navigation }) {
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-secondary">
       <StatusBar hidden={true} />
-      <LogoBgWhite></LogoBgWhite>
-      <WelcomeFrame></WelcomeFrame>
-
+      <LogoBgWhite />
+      <WelcomeFrame  />
       <LottieView
         source={aminations.Loading}
         style={{ width: "25%", height: "25%" }}
