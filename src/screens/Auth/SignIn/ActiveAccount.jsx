@@ -1,26 +1,25 @@
-import React, { useState, useEffect } from "react";
+import { Formik } from "formik";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  View,
+  ActivityIndicator,
+  SafeAreaView,
   Text,
   TextInput,
-  SafeAreaView,
-  Alert,
   TouchableOpacity,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import { images as Imgs } from "../../../constants";
-import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { setError } from "../../../services/redux-toolkit/reducers/errorSlice";
+import { LogoBgBlue } from "../../../constants/images";
 import {
   requestOTPForActivation,
   verifyOTP,
 } from "../../../services/redux-toolkit/reducers/authSlice";
+import { setError } from "../../../services/redux-toolkit/reducers/messageSlice";
 import {
   commonValidationSchema,
   createValidationSchema,
 } from "../../../services/yup/commonValidationSchema";
-import { Formik } from "formik";
 const ActiveAccount = ({ navigation }) => {
   const dispatch = useDispatch();
   const [isLocked, setIsLocked] = useState(false);
@@ -40,7 +39,7 @@ const ActiveAccount = ({ navigation }) => {
 
   useEffect(() => {
     if (otpVerified) {
-      navigation.navigate("Problems");
+      navigation.navigate("SignIn");
     }
   }, [otpVerified, navigation]);
 
@@ -65,12 +64,12 @@ const ActiveAccount = ({ navigation }) => {
       if (requestOTPForActivation.fulfilled.match(resultAction)) {
         setOtpSend(true);
       } else {
-        await dispatch(setError(t("features.collapsibles.requestOTP.failure")));
+        await dispatch(setError(t("features.auth.requestOTP.failure")));
         await setIsLocked(false);
       }
     } catch (e) {
       console.error("ActiveAccountForm/handleSendOTP: ", e);
-      await dispatch(setError(t("features.collapsibles.requestOTP.failure")));
+      await dispatch(setError(t("features.auth.requestOTP.failure")));
       await setIsLocked(false);
     }
   };
@@ -81,22 +80,18 @@ const ActiveAccount = ({ navigation }) => {
       if (verifyOTP.fulfilled.match(resultAction)) {
         await setOtpVerified(true);
       } else {
-        await dispatch(
-          setError(t("features.collapsibles.activeAccount.failure"))
-        );
+        await dispatch(setError(t("features.auth.activeAccount.failure")));
       }
     } catch (e) {
       console.error("ActiveAccountForm/handleSubmit: ", e);
-      await dispatch(
-        setError(t("features.collapsibles.activeAccount.failure"))
-      );
+      await dispatch(setError(t("features.auth.activeAccount.failure")));
     }
   };
 
   return (
     <SafeAreaView className="flex-1 justify-center items-center bg-white">
       <View className="flex items-center w-full">
-        <Imgs.LogoBgBlue className="mb-4" />
+        <LogoBgBlue className="mb-4" />
         <View className="w-full p-4 justify-center items-center">
           <Text className="text-2xl mb-6 font-sscsemibold text-secondary">
             Verify OTP

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import PieChart from "../../../components/Charts/PieChart";
+import { ActivityIndicator, Text, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import LineChart from "../../../components/Charts/LineChart";
+import PieChart from "../../../components/Charts/PieChart";
+import { setError } from "../../../services/redux-toolkit/reducers/messageSlice";
 import { getDataStatistics } from "../../../services/redux-toolkit/reducers/problemSlice";
-import { setError } from "../../../services/redux-toolkit/reducers/errorSlice";
 const Statistics = () => {
   const { isloading, error, statisticsDatasets } = useSelector(
     (state) => state.problem

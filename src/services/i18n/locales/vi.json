@@ -1,66 +1,187 @@
 {
   "language": "Ngôn ngữ",
+  "message": {
+    "error": "Lỗi",
+    "info": "Thông tin",
+    "warning": "Cảnh báo",
+    "success": "Thành công",
+    "loading": "Đang tải",
+    "debug": "Gỡ lỗi"
+  },
+  "manage": {
+    "add": "Thêm",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "view": "Xem Chi Tiết",
+    "report": "Báo cáo"
+  },
   "home": {
-    "title": "Trang chủ"
+    "title": "Trang Chủ"
   },
   "features": {
-    "title": "Tính năng",
-    "collapsibles": {
+    "title": "Các Tính Năng",
+    "auth": {
       "signIn": {
-        "success": "Đăng nhập thành công.",
-        "failure": "Đăng nhập thất bại.",
-        "invalidCredentials": "Email hoặc mật khẩu bị sai."
+        "success": "Đăng nhập thành công.😆",
+        "failure": "Đăng nhập không thành công.😣",
+        "invalidCredentials": "Email hoặc mật khẩu không chính xác.🙄"
       },
       "signUp": {
-        "success": "Đăng ký thành công.",
-        "failure": "Đăng ký thất bại.",
-        "emailTaken": "Email đã được đăng ký trước đó.",
-        "phoneNumberTaken": "Số điện thoại đã được đăng ký trước đó."
+        "success": "Đăng ký thành công.😆",
+        "failure": "Đăng ký không thành công.😣",
+        "emailTaken": "Email này đã được đăng ký.🙄",
+        "phoneNumberTaken": "Số điện thoại này đã được đăng ký.🙄"
       },
       "requestOTP": {
-        "success": "OTP đã được gửi đến email của bạn.",
-        "failure": "Yêu cầu OTP thất bại, vui lòng chọn nút 'Gửi OTP' tiếp tục gửi OTP."
+        "success": "Mã OTP đã được gửi đến email của bạn.😆",
+        "failure": "Yêu cầu OTP không thành công, vui lòng nhấn 'Gửi OTP' để gửi lại mã OTP.😣"
       },
       "activeAccount": {
-        "success": "Kích hoạt tài khoản thành công.",
-        "failure": "Kích hoạt tài khoản thất bại, vui lòng kiểm tra lại mã OTP đã nhập."
+        "success": "Kích hoạt tài khoản thành công.😆",
+        "failure": "Kích hoạt tài khoản không thành công, vui lòng kiểm tra mã OTP bạn đã nhập.😣"
       },
       "resetPassword": {
-        "success": "Thay đổi mật khẩu thành công.",
-        "failure": "Thay đổi mật khẩu thất bại, vui lòng kiểm tra lại mã OTP đã nhập."
+        "success": "Đặt lại mật khẩu thành công.😆",
+        "failure": "Đặt lại mật khẩu không thành công, vui lòng kiểm tra mã OTP bạn đã nhập.😣"
       },
       "getCurrentUser": {
-        "failure": "Không thể lấy được thông tin người dùng hiện tại."
+        "failure": "Không thể lấy thông tin người dùng hiện tại.😣"
       },
       "signOut": {
-        "failure": "Đăng xuất thất bại."
+        "success": "Đăng xuất thành công.😊",
+        "failure": "Đăng xuất không thành công.😣"
       },
       "role": {
-        "undefined": "Vai trò của người dùng không hợp lệ."
-      },
+        "undefined": "Vai trò người dùng không xác định.😵‍💫"
+      }
+    },
+    "problem": {
       "getTopics": {
-        "failure": "Lấy danh sách chủ đề bài toán thất bại."
+        "success": "Các chủ đề đã được lấy thành công.😊",
+        "failure": "Lấy các chủ đề không thành công.😣"
       },
       "getProblems": {
-        "failure": "Lấy danh sách bài toán thất bại."
+        "success": "Các vấn đề đã được lấy thành công.😊",
+        "failure": "Lấy các vấn đề không thành công.😣"
       },
       "getProblemById": {
-        "failure": "Lấy danh sách bài toán theo id thất bại."
+        "success": "Chi tiết vấn đề đã được lấy thành công.😊",
+        "failure": "Lấy vấn đề theo id không thành công.😣"
       },
       "getTrending": {
-        "failure": "Lấy danh sách bài toán thịnh hành thất bại."
+        "success": "Các vấn đề đang thịnh hành đã được lấy thành công.😊",
+        "failure": "Lấy các vấn đề đang thịnh hành không thành công.😣"
       },
       "getStatistics": {
-        "failure": "Lấy dữ liệu thống kê thất bại."
+        "success": "Thống kê đã được lấy thành công.😊",
+        "failure": "Lấy thống kê không thành công.😣"
       },
-      "profile": {
-        "getAllSolvedProblems": {
-          "failure": "Lấy danh sách các bài toán đã làm thất bại."
-        },
-        "getAllUploadedProblems": {
-          "failure": "Lấy danh sách các bài toán đã đăng thất bại."
-        }
+      "getInputCode": {
+        "success": "Mã nhập đã được lấy thành công.😊",
+        "failure": "Lấy mã nhập của vấn đề không thành công.😣"
+      },
+      "changeProgrammingLanguage": {
+        "success": "Ngôn ngữ lập trình đã được thay đổi thành công.😊",
+        "failure": "Thay đổi ngôn ngữ lập trình không thành công.😣"
+      },
+      "submitCode": {
+        "success": "Mã đã được nộp thành công.😊",
+        "failure": "Nộp mã không thành công.😣",
+        "pass": "Vấn đề đã được giải quyết thành công!🥳",
+        "wrong": "Rất tiếc, bạn đã sai. Hãy thử lại!😥"
+      },
+      "compileCode": {
+        "success": "Mã đã được biên dịch thành công.😊",
+        "failure": "Biên dịch mã không thành công.😣"
+      },
+      "pickOne": {
+        "success": "Vấn đề đã được chọn thành công.😊",
+        "failure": "Chọn một vấn đề không thành công.😣"
+      },
+      "getSubmissions": {
+        "success": "Các bài nộp đã được lấy thành công.😊",
+        "failure": "Lấy các bài nộp không thành công.😣"
+      },
+      "testWithCustomTestcases": {
+        "success": "Chạy test case tùy chỉnh thành công.😊",
+        "failure": "Chạy test case không thành công.😣"
       }
-    }
+    },
+    "profile": {
+      "getAllSolvedProblems": {
+        "success": "Tất cả các vấn đề đã giải quyết đã được lấy thành công.😊",
+        "failure": "Lấy tất cả các vấn đề đã giải quyết không thành công.😣"
+      },
+      "getAllUploadedProblems": {
+        "success": "Tất cả các vấn đề đã tải lên đã được lấy thành công.😊",
+        "failure": "Lấy tất cả các vấn đề đã tải lên không thành công.😣"
+      },
+      "getAllUploadedDiscussions": {
+        "success": "Tất cả các thảo luận đã tải lên đã được lấy thành công.😊",
+        "failure": "Lấy tất cả các thảo luận đã tải lên không thành công.😣"
+      }
+    },
+    "discussion": {
+      "getCategories": {
+        "success": "Các danh mục đã được lấy thành công.😊",
+        "failure": "Lấy các danh mục không thành công.😣"
+      },
+      "getDiscussions": {
+        "success": "Các thảo luận đã được lấy thành công.😊",
+        "failure": "Lấy các thảo luận không thành công.😣"
+      },
+      "getMyDiscussions": {
+        "success": "Các thảo luận của bạn đã được lấy thành công.😊",
+        "failure": "Lấy các thảo luận của bạn không thành công.😣"
+      },
+      "getDiscussionById": {
+        "success": "Chi tiết thảo luận đã được lấy thành công.😊",
+        "failure": "Lấy chi tiết thảo luận không thành công.😣"
+      },
+      "addDiscussion": {
+        "success": "Thảo luận đã được thêm thành công.😊",
+        "failure": "Thêm thảo luận mới không thành công.😣",
+        "title": "Thêm Thảo Luận Mới",
+        "validationError": "Tiêu đề và mô tả là bắt buộc.",
+        "postButton": "Đăng Thảo Luận",
+        "titlePlaceholder": "Tiêu đề",
+        "descriptionPlaceholder": "Mô tả",
+        "imagePlaceholder": "URL Hình Ảnh"
+      },
+      "updateDiscussion": {
+        "success": "Thảo luận đã được cập nhật thành công.😊",
+        "failure": "Cập nhật thảo luận không thành công.😣"
+      },
+      "editDiscussion": {
+        "title": "Chỉnh Sửa Thảo Luận"
+      },
+      "deleteDiscussion": {
+        "success": "Thảo luận đã được xóa thành công.😊",
+        "failure": "Xóa thảo luận không thành công.😣"
+      },
+      "addReactDiscussion": {
+        "success": "Đã phản ứng với thảo luận thành công.😊",
+        "failure": "Thêm phản ứng vào thảo luận không thành công.😣"
+      },
+      "deleteReactDiscussion": {
+        "success": "Đã xóa phản ứng khỏi thảo luận thành công.😊",
+        "failure": "Xóa phản ứng khỏi thảo luận không thành công.😣"
+      },
+      "getDiscussion": { "failure": "Lấy thảo luận không thành công.😣" },
+      "getComments": {
+        "failure": "Lấy các bình luận không thành công.😣"
+      },
+      "readMore": "Xem Thêm",
+      "readLess": "Xem Ít",
+      "love": "Yêu Thích",
+      "unlove": "Bỏ Yêu Thích",
+      "comment": "bình luận",
+      "noComments": "Không có bình luận",
+      "send": "Gửi",
+      "confirmDelete": "Bạn có chắc chắn muốn xóa thảo luận này không?",
+      "updateButton": "Cập nhật",
+      "deleteButton": "Xóa"
+    },
+    "collapsibles": {}
   }
 }

@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { Formik } from "formik";
-import {
-  commonValidationSchema,
-  createValidationSchema,
-} from "../../../services/yup/commonValidationSchema";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { setError } from "../../../services/redux-toolkit/reducers/errorSlice";
 import {
   forgotPassword,
   requestOTPByEmail,
 } from "../../../services/redux-toolkit/reducers/authSlice";
-import { useTranslation } from "react-i18next";
+import { setError } from "../../../services/redux-toolkit/reducers/messageSlice";
+import {
+  commonValidationSchema,
+  createValidationSchema,
+} from "../../../services/yup/commonValidationSchema";
+
 const FormResetPasswordVerifyOTP = ({ email }) => {
   const customFields = {
     email: commonValidationSchema.email,
@@ -26,6 +28,8 @@ const FormResetPasswordVerifyOTP = ({ email }) => {
   const [otpSend, setOtpSend] = useState(false);
   const [timer, setTimer] = useState(0);
   const { isLoading, error } = useSelector((state) => state.auth);
+  const navigation = useNavigation();
+
   useEffect(() => {
     let countdown;
     if (timer > 0) {
@@ -47,23 +51,18 @@ const FormResetPasswordVerifyOTP = ({ email }) => {
       if (requestOTPByEmail.fulfilled.match(resultAction)) {
         setOtpSend(true); // OTP sent successfully
       } else {
-        dispatch(
-          setError(
-            `${t("features.collapsibles.resetPassword.failure")} (${error})`
-          )
-        );
+        dispatch(setError(`${t("features.resetPassword.failure")} (${error})`));
         setIsLocked(false); // Unlock the button on failure
       }
     } catch (e) {
       console.error("ResetPasswordWithOTPForm/handleSendOTP: ", e);
       dispatch(
-        setError(
-          `${t("features.collapsibles.resetPassword.failure")} (${e.message})`
-        )
+        setError(`${t("features.resetPassword.failure")} (${e.message})`)
       );
       setIsLocked(false); // Unlock the button if there's an error
     }
   };
+
   const handleResetPassword = async (values) => {
     const { confirmedNewPassword, ...submitValues } = values;
 
@@ -73,18 +72,12 @@ const FormResetPasswordVerifyOTP = ({ email }) => {
       if (forgotPassword.fulfilled.match(resultAction)) {
         navigation.navigate("SignIn");
       } else {
-        dispatch(
-          setError(
-            `${t("features.collapsibles.resetPassword.failure")} (${error})`
-          )
-        );
+        dispatch(setError(`${t("features.resetPassword.failure")} (${error})`));
       }
     } catch (e) {
       console.error("ResetPasswordWithOTPForm/handleSubmit: ", e);
       dispatch(
-        setError(
-          `${t("features.collapsibles.resetPassword.failure")} (${e.message})`
-        )
+        setError(`${t("features.resetPassword.failure")} (${e.message})`)
       );
     }
   };

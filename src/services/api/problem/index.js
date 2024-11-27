@@ -25,7 +25,7 @@ export const getTrendingAPI = (limit = 10) =>
   });
 
 export const getProblemByIdAPI = (id) =>
-  axiosInstance.get(`/problems/find-by-id?problemId=${id}`, {
+  axiosInstance.get(`/problems/${id}`, {
     requiresAuth: true,
   });
 export const getDataStatisticsAPI = (id) =>

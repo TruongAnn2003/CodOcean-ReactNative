@@ -13,7 +13,7 @@ const initialState = {
   error: null,
   filters: {
     pageNumber: 0,
-    limit: 2,
+    limit: 10,
     status: null,
     difficulty: null,
     topic: null,
@@ -62,7 +62,6 @@ export const getProblems = createAsyncThunk(
   async (filters, { rejectWithValue }) => {
     try {
       const response = await getProblemsAPI(filters);
-      console.info("filters", filters);
 
       return response.data;
     } catch (error) {
@@ -153,7 +152,6 @@ const problemSlice = createSlice({
       .addCase(getProblems.pending, handlePending)
       .addCase(getProblems.fulfilled, (state, action) => {
         handleFulfilled(state, action);
-        console.log("After Update:", state.filters);
         state.problems = action.payload.problemDTOs;
         state.totalPage = action.payload.totalPage;
       })

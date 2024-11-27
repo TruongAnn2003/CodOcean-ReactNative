@@ -175,13 +175,13 @@ const authSlice = createSlice({
         state.isFirstLogin = action.payload.isFirstLogin;
         state.isAuthenticated = true;
         state.role = action.payload.role;
-        saveTokens(action.payload.accessToken, action.payload.refreshToken);
+        // saveTokens(action.payload.accessToken, action.payload.refreshToken);
       })
       .addCase(signIn.rejected, (state, action) => {
         handleRejected(state, action);
         state.isAuthenticated = false;
         state.role = ROLES.GUEST;
-        saveTokens(action.payload.accessToken, action.payload.refreshToken);
+        // saveTokens(action.payload.accessToken, action.payload.refreshToken);
       })
       .addCase(requestOTPForActivation.pending, handlePending)
       .addCase(requestOTPForActivation.fulfilled, handleFulfilled)

@@ -1,63 +1,54 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  View,
   ActivityIndicator,
-  Alert,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
+  View,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import Icon from "react-native-vector-icons/Feather";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+
+import { PROBLEM_DIFFICULTY, PROBLEM_STATUS } from "../../constants";
+import { setError } from "../../services/redux-toolkit/reducers/messageSlice";
 import {
-  FILTER_DEFAULT,
-  PROBLEM_STATUS,
-  PROBLEM_DIFFICULTY,
-} from "../../constants";
-import {
-  setFilters,
   getProblems,
   getTopics,
   getTrending,
-  getDataStatistics,
+  setFilters,
+  getProblemById,
 } from "../../services/redux-toolkit/reducers/problemSlice";
-import { setError } from "../../services/redux-toolkit/reducers/errorSlice";
-import { useTranslation } from "react-i18next";
-import { useSelector, useDispatch } from "react-redux";
 
 import ProblemList from "../../components/ProblemList";
-import TopicBar from "../../components/TopicBar";
 import SelectInput from "../../components/SelectInput";
+import TopicBar from "../../components/TopicBar";
 import TrendingProblems from "../../components/TrendingProblems";
-import Icon from "react-native-vector-icons/Feather";
 import { formatString } from "../../utils/formatting";
+import { FILTER_DEFAULT } from "../../constants";
 
 const Problems = () => {
-  const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const scrollViewRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const {
-    problems,
-    filters,
-    isLoading,
-    totalPage,
-    topics,
-    trendingProblems,
-    error,
-  } = useSelector((state) => state.problem);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const { problems, filters, isLoading, totalPage, topics, error } =
+    useSelector((state) => state.problem);
 
   const fetchTopics = async () => {
     try {
       const resultAction = await dispatch(getTopics());
       if (getTopics.rejected.match(resultAction))
         await dispatch(
-          setError(`${t("features.collapsibles.getTopics.failure")}: ${error}`)
+          setError(`${t("features.problem.getTopics.failure")}: ${resultAction.error.message}`)
         );
     } catch (e) {
       dispatch(
-        setError(
-          `${t("features.collapsibles.getTopics.failure")}: ${e.message}`
-        )
+        setError(`${t("features.problem.getTopics.failure")}: ${e.message}`)
       );
     }
   };
@@ -67,72 +58,92 @@ const Problems = () => {
       const resultAction = await dispatch(getProblems(filters));
       if (getProblems.rejected.match(resultAction))
         await dispatch(
-          setError(
-            `${t("features.collapsibles.getProblems.failure")}: ${error}`
-          )
+          setError(`${t("features.problem.getProblems.failure")}: ${error}`)
         );
+      else {
+        // Scroll to top after loading new problems
+        scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+      }
     } catch (e) {
       dispatch(
-        setError(
-          `${t("features.collapsibles.getProblems.failure")}: ${e.message}`
-        )
+        setError(`${t("features.problem.getProblems.failure")}: ${e.message}`)
       );
     }
   };
 
-  const fetchTrendingProblems = async () => {
+  const fetchTrending = async () => {
     try {
-      const resultAction = await dispatch(getTrending());
+      const resultAction = await dispatch(getTrending(10));
       if (getTrending.rejected.match(resultAction))
         await dispatch(
-          setError(
-            `${t("features.collapsibles.getTrending.failure")}: ${error}`
-          )
+          setError(`${t("features.problem.getTrending.failure")}: ${error}`)
         );
     } catch (e) {
       dispatch(
-        setError(
-          `${t("features.collapsibles.getTrending.failure")}: ${e.message}`
-        )
+        setError(`${t("features.problem.getTrending.failure")}: ${e.message}`)
       );
     }
   };
 
   useEffect(() => {
     fetchTopics();
-    fetchTrendingProblems();
+    fetchTrending();
   }, []);
 
   useEffect(() => {
-    fetchProblems(); // Fetch problems with updated filters
+    fetchProblems();
   }, [filters]);
 
-  const loadMoreProblems = () => {
-    updateFilters({
+  const updateFilters = async (newFilters) => {
+    await dispatch(setFilters({ newFilters }));
+  };
+
+  const handleFilterChange = async (name, value) => {
+    await updateFilters({ ...filters, [name]: value, pageNumber: 0 });
+  };
+
+  const handleRemoveStatusFilter = (status) => {
+    let removedStatus = {};
+    const entry = Object.entries(filters).find(([key, value]) => value === status);
+
+    if (entry && entry[0] === 'searchTerm') {
+      removedStatus = { searchTerm: '' };
+    } else {
+      removedStatus[entry[0]] = 'ALL';
+    }
+    const newFilters = { ...filters, ...removedStatus };
+    dispatch(setFilters({ newFilters }));
+  };
+
+  const handleClearFilters = () => {
+    const newFilters = {
+      ...FILTER_DEFAULT,
+      pageNumber: 0
+    };
+    dispatch(setFilters({ newFilters }));
+    setSearchTerm("");
+  };
+
+  const loadMoreProblems = async () => {
+    if (isLoadingMore) return;
+    
+    setIsLoadingMore(true);
+    await updateFilters({
       ...filters,
       pageNumber:
-        filters.pageNumber === totalPage ? totalPage : filters.pageNumber + 1,
+        filters.pageNumber >= totalPage - 1 ? 0 : filters.pageNumber + 1,
     });
+    setIsLoadingMore(false);
   };
 
-  const scrollViewRef = useRef(null);
+  const handleScroll = async (event) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const isCloseToBottom =
+      contentOffset.y + layoutMeasurement.height >= contentSize.height - 50;
 
-  const handleScroll = (event) => {
-    const scrollY = event.nativeEvent.contentOffset.y;
-    const contentHeight = event.nativeEvent.contentSize.height;
-    const layoutHeight = event.nativeEvent.layoutMeasurement.height;
-
-    if (scrollY + layoutHeight >= contentHeight - 50 && !isLoading) {
-      loadMoreProblems();
+    if (isCloseToBottom && !isLoading && !isLoadingMore) {
+      await loadMoreProblems();
     }
-  };
-
-  const updateFilters = (newFilters) => {
-    dispatch(setFilters({ newFilters })); // Update filters
-  };
-
-  const handleFilterChange = (name, value) => {
-    updateFilters({ ...filters, [name]: value, pageNumber: 0 });
   };
 
   if (isLoading && problems.length === 0) {
@@ -146,7 +157,7 @@ const Problems = () => {
   if (error) {
     return (
       <View className="flex-1 justify-center items-center">
-        <Text className="text-pink">
+        <Text className="text-pink font-sscsemibold">
           {error?.message || "An error occurred"}
         </Text>
       </View>
@@ -155,17 +166,18 @@ const Problems = () => {
 
   return (
     <ScrollView
+      ref={scrollViewRef}
       className="flex-1 p-4"
       contentContainerStyle={{ paddingBottom: 20 }}
       onScroll={handleScroll}
       scrollEventThrottle={16}
-      ref={scrollViewRef}
     >
       <View className="mb-4 bg-gray-50 rounded-lg p-4 shadow-md">
         <TopicBar
           topics={topics}
           onSelect={(value) => handleFilterChange("topic", value)}
         />
+
         <View className="flex-row items-center bg-white rounded-full border border-gray-300 p-2 mb-4">
           <TextInput
             placeholder="Search problems"
@@ -181,6 +193,55 @@ const Problems = () => {
             <Icon name="search" size={18} color="#024873" />
           </TouchableOpacity>
         </View>
+        {filters && (
+          <View className="mb-4">
+            <View className="flex-row flex-wrap">
+              {['status', 'difficulty', 'topic', 'searchTerm'].map(key => {
+                const value = filters[key];
+                if (
+                  value &&
+                  value !== "all" &&
+                  value !== "ALL" &&
+                  value !== "All" &&
+                  value !== ""
+                ) {
+                  return (
+                    <View
+                      key={value}
+                      className="flex-row items-center bg-blue-50 rounded-full px-3 py-1.5 mr-2 mb-2"
+                    >
+                      <Text className="text-secondary font-sscregular mr-2">
+                        {value}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => handleRemoveStatusFilter(value)}
+                        className="p-1"
+                      >
+                        <FontAwesome name="times" size={16} color="#024873" />
+                      </TouchableOpacity>
+                    </View>
+                  );
+                }
+                return null;
+              })}
+            </View>
+
+            {['status', 'difficulty', 'topic', 'searchTerm'].some(key => {
+              const value = filters[key];
+              return value && value !== 'all' && value !== 'ALL' && value !== '';
+            }) && (
+              <TouchableOpacity
+                onPress={handleClearFilters}
+                className="bg-secondary py-2 px-4 rounded-full self-start mt-2"
+              >
+                <Text className="text-white font-sscsemibold">
+                  Clear All Filters
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
         <View className="flex-row justify-between mb-4">
           <View className="flex-1 mr-2">
             <Text className="text-secondary font-sscsemibold mb-2">
@@ -209,8 +270,9 @@ const Problems = () => {
           </View>
         </View>
       </View>
-      <TrendingProblems></TrendingProblems>
-      <ProblemList problems={problems} isloading={isLoading} />
+
+      <TrendingProblems />
+      <ProblemList onScroll={handleScroll} />
     </ScrollView>
   );
 };

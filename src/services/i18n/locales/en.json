@@ -1,67 +1,200 @@
 {
   "language": "Language",
+  "message": {
+    "error": "Error",
+    "info": "Information",
+    "warning": "Warning",
+    "success": "Success",
+    "loading": "Loading",
+    "debug": "Debug"
+  },
+  "manage": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View Detail",
+    "report": "Report"
+  },
   "home": {
     "title": "Home"
   },
   "features": {
     "title": "Features",
-    "collapsibles": {
+    "auth": {
       "signIn": {
-        "success": "Login successful.",
-        "failure": "Login failed.",
-        "invalidCredentials": "Incorrect email or password."
+        "success": "Logged in successfully.😆",
+        "failure": "Login failed.😣",
+        "invalidCredentials": "Incorrect email or password.🙄"
       },
       "signUp": {
-        "success": "Sign up successful.",
-        "failure": "Sign up failed.",
-        "emailTaken": "Email is already registered.",
-        "phoneNumberTaken": "Phone number is already registered."
+        "success": "Sign up successful.😆",
+        "failure": "Sign up failed.😣",
+        "emailTaken": "This email is already registered.🙄",
+        "phoneNumberTaken": "This phone number is already registered.🙄"
       },
       "requestOTP": {
-        "success": "OTP has been sent to your email.",
-        "failure": "OTP request failed, please click 'Send OTP' to resend OTP."
+        "success": "An OTP has been sent to your email.😆",
+        "failure": "OTP request failed, please click 'Send OTP' to resend OTP.😣"
       },
       "activeAccount": {
-        "success": "Account activation successful.",
-        "failure": "Account activation failed, please check the OTP you entered."
+        "success": "Account activation successful.😆",
+        "failure": "Account activation failed, please check the OTP you entered.😣"
       },
       "resetPassword": {
-        "success": "Password reset successful.",
-        "failure": "Password reset failed, please check the OTP you entered."
+        "success": "Password reset successful.😆",
+        "failure": "Password reset failed, please check the OTP you entered.😣"
       },
       "getCurrentUser": {
-        "failure": "Unable to retrieve current user information."
+        "failure": "Unable to retrieve current user information.😣"
       },
       "signOut": {
-        "failure": "Sign out failed."
+        "success": "Signed out successfully.😊",
+        "failure": "Sign out was unsuccessful.😣"
       },
-
       "role": {
-        "undefined": "UserRole is undefined."
-      },
+        "undefined": "User role is undefined.😵‍💫"
+      }
+    },
+    "problem": {
       "getTopics": {
-        "failure": "Fetch topics failed."
+        "success": "Topics fetched successfully.😊",
+        "failure": "Fetch topics failed.😣"
       },
       "getProblems": {
-        "failure": "Fetch problems failed."
+        "success": "Problems fetched successfully.😊",
+        "failure": "Fetch problems failed.😣"
       },
       "getProblemById": {
-        "failure": "Fetch problem by id failed."
+        "success": "Problem details fetched successfully.😊",
+        "failure": "Fetch problem by id failed.😣"
       },
       "getTrending": {
-        "failure": "Fetch trending failed."
+        "success": "Trending problems fetched successfully.😊",
+        "failure": "Fetch trending failed.😣"
       },
       "getStatistics": {
-        "failure": "Fetch statistics failed."
+        "success": "Statistics fetched successfully.😊",
+        "failure": "Fetch statistics failed.😣"
       },
-      "profile": {
-        "getAllSolvedProblems": {
-          "failure": "Fetch all solved problems failed."
-        },
-        "getAllUploadedProblems": {
-          "failure": "Fetch all uploaded problems failed."
-        }
+      "getInputCode": {
+        "success": "Input code fetched successfully.😊",
+        "failure": "Fetch input code of problem failed.😣"
+      },
+      "changeProgrammingLanguage": {
+        "success": "Programming language changed successfully.😊",
+        "failure": "Failed to change the programming language.😣"
+      },
+      "submitCode": {
+        "success": "Code submitted successfully.😊",
+        "failure": "Failed to submit your code.😣",
+        "pass": "The problem has been solved successfully!🥳",
+        "wrong": "Unfortunately, you got it wrong. Try again!😥"
+      },
+      "compileCode": {
+        "success": "Code compiled successfully.😊",
+        "failure": "Failed to compile your code.😣"
+      },
+      "pickOne": {
+        "success": "Problem picked successfully.😊",
+        "failure": "Failed to pick one problem.😣"
+      },
+      "getSubmissions": {
+        "success": "Submissions fetched successfully.😊",
+        "failure": "Fetch submissions failed.😣"
+      },
+      "testWithCustomTestcases": {
+        "success": "Custom test case run successfully.😊",
+        "failure": "Run test case failed.😣"
       }
-    }
+    },
+    "profile": {
+      "getAllSolvedProblems": {
+        "success": "All solved problems fetched successfully.😊",
+        "failure": "Fetch all solved problems failed.😣"
+      },
+      "getAllUploadedProblems": {
+        "success": "All uploaded problems fetched successfully.😊",
+        "failure": "Fetch all uploaded problems failed.😣"
+      },
+      "getAllUploadedDiscussions": {
+        "success": "All uploaded discussions fetched successfully.😊",
+        "failure": "Fetch all uploaded discussions failed.😣"
+      }
+    },
+    "discussion": {
+      "getCategories": {
+        "success": "Categories fetched successfully.😊",
+        "failure": "Failed to fetch categories.😣"
+      },
+      "getDiscussions": {
+        "success": "Discussions fetched successfully.😊",
+        "failure": "Failed to fetch discussions.😣"
+      },
+      "getMyDiscussions": {
+        "success": "Your discussions fetched successfully.😊",
+        "failure": "Failed to fetch your discussions.😣"
+      },
+      "getDiscussionById": {
+        "success": "Discussion details fetched successfully.😊",
+        "failure": "Failed to fetch the discussion details.😣"
+      },
+      "addDiscussion": {
+        "success": "Discussion added successfully.😊",
+        "failure": "Failed to add new discussion.😣",
+        "title": "Add New Discussion",
+        "validationError": "Title and description are required.",
+        "postButton": "Post Discussion",
+        "titlePlaceholder": "Title",
+        "descriptionPlaceholder": "Description",
+        "imagePlaceholder": "Image URL"
+      },
+      "updateDiscussion": {
+        "success": "Discussion updated successfully.😊",
+        "failure": "Failed to update discussion.😣"
+      },
+      "editDiscussion": {
+        "title": "Edit Discussion"
+      },
+      "deleteDiscussion": {
+        "success": "Discussion deleted successfully.😊",
+        "failure": "Failed to delete discussion.😣"
+      },
+      "addReactDiscussion": {
+        "success": "Reacted to discussion successfully.😊",
+        "failure": "Failed to add reaction to discussion.😣"
+      },
+      "deleteReactDiscussion": {
+        "success": "Reaction removed from discussion successfully.😊",
+        "failure": "Failed to remove reaction from discussion.😣"
+      },
+      "getDiscussion": { "failure": "Failed to get discussion.😣" },
+      "getComments": {
+        "failure": "Failed to get comments.😣"
+      },
+      "readMore": "More",
+      "readLess": "Less",
+      "love": "Love",
+      "unlove": "Unlove",
+      "comment": "comment",
+      "noComments": "No comment",
+      "send": "Send",
+      "confirmDelete": "Are you sure you want to delete this discussion?",
+      "updateButton": "Update",
+      "deleteButton": "Delete",
+      "getReplysCommentById": {
+        "failure": "Failed to load replies."
+      },
+      "replyFailed": "Reply Failed!",
+      "editFailed": "Edit Comment Failed",
+      "deleteSuccess": "Delete Comment Success!",
+      "deleteFailed": "Delete Comment Failed!",
+      "reply": "Reply",
+      "search": {
+        "placeholder": "Search discussions...",
+        "button": "Search"
+      },
+      "newDiscussion": "New Discussion"
+    },
+    "collapsibles": {}
   }
 }

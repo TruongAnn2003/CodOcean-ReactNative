@@ -4,13 +4,14 @@ import TopicBarItem from "./TopicBarItem";
 
 function TopicBar({ topics, onSelect }) {
   return (
-    <View className="flex-row items-center py-2">
+    <View className="bg-white rounded-lg p-4 mb-4">
       <TouchableOpacity
         onPress={() => onSelect("ALL")}
-        className="bg-secondary rounded-full mx-2 flex-row items-center px-4 py-2 w-50 h-10"
+        className="bg-secondary rounded-lg px-4 py-2 mb-4 self-start"
       >
-        <Text className="text-white font-sscsemibold">All</Text>
+        <Text className="text-white font-sscsemibold">All Topics</Text>
       </TouchableOpacity>
+
       <FlatList
         data={topics}
         horizontal
@@ -19,7 +20,8 @@ function TopicBar({ topics, onSelect }) {
         renderItem={({ item }) => (
           <TopicBarItem topic={item} onSelect={onSelect} />
         )}
-        contentContainerStyle={{ flexDirection: "row" }} // Ensures the items are in a row
+        className="flex-grow"
+        ItemSeparatorComponent={() => <View className="w-2" />}
       />
     </View>
   );

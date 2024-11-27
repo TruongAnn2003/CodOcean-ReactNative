@@ -1,22 +1,37 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
-// import UserAvatar from "react-native-user-avatar";
-import UserAvatar from "../UserAvatar";
-import getAvatarLink from "../../services/dicebear-avt";
-import { MaterialIcons } from "@expo/vector-icons";
-import { images as Imgs } from "../../constants";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
-import { useSelector } from "react-redux";
-const CustomDrawerContent = (props) => {
-  const { user } = useSelector((state) => state.auth);
+import { useDispatch, useSelector } from "react-redux";
+import { WhaleBg } from "../../constants/images";
+import { signOut } from "../../services/redux-toolkit/reducers/authSlice";
+import UserAvatar from "../UserAvatar";
+import { removeTokens } from "../../utils/tokenUtils";
 
+const CustomDrawerContent = (props) => {
+  const { profile } = useSelector((state) => state.profile);
+  const [avatar, setAvatar] = useState(
+    "https://res.cloudinary.com/du5medjhm/image/upload/v1730996001/avatar-40_d7hhex.png"
+  );
+  const [name, setName] = useState("");
+  const dispatch = useDispatch();
+  useEffect(() => {
+    setAvatar(profile.urlImage);
+    setName(profile.fullName);
+  }, [profile]);
+  const handleSignOut = async () => {
+    const resultAction = await dispatch(signOut());
+    if (signOut.fulfilled.match(resultAction)) {
+      props.navigation.navigate("SignIn");
+      await removeTokens();
+    } else dispatch(setError(t("signOut.failure")));
+  };
   return (
     <DrawerContentScrollView {...props} style={styles.drawer}>
       <View className="flex items-center mb-6 p-4 border-b">
-        <UserAvatar size={60} src={user?.urlImage} className="mb-2" />
+        <UserAvatar size={60} src={profile?.urlImage} className="mb-2" />
         <Text className="text-lg text-white font-sscbold">
-          {user?.fullName}
+          {profile?.fullName}
         </Text>
       </View>
 
@@ -46,8 +61,8 @@ const CustomDrawerContent = (props) => {
           }}
         />
         <DrawerItem
-          label="Discuss"
-          onPress={() => props.navigation.navigate("Discuss")}
+          label="Discussions"
+          onPress={() => props.navigation.navigate("Discussions")}
           icon={() => <Icon name="message-square" size={24} color="#ffff" />}
           className="p-3 rounded-lg mb-3"
           labelStyle={{
@@ -83,7 +98,7 @@ const CustomDrawerContent = (props) => {
         />
         <DrawerItem
           label="Logout"
-          onPress={() => props.navigation.navigate("Login")}
+          onPress={handleSignOut}
           icon={() => <Icon name="log-out" size={24} color="#ffff" />}
           className="p-3 rounded-lg mb-3"
           labelStyle={{
@@ -96,7 +111,7 @@ const CustomDrawerContent = (props) => {
       </View>
 
       <View className="w-full items-center">
-        <Imgs.WhaleBg />
+        <WhaleBg />
       </View>
     </DrawerContentScrollView>
   );
@@ -107,4 +122,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-export default CustomDrawerContent;
+export default React.memo(CustomDrawerContent);

@@ -1,27 +1,28 @@
-import React, { useState, useEffect } from "react";
+import { Formik } from "formik";
+import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  View,
+  ActivityIndicator,
   Text,
   TextInput,
-  Alert,
   TouchableOpacity,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import { images as Imgs } from "../../../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
-import { Formik } from "formik";
-import { setError } from "../../../services/redux-toolkit/reducers/errorSlice";
+import { LogoBgBlue } from "../../../constants/images";
 import {
-  signIn,
   getCurrentUser,
+  signIn,
+  setUser,
 } from "../../../services/redux-toolkit/reducers/authSlice";
+import { setError } from "../../../services/redux-toolkit/reducers/messageSlice";
 import {
   commonValidationSchema,
   createValidationSchema,
 } from "../../../services/yup/commonValidationSchema";
-import { useTranslation } from "react-i18next";
-
+import { getProfile } from "../../../services/redux-toolkit/reducers/profileSlice";
+import { saveTokens } from "../../../utils/tokenUtils";
 const SignIn = ({ navigation }) => {
   const dispatch = useDispatch();
   const { isLoading, error } = useSelector((state) => state.auth);
@@ -37,6 +38,19 @@ const SignIn = ({ navigation }) => {
     navigation.setOptions({ title: "Login" });
   }, [navigation]);
 
+  const handleGetProfileCurrentUser = async () => {
+    try {
+      const resultAction = await dispatch(getProfile());
+      if (getProfile.fulfilled.match(resultAction)) {
+        await dispatch(setUser({ user: resultAction.payload.profile }));
+      } else {
+        await dispatch(setError("Failed to get profile"));
+      }
+    } catch (e) {
+      await dispatch(setError(`${t("Failed to get profile")} (${e})`));
+    }
+  };
+
   const navigateSignUp = () => {
     navigation.navigate("SignUp");
   };
@@ -45,43 +59,47 @@ const SignIn = ({ navigation }) => {
     navigation.navigate("ForgotPassword");
   };
 
- const handleLogin = async (values) => {
-   try {
-     const resultAction = await dispatch(signIn(values));
+  const handleLogin = async (values) => {
+    try {
+      const resultAction = await dispatch(signIn(values));
 
-     if (resultAction?.payload) {
-       const activeStatus = resultAction.payload.isActive;
+      if (resultAction?.payload) {
+        const activeStatus = resultAction.payload.isActive;
 
-       if (signIn.fulfilled.match(resultAction)) {
-         if (!activeStatus) {
-           await dispatch(getCurrentUser());
-           await navigation.navigate("ActiveAccount");
-         } else {
-           await dispatch(getCurrentUser());
-           await navigation.navigate("Problems");
-         }
-       } else {
-         // Log the error and display user-friendly error message
-         const errorMessage = `${t(
-           "features.collapsibles.signIn.invalidCredentials"
-         )} (${error})`;
-         await dispatch(setError(errorMessage));
-       }
-     } else {
-       await dispatch(setError(t("features.collapsibles.signIn.failure")));
-     }
-   } catch (e) {
-     // Provide a more detailed error handling
-     await dispatch(
-       setError(`${t("features.collapsibles.signIn.failure")} (${e.message})`)
-     );
-   }
- };
+        if (signIn.fulfilled.match(resultAction)) {
+          await saveTokens(
+            resultAction.payload.accessToken,
+            resultAction.payload.refreshToken
+          );
+          if (!activeStatus) {
+            await navigation.navigate("ActiveAccount");
+          } else {
+            await handleGetProfileCurrentUser();
+            await navigation.navigate("Problems");
+          }
+        } else {
+          await dispatch(
+            setError(
+              `${t("features.auth.signIn.invalidCredentials")} (${error})`
+            )
+          );
+        }
+      } else {
+        await dispatch(
+          setError(`${t("features.auth.signIn.failure")} (${error})`)
+        );
+      }
+    } catch (e) {
+      await dispatch(
+        setError(`${t("features.auth.signIn.failure")} (${e.message})`)
+      );
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 justify-center items-center bg-white">
       <View className="flex items-center w-full">
-        <Imgs.LogoBgBlue className="mb-4" />
+        <LogoBgBlue className="mb-4" />
         <View className="w-full p-4 justify-center items-center">
           <Text className="text-2xl mb-6 font-sscsemibold text-secondary">
             Sign In
