@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
   Image,
   Alert,
   ScrollView,
@@ -73,11 +72,10 @@ const CategoryMenu = ({ onSelectedCategoriesChange }) => {
           </TouchableOpacity>
           {error ? <Text style={styles.errorMessage}>{error}</Text> : null}
 
-          <FlatList
-            data={categories}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
+          <ScrollView>
+            {categories.map((item) => (
               <TouchableOpacity
+                key={item.id.toString()}
                 style={styles.card}
                 onPress={() => handleSelectCategory(item)}
               >
@@ -89,8 +87,8 @@ const CategoryMenu = ({ onSelectedCategoriesChange }) => {
                 <View style={styles.cardContent}>
                   {item.imageUrl.endsWith(".svg") ? (
                     <SvgUri
-                      width={40} // Adjusted size
-                      height={40} // Adjusted size
+                      width={40}
+                      height={40}
                       uri={item.imageUrl}
                       style={styles.image}
                     />
@@ -108,8 +106,8 @@ const CategoryMenu = ({ onSelectedCategoriesChange }) => {
                   </View>
                 </View>
               </TouchableOpacity>
-            )}
-          />
+            ))}
+          </ScrollView>
         </View>
       )}
     </View>
@@ -172,8 +170,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   image: {
-    width: 40, // Adjusted size
-    height: 40, // Adjusted size
+    width: 40,
+    height: 40,
     borderRadius: 5,
   },
   infoContainer: {

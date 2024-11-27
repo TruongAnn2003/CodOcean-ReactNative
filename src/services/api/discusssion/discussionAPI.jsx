@@ -21,16 +21,12 @@ export const getMyDiscussionsAPI = () => {
 };
 
 export const addDiscussionAPI = (request) =>
-  axiosInstance.post(`${BASE_URL}`, request, {
+  axiosInstance.post(`${BASE_URL}/without-images`, request, {
     requiresAuth: true,
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "multipart/form-data",
-    },
   });
 
-export const updateDiscussionAPI = (id, discussion) =>
-  axiosInstance.put(`${BASE_URL}/${id}`, discussion, {
+export const updateDiscussionAPI = (id, request) =>
+  axiosInstance.put(`${BASE_URL}/${id}`, request, {
     requiresAuth: true,
   });
 

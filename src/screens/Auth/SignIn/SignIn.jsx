@@ -14,6 +14,7 @@ import { LogoBgBlue } from "../../../constants/images";
 import {
   getCurrentUser,
   signIn,
+  setUser,
 } from "../../../services/redux-toolkit/reducers/authSlice";
 import { setError } from "../../../services/redux-toolkit/reducers/messageSlice";
 import {
@@ -21,7 +22,7 @@ import {
   createValidationSchema,
 } from "../../../services/yup/commonValidationSchema";
 import { getProfile } from "../../../services/redux-toolkit/reducers/profileSlice";
-
+import { saveTokens } from "../../../utils/tokenUtils";
 const SignIn = ({ navigation }) => {
   const dispatch = useDispatch();
   const { isLoading, error } = useSelector((state) => state.auth);
@@ -36,6 +37,19 @@ const SignIn = ({ navigation }) => {
     // Set the title of the screen if needed
     navigation.setOptions({ title: "Login" });
   }, [navigation]);
+
+  const handleGetProfileCurrentUser = async () => {
+    try {
+      const resultAction = await dispatch(getProfile());
+      if (getProfile.fulfilled.match(resultAction)) {
+        await dispatch(setUser({ user: resultAction.payload.profile }));
+      } else {
+        await dispatch(setError("Failed to get profile"));
+      }
+    } catch (e) {
+      await dispatch(setError(`${t("Failed to get profile")} (${e})`));
+    }
+  };
 
   const navigateSignUp = () => {
     navigation.navigate("SignUp");
@@ -53,11 +67,14 @@ const SignIn = ({ navigation }) => {
         const activeStatus = resultAction.payload.isActive;
 
         if (signIn.fulfilled.match(resultAction)) {
+          await saveTokens(
+            resultAction.payload.accessToken,
+            resultAction.payload.refreshToken
+          );
           if (!activeStatus) {
-            await dispatch(getCurrentUser());
             await navigation.navigate("ActiveAccount");
           } else {
-            await dispatch(getProfile());
+            await handleGetProfileCurrentUser();
             await navigation.navigate("Problems");
           }
         } else {

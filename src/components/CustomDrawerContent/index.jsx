@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { WhaleBg } from "../../constants/images";
 import { signOut } from "../../services/redux-toolkit/reducers/authSlice";
 import UserAvatar from "../UserAvatar";
+import { removeTokens } from "../../utils/tokenUtils";
 
 const CustomDrawerContent = (props) => {
   const { profile } = useSelector((state) => state.profile);
@@ -20,9 +21,10 @@ const CustomDrawerContent = (props) => {
   }, [profile]);
   const handleSignOut = async () => {
     const resultAction = await dispatch(signOut());
-    if (signOut.fulfilled.match(resultAction))
+    if (signOut.fulfilled.match(resultAction)) {
       props.navigation.navigate("SignIn");
-    else dispatch(setError(t("signOut.failure")));
+      await removeTokens();
+    } else dispatch(setError(t("signOut.failure")));
   };
   return (
     <DrawerContentScrollView {...props} style={styles.drawer}>

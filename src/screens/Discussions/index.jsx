@@ -33,6 +33,24 @@ export default function Discussions() {
   );
   const [inputValue, setInputValue] = useState("");
   const [isFormVisible, setFormVisible] = useState(false);
+  const [posts, setPosts] = useState(discussionPosts || []);
+  const [hasMore, setHasMore] = useState(true);
+  const handleAddDiscussion = (discussion) => {
+    setPosts((prev) => [discussion, ...prev]);
+    setFormVisible(false);
+  };
+
+  const handleUpdateDiscussion = (updatedDiscussion) => {
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === updatedDiscussion.id ? updatedDiscussion : post
+      )
+    );
+  };
+
+  const handleDeleteDiscussion = (deletedDiscussion) => {
+    setPosts((prev) => prev.filter((post) => post.id !== deletedDiscussion.id));
+  };
 
   useEffect(() => {
     dispatch(getCategories())
@@ -47,18 +65,32 @@ export default function Discussions() {
   }, []);
 
   useEffect(() => {
-    dispatch(getDiscussions(filters))
-      .unwrap()
-      .catch((err) =>
-        dispatch(
+    fetchDiscussionPosts();
+  }, [filters]);
+
+  const fetchDiscussionPosts = async () => {
+    try {
+      const resultAction = await dispatch(getDiscussions(filters));
+      if (getDiscussions.rejected.match(resultAction))
+        await dispatch(
           setError(
-            `${t("features.discussion.getDiscussions.failure")} (${
-              err.message
-            })`
+            `${t("features.discussion.getDiscussions.failure")} (${error})`
           )
+        );
+      else {
+        let newPosts = [];
+        newPosts = resultAction.payload.discussDTOs;
+        setPosts([...newPosts]);
+        setHasMore(newPosts.length > 0);
+      }
+    } catch (e) {
+      await dispatch(
+        setError(
+          `${t("features.discussion.getDiscussions.failure")} (${e.message})`
         )
       );
-  }, [filters]);
+    }
+  };
 
   const updateFilters = (newFilters) => {
     dispatch(setFilters({ newFilters }));
@@ -67,6 +99,24 @@ export default function Discussions() {
   const handleSearchSubmit = () => {
     updateFilters({ ...filters, searchTerm: inputValue });
   };
+
+   const handleToggleReaction = (postId) => {
+     setPosts((prevPosts) =>
+       prevPosts.map((post) => {
+         if (post.id === postId) {
+           return {
+             ...post,
+             liked: !post.liked,
+             reactCount: post.liked
+               ? Math.max(0, post.reactCount - 1)
+               : post.reactCount + 1,
+           };
+         }
+         return post;
+       })
+     );
+   };
+
   return (
     <ScrollView className="flex-1 bg-gray-50 p-4">
       <CategoryList />
@@ -75,7 +125,7 @@ export default function Discussions() {
         <View className="flex-row items-center space-x-2">
           <View className="flex-1">
             <Input
-              placeholder={t("features.discussion.search.placeholder")} 
+              placeholder={t("features.discussion.search.placeholder")}
               value={inputValue}
               onChangeText={setInputValue}
               onSubmitEditing={handleSearchSubmit}
@@ -84,7 +134,7 @@ export default function Discussions() {
                 inputValue ? (
                   <Icon
                     name="clear"
-                    size={20} 
+                    size={20}
                     color="#3b82f6"
                     onPress={() => setInputValue("")}
                   />
@@ -93,18 +143,18 @@ export default function Discussions() {
               containerStyle={{
                 paddingHorizontal: 0,
                 paddingVertical: 0,
-                height: 45
+                height: 45,
               }}
               inputContainerStyle={{
                 borderWidth: 1,
-                borderColor: '#e5e7eb',
+                borderColor: "#e5e7eb",
                 borderRadius: 8,
                 paddingLeft: 8,
-                backgroundColor: 'white',
-                height: '100%'
+                backgroundColor: "white",
+                height: "100%",
               }}
               inputStyle={{
-                fontSize: 16
+                fontSize: 16,
               }}
             />
           </View>
@@ -131,12 +181,21 @@ export default function Discussions() {
       </TouchableOpacity>
 
       {isFormVisible && (
-        <AddDiscussion onClose={() => setFormVisible((prev) => !prev)} />
+        <AddDiscussion
+          onClose={() => setFormVisible((prev) => !prev)}
+          onAddDiscussion={handleAddDiscussion}
+        />
       )}
 
       <View className="flex-1 space-y-4">
-        {discussionPosts.map((discussion) => (
-          <DiscussionPost key={discussion.id} post={discussion} />
+        {posts.map((post) => (
+          <DiscussionPost
+            key={post.id}
+            post={post}
+            onToggleReaction={handleToggleReaction}
+            onUpdate={handleUpdateDiscussion}
+            onDelete={handleDeleteDiscussion}
+          />
         ))}
       </View>
     </ScrollView>

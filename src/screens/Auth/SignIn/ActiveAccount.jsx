@@ -7,7 +7,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { LogoBgBlue } from "../../../constants/images";
@@ -39,7 +39,7 @@ const ActiveAccount = ({ navigation }) => {
 
   useEffect(() => {
     if (otpVerified) {
-      navigation.navigate("Problems");
+      navigation.navigate("SignIn");
     }
   }, [otpVerified, navigation]);
 
@@ -80,9 +80,7 @@ const ActiveAccount = ({ navigation }) => {
       if (verifyOTP.fulfilled.match(resultAction)) {
         await setOtpVerified(true);
       } else {
-        await dispatch(
-          setError(t("features.auth.activeAccount.failure"))
-        );
+        await dispatch(setError(t("features.auth.activeAccount.failure")));
       }
     } catch (e) {
       console.error("ActiveAccountForm/handleSubmit: ", e);

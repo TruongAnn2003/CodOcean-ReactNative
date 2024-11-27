@@ -22,7 +22,7 @@ import CommentInputBox from "./CommentInputBox";
 import { setError } from "../../services/redux-toolkit/reducers/messageSlice";
 import useWebSocket from "../../hooks/useWebSocket";
 
-const Comment = ({ comment }) => {
+const Comment = ({ comment, onDeleteComment }) => {
   const { profile } = useSelector((state) => state.profile);
   const [id, setId] = useState(comment.id || "");
   const [text, setText] = useState(comment.text || "");
@@ -48,63 +48,27 @@ const Comment = ({ comment }) => {
     setUpdatedAt(comment.updatedAt);
   }, [comment]);
 
-  // const stompClientRef = useWebSocket((message) => {
-  //   console.log("Received message in Comment:", message);
-  //   switch (message.type) {
-  //     case "DELETE":
-  //       setReplies((prevReplies) => {
-  //         const findAndRemoveReply = (replies) => {
-  //           for (let i = 0; i < replies.length; i++) {
-  //             if (replies[i].id === message.id) {
-  //               replies.splice(i, 1);
-  //               return replies;
-  //             }
-  //             if (replies[i].replies) {
-  //               replies[i].replies = findAndRemoveReply(replies[i].replies);
-  //             }
-  //           }
-  //           return replies;
-  //         };
-  //         return findAndRemoveReply(prevReplies);
-  //       });
-  //       break;
-  //     case "REPLY":
-  //       setReplies((prevReplies) => {
-  //         return [message, ...prevReplies];
-  //       });
-  //       break;
-  //     case "UPDATE":
-  //       setId(message.id);
-  //       setText(message.text);
-  //       setOwnerName(message.ownerName);
-  //       setOwnerImageUrl(message.ownerImageUrl);
-  //       setUpdatedAt(message.updatedAt);
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }, `/topic/discuss-comment/${id}`);
-
   const handleFetchReplies = async () => {
     try {
       const resultAction = await dispatch(getRepliesCommentById(id));
       if (getRepliesCommentById.fulfilled.match(resultAction)) {
         setReplies(resultAction.payload);
       } else {
-        console.error(
-          `${t("features.comment.getReplysCommentById.failure")} (${error})`
-        );
+        console.error(`Failed to fetch replies for comment ID ${id}: ${error}`);
       }
     } catch (e) {
-      console.error(
-        `${t("features.comment.getReplysCommentById.failure")} (${e})`
-      );
+      console.error(`Failed to fetch replies for comment ID ${id}: ${e}`);
     }
   };
 
-  useEffect(() => {
-    handleFetchReplies();
-  }, []);
+  const handleShowReplies = async () => {
+    await handleFetchReplies();
+    setShowReplies((prev) => !prev);
+  };
+
+  // useEffect(() => {
+  //   handleFetchReplies();
+  // }, []);
 
   const handleReply = async (replyText) => {
     if (replyText.trim()) {
@@ -113,10 +77,12 @@ const Comment = ({ comment }) => {
           replyComment({ commentId: id, text: replyText })
         );
 
-        if (!replyComment.fulfilled.match(resultAction)) {
+        if (replyComment.rejected.match(resultAction)) {
           dispatch(
             setError(`${t("features.comment.replyComment.failure")} (${error})`)
           );
+        } else {
+          await handleFetchReplies();
         }
       } catch (e) {
         dispatch(
@@ -130,7 +96,8 @@ const Comment = ({ comment }) => {
       try {
         const resultAction = await dispatch(updateComment({ id, text }));
         if (updateComment.fulfilled.match(resultAction)) {
-          setText(text);
+          await setText(text);
+          await setIsEditing((prev) => !prev);
         } else {
           dispatch(
             setError(`${t("features.discussion.editFailed")} (${error})`)
@@ -143,27 +110,16 @@ const Comment = ({ comment }) => {
   };
 
   const handleDeleteComment = async () => {
-    await setShowOptions(!showOptions);
-    try {
-      const resultAction = await dispatch(deleteComment(id));
-      if (deleteComment.fulfilled.match(resultAction)) {
-        await dispatch(setSuccess(`${t("features.discussion.deleteSuccess")}`));
-      } else {
-        dispatch(
-          setError(`${t("features.discussion.deleteFailed")} (${error})`)
-        );
-      }
-    } catch (e) {
-      dispatch(setError(`${t("features.discussion.deleteFailed")} (${error})`));
-    }
+    onDeleteComment(id);
+    await handleFetchReplies();
   };
 
   return (
     <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
       <View className="flex-row items-center justify-between mb-3">
         <View className="flex-row items-center flex-1">
-          <Image 
-            source={{ uri: ownerImageUrl || "" }} 
+          <Image
+            source={{ uri: ownerImageUrl || "" }}
             className="w-10 h-10 rounded-full mr-3"
           />
           <View>
@@ -175,7 +131,7 @@ const Comment = ({ comment }) => {
         </View>
 
         {profile.fullName === ownerName && (
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => setShowOptions(!showOptions)}
             className="p-2"
           >
@@ -188,13 +144,15 @@ const Comment = ({ comment }) => {
         {isEditing ? (
           <CommentInputBox onSubmit={handleEditComment} initialValue={text} />
         ) : (
-          <Text className="text-gray-700 text-base leading-relaxed">{text}</Text>
+          <Text className="text-gray-700 text-base leading-relaxed">
+            {text}
+          </Text>
         )}
       </View>
 
       <View className="flex-row items-center space-x-4">
         <TouchableOpacity
-          onPress={() => setShowReplies((prev) => !prev)}
+          onPress={handleShowReplies}
           className="flex-row items-center space-x-1"
         >
           <FontAwesome name="reply" size={14} color="#3b82f6" />

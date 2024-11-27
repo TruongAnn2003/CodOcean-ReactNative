@@ -5,7 +5,7 @@ import { getTokens } from "../utils/tokenUtils";
 
 const useWebSocket = (onMessageReceived, subscribeUrl) => {
   const stompClientRef = useRef(null);
-  const baseURL = "https://5d65-113-22-176-182.ngrok-free.app/ws";
+  const baseURL = "https://cod-ocean-be-8e379a6f2a87.herokuapp.com/ws";
 
   const disconnectWebSocket = async () => {
     if (stompClientRef.current) {
@@ -17,6 +17,8 @@ const useWebSocket = (onMessageReceived, subscribeUrl) => {
     const { accessToken } = await getTokens();
     const socket = new SockJS(baseURL);
 
+    console.log("Subscribe URL in onConnect:", subscribeUrl);
+
     const client = new Client({
       webSocketFactory: () => socket,
       connectHeaders: {
@@ -24,8 +26,6 @@ const useWebSocket = (onMessageReceived, subscribeUrl) => {
       },
       reconnectDelay: 5000,
       onConnect: () => {
-        console.log("Subscribe URL in onConnect:", subscribeUrl);
-
         client.subscribe(subscribeUrl, (message) => {
           const body = JSON.parse(message.body);
           onMessageReceived(body);

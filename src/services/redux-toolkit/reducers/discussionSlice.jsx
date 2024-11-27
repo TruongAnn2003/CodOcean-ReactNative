@@ -179,7 +179,6 @@ export const addDiscussion = createAsyncThunk(
   "/discussion/add/request-auth",
   async (request, { rejectWithValue }) => {
     try {
-      console.log("request", request);
       const response = await addDiscussionAPI(request);
       return response.data;
     } catch (error) {
@@ -190,9 +189,9 @@ export const addDiscussion = createAsyncThunk(
 
 export const updateDiscussion = createAsyncThunk(
   "/discussion/update/request-auth",
-  async ({ id, discussion }, { rejectWithValue }) => {
+  async ({ id, request }, { rejectWithValue }) => {
     try {
-      const response = await updateDiscussionAPI(id, discussion);
+      const response = await updateDiscussionAPI(id, request);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data || "Update discussion failed");

@@ -1,8 +1,5 @@
 import React, { memo, useRef, useState } from "react";
 import {
-  FlatList,
-  Image,
-  Platform,
   Modal,
   StyleSheet,
   Text,
@@ -28,11 +25,10 @@ import {
 } from "../../services/redux-toolkit/reducers/messageSlice";
 import CategoryMenu from "../CategoryMenu";
 
-const AddDiscussion = ({ onClose }) => {
+const AddDiscussion = ({ onClose, onAddDiscussion }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [endAt, setEndAt] = useState("");
-  const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [errors, setErrors] = useState({});
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -41,113 +37,6 @@ const AddDiscussion = ({ onClose }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { error } = useSelector((state) => state.discussion);
-
-  // const handleFileChange = async () => {
-  //   const permissionResult =
-  //     await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-  //   if (permissionResult.granted === false) {
-  //     Alert.alert("Permission to access camera roll is required!");
-  //     return;
-  //   }
-
-  //   const result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     quality: 1,
-  //   });
-
-  //   if (!result.cancelled) {
-  //     if (result.assets && result.assets.length > 0) {
-  //       const file = result.assets[0];
-  //       if (file.fileSize > 5000000) {
-  //         dispatch(setError("File size should be less than 5MB"));
-  //       } else {
-  //         const newFiles = result.assets.map((file) => ({
-  //           url: file.uri,
-  //           file: file,
-  //         }));
-  //         setSelectedFiles((prev) => [...prev, ...newFiles]);
-  //       }
-  //     }
-  //   }
-  // };
-  const handleFileChange = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      Alert.alert("Permission to access camera roll is required!");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1, // Chất lượng ảnh gốc
-    });
-
-    if (!result.canceled) {
-      if (result.assets && result.assets.length > 0) {
-        const file = result.assets[0];
-        const fileSize = file.fileSize || (await getFileSize(file.uri)); // Luôn đảm bảo lấy được kích thước file
-
-        // Kiểm tra kích thước file trước khi xử lý
-        if (fileSize > 5000000) {
-          // Nén và resize ảnh
-          try {
-            const resizedImage = await ImageManipulator.manipulateAsync(
-              file.uri,
-              [{ resize: { width: 1024 } }], // Resize chiều rộng xuống 1024
-              { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG } // Nén 80%, định dạng JPEG
-            );
-
-            const compressedFile = {
-              ...file,
-              uri: resizedImage.uri,
-              fileSize:
-                resizedImage.fileSize || (await getFileSize(resizedImage.uri)), // Cập nhật kích thước
-            };
-
-            // Kiểm tra lại kích thước sau khi nén
-            if (compressedFile.fileSize > 5000000) {
-              dispatch(
-                setError("File size should be less than 5MB after resizing")
-              );
-            } else {
-              const newFiles = [
-                {
-                  url: compressedFile.uri,
-                  file: compressedFile,
-                },
-              ];
-              setSelectedFiles((prev) => [...prev, ...newFiles]);
-            }
-          } catch (error) {
-            console.error("Error resizing image:", error.message);
-            dispatch(setError("Failed to resize image"));
-          }
-        } else {
-          // Nếu file đã nhỏ hơn 5MB
-          const newFiles = [
-            {
-              url: file.uri,
-              file: file,
-            },
-          ];
-          setSelectedFiles((prev) => [...prev, ...newFiles]);
-        }
-      }
-    }
-  };
-
-  // Hàm lấy kích thước file
-  const getFileSize = async (uri) => {
-    const info = await FileSystem.getInfoAsync(uri);
-    return info.size;
-  };
-
-  const removeImage = (index) => {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -162,41 +51,24 @@ const AddDiscussion = ({ onClose }) => {
     setTitle("");
     setDescription("");
     setEndAt("");
-    setSelectedFiles([]);
     setSelectedCategories([]);
   };
 
   const handleAddDiscussion = async () => {
-    const formData = new FormData();
-    formData.append(
-      "request",
-      new Blob(
-        [
-          JSON.stringify({
-            title,
-            description,
-            endAt,
-            categories: selectedCategories,
-          }),
-        ],
-        { type: "application/json" }
-      )
-    );
-
-    selectedFiles.forEach((file) => {
-      formData.append("multipartFiles", {
-        uri: file.uri.startsWith("file://") ? file.uri : `file://${file.uri}`,
-        type: file.type || "image/jpeg",
-        name: file.name || "photo.jpg",
-      });
-    });
-    console.log("formData:", JSON.stringify(formData, null, 2));
     try {
-      const resultAction = await dispatch(addDiscussion(formData));
-      console.log("Result action:", JSON.stringify(resultAction, null, 2));
+      const request = {
+        title,
+        description,
+        endAt,
+        categories: selectedCategories,
+      };
+
+      const resultAction = await dispatch(addDiscussion(request));
+      console.log("Data:", resultAction.payload);
 
       if (addDiscussion.fulfilled.match(resultAction)) {
         await dispatch(setSuccess("Add Discussion successfully"));
+        onAddDiscussion(resultAction.payload);
         clearState();
       } else {
         dispatch(setError(`Error add discussion (${error})`));
@@ -305,34 +177,6 @@ const AddDiscussion = ({ onClose }) => {
               <CategoryMenu
                 onSelectedCategoriesChange={handleSelectedCategoriesChange}
               />
-
-              <View style={styles.imagesSection}>
-                <Text style={styles.label}>Images</Text>
-                <TouchableOpacity
-                  style={styles.uploadButton}
-                  onPress={handleFileChange}
-                >
-                  <FontAwesome name="plus" size={24} />
-                  <Text style={styles.uploadButtonText}>Add Images</Text>
-                </TouchableOpacity>
-
-                <FlatList
-                  data={selectedFiles}
-                  keyExtractor={(item, index) => index.toString()}
-                  renderItem={({ item, index }) => (
-                    <View style={styles.imageContainer}>
-                      <Image source={{ uri: item.url }} style={styles.image} />
-                      <TouchableOpacity
-                        onPress={() => removeImage(index)}
-                        style={styles.removeImageButton}
-                      >
-                        <FontAwesome name="times" size={16} color="white" />
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                  numColumns={3}
-                />
-              </View>
 
               <View style={styles.submitButtonContainer}>
                 <Button
@@ -481,4 +325,3 @@ const styles = StyleSheet.create({
 });
 
 export default memo(AddDiscussion);
-

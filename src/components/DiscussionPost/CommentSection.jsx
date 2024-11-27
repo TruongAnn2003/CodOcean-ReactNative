@@ -10,8 +10,9 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import Comment from "./Comment";
 import CommentInputBox from "./CommentInputBox";
+import { getComments } from "../../services/redux-toolkit/reducers/discussionSlice";
 
-function CommentSection({ comments, onAddComment }) {
+function CommentSection({ comments, onAddComment, onDeleteComment }) {
   const handleAddComment = (commentText) => {
     if (commentText.trim()) {
       onAddComment(commentText);
@@ -27,7 +28,11 @@ function CommentSection({ comments, onAddComment }) {
       </View>
       <ScrollView>
         {comments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
+          <Comment
+            key={comment.id}
+            comment={comment}
+            onDeleteComment={onDeleteComment}
+          />
         ))}
       </ScrollView>
     </View>

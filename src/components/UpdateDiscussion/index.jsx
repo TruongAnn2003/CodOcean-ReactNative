@@ -8,6 +8,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ScrollView,
+  Modal,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -22,7 +24,7 @@ import {
 } from "../../services/redux-toolkit/reducers/messageSlice";
 import CategoryMenu from "../CategoryMenu";
 
-const UpdateDiscussion = ({ post, onClose }) => {
+const UpdateDiscussion = ({ post, onClose, onEditDiscussion }) => {
   const [title, setTitle] = useState(post.title);
   const [description, setDescription] = useState(post.description);
   const [endAt, setEndAt] = useState(post.endAt);
@@ -53,26 +55,29 @@ const UpdateDiscussion = ({ post, onClose }) => {
 
   const handleUpdateDiscussion = async () => {
     try {
+      const request = {
+        title,
+        description,
+        categories: selectedCategories,
+        endAt,
+      };
       const resultAction = await dispatch(
-        updateDiscussion(post.id, {
-          title,
-          description,
-          categories: selectedCategories,
-          endAt,
+        updateDiscussion({
+          id: post.id,
+          request,
         })
       );
       if (updateDiscussion.fulfilled.match(resultAction)) {
-        dispatch(setSuccess("Add Discussion successfully"));
+        dispatch(setSuccess("Edit Discussion successfully"));
         clearState();
+        onEditDiscussion(resultAction.payload);
       } else {
-        dispatch(setError(`Error add discussion (${error})`));
+        dispatch(setError(`Error edit discussion (${error})`));
       }
-    
     } catch (e) {
-      console.error("Error add discussion: ", e);
-    }
-    finally{
-      onClose()
+      console.error("Error edit discussion: ", e);
+    } finally {
+      onClose();
     }
   };
 
@@ -93,178 +98,118 @@ const UpdateDiscussion = ({ post, onClose }) => {
     await setEndAt(currentDate.toISOString());
   };
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Edit Discussion</Text>
+    <Modal visible={true} animationType="slide" transparent>
+      <View className="flex-1 justify-center items-center bg-black/50">
+        <View className="w-11/12 max-h-[90%] bg-white rounded-xl">
+          <ScrollView>
+            <View className="flex-row justify-between items-center p-4 border-b border-gray-200">
+              <Text className="text-xl font-bold text-gray-800">
+                Edit Discussion
+              </Text>
+              <TouchableOpacity onPress={onClose} className="p-2">
+                <FontAwesome name="times" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
 
-      <View style={styles.form}>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Title</Text>
-          <TextInput
-            style={[styles.input, errors.title ? styles.errorInput : null]}
-            value={title}
-            onChangeText={setTitle}
-            placeholder="Enter title"
-          />
-          {errors.title && <Text style={styles.errorMsg}>{errors.title}</Text>}
-        </View>
+            <View className="p-4">
+              <View className="mb-4">
+                <Text className="text-sm font-semibold text-gray-700 mb-1">
+                  Title
+                </Text>
+                <TextInput
+                  className={`w-full p-3 border rounded-lg ${
+                    errors.title ? "border-red-500" : "border-gray-300"
+                  }`}
+                  value={title}
+                  onChangeText={setTitle}
+                  placeholder="Enter title"
+                />
+                {errors.title && (
+                  <Text className="text-red-500 text-xs mt-1">
+                    {errors.title}
+                  </Text>
+                )}
+              </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Description</Text>
-          <TextInput
-            style={[
-              styles.textarea,
-              errors.description ? styles.errorInput : null,
-            ]}
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={4}
-            placeholder="Enter description"
-            ref={inputRef}
-          />
-          {errors.description && (
-            <Text style={styles.errorMsg}>{errors.description}</Text>
-          )}
-        </View>
+              <View className="mb-4">
+                <Text className="text-sm font-semibold text-gray-700 mb-1">
+                  Description
+                </Text>
+                <TextInput
+                  className={`w-full p-3 border rounded-lg min-h-[100px] ${
+                    errors.description ? "border-red-500" : "border-gray-300"
+                  }`}
+                  value={description}
+                  onChangeText={setDescription}
+                  multiline
+                  numberOfLines={4}
+                  placeholder="Enter description"
+                  ref={inputRef}
+                />
+                {errors.description && (
+                  <Text className="text-red-500 text-xs mt-1">
+                    {errors.description}
+                  </Text>
+                )}
+              </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>End Date & Time</Text>
-          <TouchableOpacity
-            style={[styles.input, errors.endAt ? styles.errorInput : null]}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text>
-              {endAt
-                ? new Date(endAt).toLocaleString()
-                : "Select date and time"}
-            </Text>
-          </TouchableOpacity>
-          {errors.endAt && <Text style={styles.errorMsg}>{errors.endAt}</Text>}
-        </View>
+              <View className="mb-4">
+                <Text className="text-sm font-semibold text-gray-700 mb-1">
+                  End Date & Time
+                </Text>
+                <TouchableOpacity
+                  className={`w-full p-3 border rounded-lg ${
+                    errors.endAt ? "border-red-500" : "border-gray-300"
+                  }`}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Text className="text-gray-700">
+                    {endAt
+                      ? new Date(endAt).toLocaleString()
+                      : "Select date and time"}
+                  </Text>
+                </TouchableOpacity>
+                {errors.endAt && (
+                  <Text className="text-red-500 text-xs mt-1">
+                    {errors.endAt}
+                  </Text>
+                )}
+              </View>
 
-        {showDatePicker && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            is24Hour={true}
-            display={"spinner"}
-            onChange={onChange}
-          />
-        )}
+              {showDatePicker && (
+                <DateTimePicker
+                  value={date}
+                  mode="date"
+                  is24Hour={true}
+                  display={"spinner"}
+                  onChange={onChange}
+                />
+              )}
 
-        <CategoryMenu
-          onSelectedCategoriesChange={handleSelectedCategoriesChange}
-        />
+              <CategoryMenu
+                onSelectedCategoriesChange={handleSelectedCategoriesChange}
+              />
 
-        <View style={styles.submitButtonContainer}>
-          <Button
-            title="Cancel"
-            onPress={onClose}
-            buttonStyle={styles.cancelButton}
-          />
-          <Button
-            title="Create Discussion"
-            onPress={handleSubmit}
-            buttonStyle={styles.submitButton}
-          />
+              <View className="flex-row justify-between mt-6">
+                <Button
+                  title="Cancel"
+                  onPress={onClose}
+                  buttonStyle="bg-gray-500 px-6 py-2 rounded-lg"
+                  titleStyle="text-white font-semibold"
+                />
+                <Button
+                  title="Edit Discussion"
+                  onPress={handleSubmit}
+                  buttonStyle="bg-blue-500 px-6 py-2 rounded-lg"
+                  titleStyle="text-white font-semibold"
+                />
+              </View>
+            </View>
+          </ScrollView>
         </View>
       </View>
-    </View>
+    </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  inputGroup: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-  },
-  textarea: {
-    minHeight: 100,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    textAlignVertical: "top",
-  },
-  errorInput: {
-    borderColor: "red",
-  },
-  errorMsg: {
-    marginTop: 5,
-    fontSize: 12,
-    color: "red",
-  },
-  imagesSection: {
-    marginTop: 20,
-  },
-  uploadButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  imageContainer: {
-    position: "relative",
-    margin: 5,
-    borderRadius: 5,
-    overflow: "hidden",
-    width: "30%",
-  },
-  image: {
-    width: "100%",
-    height: 100,
-    objectFit: "cover",
-  },
-  removeImageButton: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-    backgroundColor: "red",
-    borderRadius: 50,
-    padding: 5,
-  },
-  submitButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
-  },
-  submitButton: {
-    backgroundColor: "#007BFF",
-  },
-  cancelButton: {
-    backgroundColor: "#FF6F61",
-  },
-});
 
 export default memo(UpdateDiscussion);
