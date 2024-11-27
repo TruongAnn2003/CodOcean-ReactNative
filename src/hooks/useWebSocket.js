@@ -1,12 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { getTokens } from "../utils/tokenUtils";
 
 const useWebSocket = (onMessageReceived, subscribeUrl) => {
   const stompClientRef = useRef(null);
-  const baseURL =
-    "https://06f8-2001-ee0-51de-d090-95ab-7481-5212-94a3.ngrok-free.app/ws";
+  const baseURL = "https://5d65-113-22-176-182.ngrok-free.app/ws";
 
   const disconnectWebSocket = async () => {
     if (stompClientRef.current) {
@@ -16,7 +15,7 @@ const useWebSocket = (onMessageReceived, subscribeUrl) => {
 
   const connectWebSocket = async () => {
     const { accessToken } = await getTokens();
-    const socket = new SockJS(`${baseURL}`);
+    const socket = new SockJS(baseURL);
 
     const client = new Client({
       webSocketFactory: () => socket,
@@ -25,6 +24,8 @@ const useWebSocket = (onMessageReceived, subscribeUrl) => {
       },
       reconnectDelay: 5000,
       onConnect: () => {
+        console.log("Subscribe URL in onConnect:", subscribeUrl);
+
         client.subscribe(subscribeUrl, (message) => {
           const body = JSON.parse(message.body);
           onMessageReceived(body);
@@ -32,8 +33,15 @@ const useWebSocket = (onMessageReceived, subscribeUrl) => {
       },
       onStompError: (frame) => {
         console.error("STOMP error: ", frame);
-        console.error("Broker reported error: " + frame.headers["message"]);
-        console.error("Additional details: " + frame.body);
+        setTimeout(() => {
+          connectWebSocket();
+        }, 5000);
+      },
+      onWebSocketClose: () => {
+        console.warn("WebSocket closed, attempting to reconnect...");
+        setTimeout(() => {
+          connectWebSocket();
+        }, 5000);
       },
     });
 

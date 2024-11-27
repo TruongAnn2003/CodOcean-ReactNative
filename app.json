@@ -31,7 +31,7 @@
     "plugins": ["expo-localization"],
     "extra": {
       "eas": {
-        "projectId": "CODOCEAN_EAS_PROJECT_ID"
+        "projectId": "43598719-efea-446c-971b-facd268d71fa"
       }
     }
   }

@@ -3,8 +3,7 @@ import { getTokens } from "../../utils/tokenUtils";
 import axiosRetry from "axios-retry";
 // import { REACT_APP_API_URL } from "@env";
 
-const REACT_APP_API_URL =
-  "https://06f8-2001-ee0-51de-d090-95ab-7481-5212-94a3.ngrok-free.app/api";
+const REACT_APP_API_URL = "https://5d65-113-22-176-182.ngrok-free.app/api";
   
 const axiosInstance = axios.create({
   baseURL: REACT_APP_API_URL,

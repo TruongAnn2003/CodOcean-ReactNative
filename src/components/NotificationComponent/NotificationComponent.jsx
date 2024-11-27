@@ -9,6 +9,7 @@ import {
   Pressable,
   Dimensions,
   Image,
+  Platform,
 } from "react-native";
 import { Avatar } from "react-native-paper";
 import Icon from "react-native-vector-icons/Feather";
@@ -31,31 +32,6 @@ Notifications.setNotificationHandler({
   }),
 });
 
-async function registerForPushNotificationsAsync(setExpoPushToken) {
-  try {
-    if (Device.isDevice) {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== "granted") {
-        throw new Error("Permission not granted for push notifications!");
-      }
-
-      const pushToken = (await Notifications.getExpoPushTokenAsync()).data;
-      setExpoPushToken(pushToken);
-      return pushToken;
-    } else {
-      throw new Error("Must use physical device for push notifications");
-    }
-  } catch (error) {
-    console.error("Error registering for push notifications:", error);
-  }
-}
-
 const { width } = Dimensions.get("window");
 
 const NotificationComponent = () => {
@@ -70,30 +46,102 @@ const NotificationComponent = () => {
   const responseListener = useRef();
 
   useEffect(() => {
-    registerForPushNotificationsAsync(setExpoPushToken);
+    const registerForPushNotificationsAsync = async () => {
+      let token;
+      if (Device.isDevice) {
+        const { status: existingStatus } =
+          await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== "granted") {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+        if (finalStatus !== "granted") {
+          alert("Failed to get push token for push notification!");
+          return;
+        }
+        token = (await Notifications.getExpoPushTokenAsync()).data;
+        setExpoPushToken(token);
+      } else {
+        alert("Must use physical device for Push Notifications");
+      }
 
-    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
-      setNotifications((prev) => [notification.request.content, ...prev]);
-      setUnreadCount((prev) => prev + 1);
-    });
+      if (Platform.OS === "android") {
+        Notifications.setNotificationChannelAsync("default", {
+          name: "default",
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: "#FF231F7C",
+        });
+      }
 
-    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log("Notification Response:", response);
-    });
+      return token;
+    };
+
+    registerForPushNotificationsAsync();
+
+    // const scheduleSampleNotification = async () => {
+    //   await Notifications.scheduleNotificationAsync({
+    //     content: {
+    //       title: "Common Notification",
+    //       body: "Admin just sent you a notification!",
+    //       data: {
+    //         ownerImageUrl:
+    //           "https://res.cloudinary.com/du5medjhm/image/upload/v1730821482/avatar-default_vxhm9l.png",
+    //         ownerName: "Hoang",
+    //         message: "Admin just sent you a notification!",
+    //         date: new Date().toISOString(),
+    //       },
+    //     },
+    //     trigger: { seconds: 5 }, // Triggers after 5 seconds
+    //   });
+    // };
+
+    // scheduleSampleNotification();
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        console.log(
+          "Notification Received:",
+          notification.request.content.data
+        );
+        setNotifications((prev) => [
+          notification.request.content.data,
+          ...prev,
+        ]);
+        setUnreadCount((prev) => prev + 1);
+
+        console.log("Notifications:", notifications);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log("Notification Response:", response);
+      });
 
     return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
 
   const handleWebSocketMessage = (message) => {
+    console.log("Message in notification component:", message);
     if (message.content) {
       Notifications.scheduleNotificationAsync({
         content: {
-          title: message.title || "New Notification",
+          title: "Common Notification",
           body: message.content,
-          data: message,
+          data: {
+            id: message.id,
+            content: message.content,
+            receivedTime: message.receivedTime,
+            isRead: message.isRead,
+            ownerImageUrl: message.ownerImageUrl,
+            ownerName: message.ownerName,
+          },
         },
         trigger: null,
       });
@@ -104,7 +152,10 @@ const NotificationComponent = () => {
   };
 
   useWebSocket(handleWebSocketMessage, `/topic/notification/broadcast/${role}`);
-  useWebSocket(handleWebSocketMessage, `/topic/notification/personal/${profile?.email}`);
+  useWebSocket(
+    handleWebSocketMessage,
+    `/topic/notification/personal/${profile?.email}`
+  );
 
   const markAllAsRead = async () => {
     try {
@@ -128,7 +179,9 @@ const NotificationComponent = () => {
       if (setNotificationRead.fulfilled.match(resultAction)) {
         setNotifications((prevNotifications) =>
           prevNotifications.map((notification) =>
-            notification.id === id ? { ...notification, read: true } : notification
+            notification.id === id
+              ? { ...notification, read: true }
+              : notification
           )
         );
         setUnreadCount((prevUnreadCount) => prevUnreadCount - 1);
@@ -147,15 +200,19 @@ const NotificationComponent = () => {
       onPress={() => !item.read && markAsRead(item.id)}
     >
       <View style={styles.notificationContent}>
-        <Avatar.Image 
-          size={50} 
-          source={{ uri: item.ownerImageUrl }} 
+        <Avatar.Image
+          size={50}
+          source={{
+            uri: item.ownerImageUrl || "default_image_url",
+          }}
           style={styles.avatar}
         />
         <View style={styles.textContainer}>
-          <Text style={styles.ownerName}>{item.ownerName}</Text>
-          <Text style={styles.notificationText}>{item.content}</Text>
-          <Text style={styles.timeText}>2 hours ago</Text>
+          <Text style={styles.ownerName}>{item.ownerName || "Unknown"}</Text>
+          <Text style={styles.notificationText}>{item.message || ""}</Text>
+          <Text style={styles.timeText}>
+            {item.date ? new Date(item.date).toLocaleTimeString() : ""}
+          </Text>
         </View>
         {!item.read && <View style={styles.unreadDot} />}
       </View>
@@ -166,7 +223,7 @@ const NotificationComponent = () => {
     dispatch(getNotifications()).then((action) => {
       if (getNotifications.fulfilled.match(action)) {
         setNotifications(action.payload);
-        setUnreadCount(action.payload.filter(n => !n.read).length);
+        setUnreadCount(action.payload.filter((n) => !n.read).length);
       }
     });
   }, [dispatch]);
@@ -179,8 +236,10 @@ const NotificationComponent = () => {
       >
         <Icon name="bell" size={24} color="#FF6B6B" />
         {unreadCount > 0 && (
-          <View style={[styles.badge, { backgroundColor: '#28A745' }]}>
-            <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>{unreadCount}</Text>
+          <View style={[styles.badge, { backgroundColor: "#28A745" }]}>
+            <Text style={[styles.badgeText, { color: "#FFFFFF" }]}>
+              {unreadCount}
+            </Text>
           </View>
         )}
       </TouchableOpacity>
@@ -202,17 +261,17 @@ const NotificationComponent = () => {
                   </View>
                 )}
               </View>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setIsNotificationOpen(false)}
               >
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
-            
+
             {unreadCount > 0 && (
-              <TouchableOpacity 
-                style={styles.markAllButton} 
+              <TouchableOpacity
+                style={styles.markAllButton}
                 onPress={markAllAsRead}
               >
                 <Icon name="check-circle" size={20} color="#1A73E8" />
@@ -223,7 +282,7 @@ const NotificationComponent = () => {
             <FlatList
               data={notifications}
               renderItem={renderNotificationItem}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id}
               style={styles.notificationList}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.listContent}

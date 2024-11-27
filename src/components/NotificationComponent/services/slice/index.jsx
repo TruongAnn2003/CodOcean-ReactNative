@@ -29,7 +29,6 @@ export const getNotifications = createAsyncThunk(
   '/notification/get-notifications/request-auth',
   async ({ pageNumber, limit }, { rejectWithValue }) => {
     try {
-      console.log('pageNumber in getNotifications: ', pageNumber);
       const response = await getNotificationsAPI(pageNumber, limit);
       return response.data;
     } catch (error) {
