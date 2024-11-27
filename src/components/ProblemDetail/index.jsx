@@ -71,7 +71,7 @@ const ProblemDetail = ({ route }) => {
           </View>
         )}
 
-        <View className="flex-row justify-end">
+        {/* <View className="flex-row justify-end">
           <TouchableOpacity 
             onPress={handleForumPress}
             className="flex-row items-center mr-4 bg-blue-500 px-4 py-2 rounded-lg"
@@ -87,7 +87,7 @@ const ProblemDetail = ({ route }) => {
             <FontAwesome name="flag" size={16} color="white" />
             <Text className="text-white ml-2 font-sscsemibold">Report</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     </ScrollView>
   );

@@ -12,6 +12,7 @@ const Statistics = React.lazy(() => import("../../screens/User/Statistics"));
 const Discussions = React.lazy(() => import("../../screens/Discussions"));
 const Setting = React.lazy(() => import("../../screens/Setting"));
 
+
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {

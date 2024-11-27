@@ -41,9 +41,14 @@ const NotificationComponent = () => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notifications, setNotifications] = useState([]);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const notificationListener = useRef();
   const responseListener = useRef();
+  const loader = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [hasMoreNotifications, setHasMoreNotifications] = useState(true);
 
   useEffect(() => {
     const registerForPushNotificationsAsync = async () => {
@@ -193,28 +198,31 @@ const NotificationComponent = () => {
 
   const renderNotificationItem = ({ item }) => (
     <TouchableOpacity
-      style={[
-        styles.notificationItem,
-        { backgroundColor: item.read ? "#F8F9FA" : "#FFFFFF" },
-      ]}
+      className={`p-4 rounded-lg shadow-md ${
+        item.read ? "bg-gray-200" : "bg-blue-50"
+      }`}
       onPress={() => !item.read && markAsRead(item.id)}
     >
-      <View style={styles.notificationContent}>
+      <View className="flex flex-row items-center">
         <Avatar.Image
           size={50}
           source={{
             uri: item.ownerImageUrl || "default_image_url",
           }}
-          style={styles.avatar}
+          className="mr-4"
         />
-        <View style={styles.textContainer}>
-          <Text style={styles.ownerName}>{item.ownerName || "Unknown"}</Text>
-          <Text style={styles.notificationText}>{item.message || ""}</Text>
-          <Text style={styles.timeText}>
-            {item.date ? new Date(item.date).toLocaleTimeString() : ""}
+        <View className="flex-1">
+          <Text className="font-bold text-lg text-blue-900">
+            {item.ownerName || "Unknown"}
+          </Text>
+          <Text className="text-blue-700">{item.content || ""}</Text>
+          <Text className="text-sm text-blue-600">
+            {item.receivedTime
+              ? new Date(item.receivedTime).toLocaleTimeString()
+              : ""}
           </Text>
         </View>
-        {!item.read && <View style={styles.unreadDot} />}
+        {!item.read && <View className="w-3 h-3 bg-red-500 rounded-full" />}
       </View>
     </TouchableOpacity>
   );
@@ -228,16 +236,59 @@ const NotificationComponent = () => {
     });
   }, [dispatch]);
 
+  const fetchNotifications = async (pageNumber) => {
+    setIsLoading(true);
+    try {
+      const limit = 5;
+      const resultAction = await dispatch(
+        getNotifications({ pageNumber, limit })
+      );
+      if (getNotifications.fulfilled.match(resultAction)) {
+        const filteredNotifications = resultAction.payload.filter(
+          (notification) => notification.content
+        );
+        setNotifications((prevNotifications) => [
+          ...prevNotifications,
+          ...filteredNotifications,
+        ]);
+        setUnreadCount(
+          (prevUnreadCount) =>
+            prevUnreadCount +
+            filteredNotifications.filter((n) => !n.read).length
+        );
+        if (filteredNotifications.length <= 0) {
+          setHasMoreNotifications(false);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications(pageNumber);
+  }, [dispatch, pageNumber]);
+
+  const handleScroll = (e) => {
+    e.stopPropagation();
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollHeight - scrollTop <= clientHeight + 30) {
+      setPageNumber((prevPageNumber) => prevPageNumber + 1);
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <View className="relative">
       <TouchableOpacity
         onPress={() => setIsNotificationOpen(true)}
-        style={styles.bellContainer}
+        className="p-3 relative"
       >
         <Icon name="bell" size={24} color="#FF6B6B" />
         {unreadCount > 0 && (
-          <View style={[styles.badge, { backgroundColor: "#28A745" }]}>
-            <Text style={[styles.badgeText, { color: "#FFFFFF" }]}>
+          <View className="absolute top-2 right-2 bg-green-500 min-w-[18px] h-[18px] rounded-full flex justify-center items-center">
+            <Text className="text-white text-xs font-semibold">
               {unreadCount}
             </Text>
           </View>
@@ -250,19 +301,23 @@ const NotificationComponent = () => {
         animationType="slide"
         onRequestClose={() => setIsNotificationOpen(false)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={styles.headerLeft}>
-                <Text style={styles.modalTitle}>Notifications</Text>
+        <View className="flex-1 bg-black bg-opacity-50">
+          <View className="bg-white mt-15 flex-1 rounded-t-2xl shadow-lg">
+            <View className="flex-row justify-between items-center p-5 border-b border-gray-200">
+              <View className="flex-row items-center">
+                <Text className="text-xl font-bold text-gray-900">
+                  Notifications
+                </Text>
                 {unreadCount > 0 && (
-                  <View style={styles.countBadge}>
-                    <Text style={styles.countText}>{unreadCount}</Text>
+                  <View className="bg-blue-500 px-2 py-1 rounded-full ml-2">
+                    <Text className="text-white text-sm font-semibold">
+                      {unreadCount}
+                    </Text>
                   </View>
                 )}
               </View>
               <TouchableOpacity
-                style={styles.closeButton}
+                className="p-1"
                 onPress={() => setIsNotificationOpen(false)}
               >
                 <MaterialIcons name="close" size={24} color="#666" />
@@ -271,11 +326,13 @@ const NotificationComponent = () => {
 
             {unreadCount > 0 && (
               <TouchableOpacity
-                style={styles.markAllButton}
+                className="flex-row items-center p-4 bg-gray-100 mx-4 my-2 rounded-lg"
                 onPress={markAllAsRead}
               >
                 <Icon name="check-circle" size={20} color="#1A73E8" />
-                <Text style={styles.markAllText}>Mark all as read</Text>
+                <Text className="ml-2 text-blue-600 font-semibold">
+                  Mark all as read
+                </Text>
               </TouchableOpacity>
             )}
 
@@ -283,9 +340,10 @@ const NotificationComponent = () => {
               data={notifications}
               renderItem={renderNotificationItem}
               keyExtractor={(item) => item.id}
-              style={styles.notificationList}
+              className="flex-1"
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.listContent}
+              contentContainerStyle="px-4"
+              onScroll={handleScroll}
             />
           </View>
         </View>
@@ -293,151 +351,5 @@ const NotificationComponent = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    position: "relative",
-  },
-  bellContainer: {
-    padding: 12,
-    position: "relative",
-  },
-  badge: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    backgroundColor: "#FF4444",
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  badgeText: {
-    color: "white",
-    fontSize: 11,
-    fontWeight: "600",
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    marginTop: 60,
-    flex: 1,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
-  },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#1A1A1A",
-  },
-  countBadge: {
-    backgroundColor: "#1A73E8",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginLeft: 8,
-  },
-  countText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  closeButton: {
-    padding: 4,
-  },
-  markAllButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 15,
-    backgroundColor: "#F8F9FA",
-    marginHorizontal: 15,
-    marginVertical: 10,
-    borderRadius: 8,
-  },
-  markAllText: {
-    marginLeft: 8,
-    color: "#1A73E8",
-    fontWeight: "600",
-  },
-  notificationList: {
-    flex: 1,
-  },
-  listContent: {
-    paddingHorizontal: 15,
-  },
-  notificationItem: {
-    marginVertical: 8,
-    padding: 15,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  notificationContent: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  avatar: {
-    backgroundColor: "#F0F0F0",
-  },
-  textContainer: {
-    flex: 1,
-    marginLeft: 15,
-    marginRight: 25,
-  },
-  ownerName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#1A1A1A",
-    marginBottom: 4,
-  },
-  notificationText: {
-    fontSize: 14,
-    color: "#666666",
-    lineHeight: 20,
-  },
-  timeText: {
-    fontSize: 12,
-    color: "#999999",
-    marginTop: 6,
-  },
-  unreadDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#1A73E8",
-    position: "absolute",
-    right: 0,
-  },
-});
 
 export default NotificationComponent;
