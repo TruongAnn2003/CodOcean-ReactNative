@@ -38,12 +38,12 @@ const Profile = () => {
           <Text className="font-sscsemibold text-secondary">My Problems</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => handleNavigate("MyDiscuss")}
           className="flex-1 items-center bg-white rounded-lg shadow-md p-2 mx-2"
         >
           <Text className="font-sscsemibold text-secondary">My Discuss</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           onPress={() => handleNavigate("Statistics")}

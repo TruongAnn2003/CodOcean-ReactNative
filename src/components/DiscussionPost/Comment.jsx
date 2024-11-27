@@ -113,6 +113,21 @@ const Comment = ({ comment, onDeleteComment }) => {
     onDeleteComment(id);
     await handleFetchReplies();
   };
+  const onDeleteReply = async (commentId) => {
+    try {
+      const resultAction = await dispatch(deleteComment(commentId));
+      if (deleteComment.fulfilled.match(resultAction)) {
+        setReplies((prevReplies) =>
+          prevReplies.filter((reply) => reply.id !== commentId)
+        );
+        alert("Comment deleted successfully");
+      } else {
+        alert(`Failed to delete comment: ${error}`);
+      }
+    } catch (e) {
+      alert(`Failed to delete comment: ${e}`);
+    }
+  };
 
   return (
     <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
@@ -164,7 +179,11 @@ const Comment = ({ comment, onDeleteComment }) => {
 
       {showReplies && (
         <View className="mt-3 pl-4 border-l-2 border-gray-100">
-          <CommentSection comments={replies} onAddComment={handleReply} />
+          <CommentSection
+            comments={replies}
+            onAddComment={handleReply}
+            onDeleteComment={onDeleteReply}
+          />
         </View>
       )}
 
